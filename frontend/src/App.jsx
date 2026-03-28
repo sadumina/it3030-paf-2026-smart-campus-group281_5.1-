@@ -7,7 +7,7 @@ function App() {
       <header className="navbar">
         <div className="navbar-container">
           <div className="logo">
-            <h1>🏫 Smart Campus</h1>
+            <h1>✨ Smart Study Operation Hub</h1>
           </div>
           <nav className="nav-links">
             <a href="#features">Features</a>
@@ -24,79 +24,99 @@ function App() {
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-content">
-          <h2>Welcome to Smart Campus</h2>
-          <p className="hero-subtitle">Transform your campus experience with intelligent solutions</p>
+          <h2>Welcome to Smart Study Operation Hub</h2>
+          <p className="hero-subtitle">Revolutionize Your Learning Experience</p>
           <p className="hero-description">
-            Manage resources, connect with the community, and optimize campus life with our comprehensive platform
+            Optimize study sessions, collaborate with peers, and master your academics with cutting-edge smart learning technology
           </p>
           <div className="hero-buttons">
-            <button className="btn-primary">Get Started</button>
-            <button className="btn-secondary">Learn More</button>
+            <button className="btn-primary">Get Started Now</button>
+            <button className="btn-secondary">Explore Platform</button>
           </div>
         </div>
         <div className="hero-image">
-          <div className="placeholder-image">📚</div>
+          <div className="placeholder-image">🚀</div>
         </div>
       </section>
 
       {/* Features Section */}
       <section id="features" className="features">
-        <h2>Key Features</h2>
+        <h2>Powerful Features</h2>
         <div className="features-grid">
           <div className="feature-card">
-            <div className="feature-icon">🗓️</div>
-            <h3>Event Management</h3>
-            <p>Organize and manage campus events effortlessly</p>
+            <div className="feature-icon">📚</div>
+            <h3>Smart Study Planner</h3>
+            <p>AI-powered study schedules tailored to your learning pace</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🏢</div>
-            <h3>Resource Booking</h3>
-            <p>Book facilities and resources with ease</p>
-          </div>
-          <div className="feature-card">
-            <div className="feature-icon">👥</div>
-            <h3>Community Connect</h3>
-            <p>Connect with students and staff across campus</p>
+            <div className="feature-icon">🤝</div>
+            <h3>Collaborative Learning</h3>
+            <p>Study groups, peer mentoring, and knowledge sharing</p>
           </div>
           <div className="feature-card">
             <div className="feature-icon">📊</div>
-            <h3>Analytics & Reports</h3>
-            <p>Get insights into campus activities and usage</p>
+            <h3>Performance Analytics</h3>
+            <p>Track progress and identify improvement areas</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🔔</div>
-            <h3>Smart Notifications</h3>
-            <p>Stay updated with real-time notifications</p>
+            <div className="feature-icon">💡</div>
+            <h3>Resource Library</h3>
+            <p>Access thousands of study materials and expert content</p>
           </div>
           <div className="feature-card">
-            <div className="feature-icon">🔒</div>
-            <h3>Secure & Reliable</h3>
-            <p>Your data is protected with enterprise security</p>
+            <div className="feature-icon">🎯</div>
+            <h3>Goal Tracking</h3>
+            <p>Set, monitor, and achieve your academic milestones</p>
+          </div>
+          <div className="feature-card">
+            <div className="feature-icon">🔐</div>
+            <h3>Secure Platform</h3>
+            <p>Enterprise-grade security for all your academic data</p>
           </div>
         </div>
       </section>
 
       {/* About Section */}
       <section id="about" className="about">
-        <h2>About Smart Campus</h2>
+        <h2>About Smart Study Operation Hub</h2>
         <p>
-          Smart Campus is a comprehensive platform designed to streamline campus operations and enhance the student and staff experience. Our mission is to make campus life more connected, efficient, and enjoyable.
+          Smart Study Operation Hub empowers students and educators with intelligent tools to enhance learning outcomes. We combine AI, analytics, and collaborative features to create the ultimate academic platform. Join thousands of learners transforming their educational journey.
         </p>
+      </section>
+
+      {/* Stats Section */}
+      <section className="stats">
+        <div className="stat-card">
+          <h3>10K+</h3>
+          <p>Active Students</p>
+        </div>
+        <div className="stat-card">
+          <h3>500+</h3>
+          <p>Study Resources</p>
+        </div>
+        <div className="stat-card">
+          <h3>95%</h3>
+          <p>Success Rate</p>
+        </div>
+        <div className="stat-card">
+          <h3>24/7</h3>
+          <p>Support Available</p>
+        </div>
       </section>
 
       {/* CTA Section */}
       <section className="cta">
-        <h2>Ready to Transform Your Campus?</h2>
-        <p>Join institutions worldwide using Smart Campus</p>
-        <button className="btn-cta">Start Your Journey Today</button>
+        <h2>Ready to Transform Your Studies?</h2>
+        <p>Join the smart learning revolution today</p>
+        <button className="btn-cta">Start Free Trial</button>
       </section>
 
       {/* Footer */}
       <footer className="footer">
         <div className="footer-content">
           <div className="footer-section">
-            <h4>Smart Campus</h4>
-            <p>Empowering campus communities worldwide</p>
+            <h4>Smart Study Hub</h4>
+            <p>Empowering learners worldwide with smart education technology</p>
           </div>
           <div className="footer-section">
             <h4>Quick Links</h4>
@@ -115,79 +135,10 @@ function App() {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2024 Smart Campus. All rights reserved.</p>
+          <p>&copy; 2024 Smart Study Operation Hub. All rights reserved.</p>
         </div>
       </footer>
     </div>
-  )
-}
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
   )
 }
 
