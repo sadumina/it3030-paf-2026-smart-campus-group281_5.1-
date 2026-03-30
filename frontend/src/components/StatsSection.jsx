@@ -4,26 +4,26 @@ import { Megaphone, Lightbulb, Video, Layers } from "lucide-react";
 const services = [
   {
     icon: Megaphone,
-    title: "Social pulse",
-    description: "Realtime content calendars, approvals, and personalized rollouts.",
+    title: "Module A · Catalogue",
+    description: "Searchable inventory of lecture halls, labs, and equipment with status, capacity, and availability windows.",
     accent: "from-[#ffe6cc] to-[#fff7ed]",
   },
   {
     icon: Lightbulb,
-    title: "Marketing science",
-    description: "Experiment dashboards that surface insights and ready-to-use actions.",
+    title: "Module B · Booking",
+    description: "Conflict-free booking workflow with PENDING→APPROVED/REJECTED transitions and audit notes.",
     accent: "from-[#ffe4ec] to-white",
   },
   {
     icon: Video,
-    title: "Viral engine",
-    description: "Short-form storytelling kits paired with performance snapshots.",
+    title: "Module C · Incident",
+    description: "Maintenance ticketing with categories, attachments, technician assignment, and OPEN→CLOSED lifecycle.",
     accent: "from-[#e7f8ff] to-white",
   },
   {
     icon: Layers,
-    title: "Other delights",
-    description: "UX polish, onboarding scripts, and partner enablement in one place.",
+    title: "Module D · Notifications",
+    description: "Real-time notification tray for approvals, ticket updates, and threaded comments across roles.",
     accent: "from-[#fef3f2] to-white",
   },
 ];
@@ -46,10 +46,10 @@ export default function StatsSection() {
 
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto">
-          <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-400">Services</p>
-          <h2 className="mt-4 text-4xl font-semibold text-slate-900">We provide the best services</h2>
+          <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-400">Core modules</p>
+          <h2 className="mt-4 text-4xl font-semibold text-slate-900">Everything the campus team needs</h2>
           <p className="mt-3 text-slate-500">
-            Crafted service pods keep strategy, creative, and data flowing together. No handoffs, just delightful dashboards.
+            CampusFlow honors the IT3030 assignment scope with a catalogue, bookings, incident ticketing, and notification center out of the box.
           </p>
         </div>
 
@@ -67,7 +67,7 @@ export default function StatsSection() {
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900">{service.title}</h3>
                 <p className="mt-2 text-sm text-slate-500">{service.description}</p>
-                <div className="mt-6 text-sm font-semibold text-orange-500">Explore more →</div>
+                <div className="mt-6 text-sm font-semibold text-orange-500">See details →</div>
               </motion.div>
             );
           })}

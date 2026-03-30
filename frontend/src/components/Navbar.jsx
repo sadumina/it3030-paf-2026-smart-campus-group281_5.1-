@@ -25,22 +25,22 @@ export default function Navbar() {
             className="cursor-pointer flex flex-col leading-tight"
           >
             <span className="text-2xl font-black tracking-tight text-transparent bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 bg-clip-text">
-              BrandHive
+              CampusFlow
             </span>
             <span className="text-[11px] font-semibold uppercase tracking-[0.4em] text-orange-400">
-              campus studio
+              operations hub
             </span>
           </div>
 
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
             <a href="#services" className="hover:text-orange-500 transition-colors">
-              Services
+              Modules
             </a>
             <a href="#solutions" className="hover:text-orange-500 transition-colors">
-              Solutions
+              Workflow
             </a>
             <a href="#agency" className="hover:text-orange-500 transition-colors">
-              Agency
+              Governance
             </a>
             <a href="#testimonials" className="hover:text-orange-500 transition-colors">
               Stories

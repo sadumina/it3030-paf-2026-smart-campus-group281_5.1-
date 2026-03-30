@@ -42,9 +42,9 @@ export default function Footer() {
         >
           <motion.div variants={itemVariants} className="flex flex-col gap-4 rounded-[32px] border border-orange-100 bg-white/80 p-8 text-center shadow-[0_20px_60px_rgba(15,23,42,.08)]">
             <div className="text-2xl font-black tracking-tight text-transparent bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 bg-clip-text">
-              BrandHive
+              CampusFlow
             </div>
-            <p className="text-sm text-slate-500">Warm dashboards for marketing, product, and student engagement teams.</p>
+            <p className="text-sm text-slate-500">The smart campus hub for catalogues, bookings, incidents, and notifications.</p>
           </motion.div>
 
           <motion.div
@@ -52,10 +52,10 @@ export default function Footer() {
             className="mt-12 grid grid-cols-1 gap-10 text-sm text-slate-600 sm:grid-cols-2 lg:grid-cols-4"
           >
             {[
-              { title: "Company", links: ["About", "Culture", "Careers", "Press"] },
-              { title: "Services", links: ["Brand systems", "Campaign ops", "Automation", "Advisory"] },
-              { title: "Resources", links: ["Guide", "Case studies", "Newsletter", "Events"] },
-              { title: "Support", links: ["Contact", "Status", "Security", "Terms"] },
+              { title: "Company", links: ["About", "Roadmap", "Careers", "Press"] },
+              { title: "Modules", links: ["Catalogue", "Bookings", "Incidents", "Notifications"] },
+              { title: "Resources", links: ["Implementation guide", "Case studies", "Security brief", "Events"] },
+              { title: "Support", links: ["Contact", "Status", "OAuth setup", "Terms"] },
             ].map((column) => (
               <motion.div key={column.title} variants={itemVariants}>
                 <h4 className="text-base font-semibold text-slate-900">{column.title}</h4>

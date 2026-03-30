@@ -4,23 +4,23 @@ import { MessageCircle, ClipboardCheck, CreditCard, ShieldCheck } from "lucide-r
 const steps = [
   {
     icon: MessageCircle,
-    title: "Contact us",
-    copy: "Drop your brief or challenges and meet the squad in 24 hours.",
+    title: "Catalogue",
+    copy: "Faculty staff maintain the live inventory with capacity, location, and status tags.",
   },
   {
     icon: ClipboardCheck,
-    title: "Consult",
-    copy: "We sketch a journey map, show moodboards, and align on KPIs.",
+    title: "Book & approve",
+    copy: "Users submit booking intents; admins review conflicts, note decisions, and assign roles.",
   },
   {
     icon: CreditCard,
-    title: "Place order",
-    copy: "Streamlined proposals, transparent pricing, and milestone tracking.",
+    title: "Raise incidents",
+    copy: "Any stakeholder can log tickets with attachments, priority, and preferred contact info.",
   },
   {
     icon: ShieldCheck,
-    title: "Payment",
-    copy: "Secure checkout plus live support as we launch together.",
+    title: "Resolve & audit",
+    copy: "Technicians update statuses, record resolutions, and CampusFlow logs every step for audits.",
   },
 ];
 
@@ -33,9 +33,9 @@ export default function FeaturesSection() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-500">Simple solutions</p>
-              <h2 className="mt-4 text-4xl font-semibold text-slate-900">We understand no two businesses are alike.</h2>
+              <h2 className="mt-4 text-4xl font-semibold text-slate-900">A transparent workflow for campus ops.</h2>
               <p className="mt-4 text-slate-600">
-                Tap into our human-centered process that blends research, craft, and automation. Every phase is visible inside BrandHive so you always know what is next.
+                From asset catalogues to incident tickets, every interaction travels through a logged workflow that satisfies IT3030 requirements for auditability and role-based control.
               </p>
 
               <div className="mt-8 space-y-5">
@@ -60,10 +60,10 @@ export default function FeaturesSection() {
 
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <button className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-orange-500 shadow-lg shadow-orange-200/70">
-                  Get started
+                  Launch a booking
                 </button>
                 <button className="rounded-full border border-white/60 px-8 py-3 text-sm font-semibold text-white/80">
-                  Read more
+                  View audit log
                 </button>
               </div>
             </div>
@@ -76,20 +76,20 @@ export default function FeaturesSection() {
                 transition={{ duration: 0.8 }}
                 className="rounded-[32px] border border-white/60 bg-white/80 p-8 backdrop-blur"
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.4em] text-orange-300">workflow</p>
-                    <h3 className="text-2xl font-semibold text-slate-900">Live project board</h3>
-                  </div>
-                  <span className="rounded-full bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-500">In progress</span>
-                </div>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.4em] text-orange-300">workflow</p>
+                        <h3 className="text-2xl font-semibold text-slate-900">Campus approval board</h3>
+                      </div>
+                      <span className="rounded-full bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-500">5 actions due</span>
+                    </div>
 
                 <div className="mt-8 space-y-5">
-                  {["Discovery", "Design", "Delivery"].map((phase, index) => (
+                  {["Facility review", "Booking queue", "Incident desk"].map((phase, index) => (
                     <div key={phase} className="rounded-2xl border border-orange-50 bg-orange-50/40 p-4">
                       <div className="flex items-center justify-between text-sm font-semibold text-slate-600">
                         <span>{phase}</span>
-                        <span>{index === 0 ? "Done" : index === 1 ? "Now" : "Next"}</span>
+                        <span>{index === 0 ? "Synced" : index === 1 ? "In review" : "Open"}</span>
                       </div>
                       <div className="mt-3 flex items-center gap-3">
                         <div className="flex -space-x-3">

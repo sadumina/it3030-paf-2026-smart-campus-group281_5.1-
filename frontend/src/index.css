@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -16,10 +16,10 @@ html, body, #root {
 }
 
 body {
-  font-family: 'Poppins', 'Segoe UI', 'Helvetica Neue', sans-serif;
+  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: radial-gradient(circle at top, #fff5e6, #fffaf5 55%, #ffffff);
+  background: radial-gradient(circle at 20% 20%, #eef4ff, #fafbff 55%, #ffffff);
   color: #1f2937;
   line-height: 1.6;
 }

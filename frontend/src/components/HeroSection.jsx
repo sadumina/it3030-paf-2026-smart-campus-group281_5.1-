@@ -4,19 +4,19 @@ import { ArrowRight, Play, Star, Sparkles } from "lucide-react";
 
 const highlightMetrics = [
   {
-    label: "Campaigns delivered",
-    value: "320+",
-    detail: "cross-channel launches",
+    label: "Resources tracked",
+    value: "480+",
+    detail: "rooms, labs & assets",
   },
   {
-    label: "Avg. conversion",
-    value: "4.3x",
-    detail: "vs. last quarter",
+    label: "Conflict-free bookings",
+    value: "99.4%",
+    detail: "automated validation",
   },
   {
-    label: "Client rating",
-    value: "4.9/5",
-    detail: "experience score",
+    label: "Incidents resolved",
+    value: "3.2h",
+    detail: "median resolution time",
   },
 ];
 
@@ -48,18 +48,18 @@ export default function HeroSection() {
             className="space-y-8"
           >
             <div className="inline-flex items-center rounded-full border border-orange-200/80 bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">
-              Rise & shine brands
+              Smart campus operations
             </div>
 
             <h1 className="text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl lg:text-[56px]">
-              We craft warm, human dashboards
+              One platform for bookings, incidents,
               <span className="block text-transparent bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 bg-clip-text">
-                for bold campus teams
+                and audit-ready workflows
               </span>
             </h1>
 
             <p className="text-lg text-slate-600">
-              BrandHive blends storytelling, analytics, and automation to keep every stakeholder aligned. Launch thoughtful experiences, measure what matters, and stay inspired.
+              CampusFlow brings facility catalogues, booking approvals, maintenance tickets, role-based access, and notifications into a single web command center tailored for universities.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row">
@@ -104,24 +104,24 @@ export default function HeroSection() {
               <div className="mb-8 flex items-center justify-between">
                 <div>
                   <p className="text-xs uppercase tracking-[0.3em] text-orange-300">live dashboard</p>
-                  <h3 className="text-2xl font-semibold text-slate-900">Engagement Pulse</h3>
+                  <h3 className="text-2xl font-semibold text-slate-900">Operations heartbeat</h3>
                 </div>
                 <div className="rounded-full bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-500">
-                  +18% today
+                  OAuth secure
                 </div>
               </div>
 
               <div className="space-y-6">
-                {["Strategy", "Campaign", "Care"].map((label, index) => (
+                {["Catalogue", "Bookings", "Incidents"].map((label, index) => (
                   <div key={label}>
                     <div className="flex items-center justify-between text-sm font-semibold text-slate-500">
-                      <span>{label} flow</span>
-                      <span>{index === 0 ? "92%" : index === 1 ? "78%" : "65%"}</span>
+                      <span>{label} health</span>
+                      <span>{index === 0 ? "100%" : index === 1 ? "86%" : "72%"}</span>
                     </div>
                     <div className="mt-2 h-2 rounded-full bg-orange-50">
                       <motion.div
                         initial={{ width: 0 }}
-                        whileInView={{ width: index === 0 ? "92%" : index === 1 ? "78%" : "65%" }}
+                        whileInView={{ width: index === 0 ? "100%" : index === 1 ? "86%" : "72%" }}
                         viewport={{ once: true }}
                         transition={{ duration: 1.2, ease: "easeOut" }}
                         className="h-2 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500"
@@ -133,8 +133,8 @@ export default function HeroSection() {
 
               <div className="mt-10 rounded-2xl bg-gradient-to-br from-orange-100 via-white to-rose-50 p-5">
                 <p className="text-sm font-semibold text-orange-400">Next milestone</p>
-                <p className="text-xl font-semibold text-slate-900">Quarterly showcase on Apr 18</p>
-                <p className="text-sm text-slate-500">Content, design, and analytics packs already synced.</p>
+                <p className="text-xl font-semibold text-slate-900">Semester readiness review – Apr 18</p>
+                <p className="text-sm text-slate-500">Facility audits, technician rosters, and SLA baselines synced.</p>
               </div>
             </div>
 

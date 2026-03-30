@@ -3,37 +3,37 @@ import { PieChart, Target, TrendingUp, Quote, Star } from "lucide-react";
 
 const agencyHighlights = [
   {
-    title: "Analytics-first decisions",
-    copy: "Our analysts turn messy dashboards into poetic prompts you can act on.",
+    title: "Audit-ready logs",
+    copy: "Every booking, approval, and incident status change is time stamped and role-attributed.",
     icon: PieChart,
   },
   {
-    title: "Creative sprints",
-    copy: "Weekly rituals keep copy, design, and dev shipping in one rhythm.",
+    title: "Role-based control",
+    copy: "USER, ADMIN, and TECHNICIAN roles gate who can approve, assign, or close tickets.",
     icon: Target,
   },
   {
-    title: "ROI playbooks",
-    copy: "Proactive experiments and automation recipes to scale what works.",
+    title: "Actionable analytics",
+    copy: "Utilization and SLA widgets highlight bottlenecks across facilities and maintenance.",
     icon: TrendingUp,
   },
 ];
 
 const testimonials = [
   {
-    name: "Anjali Perera",
-    role: "CX Lead, SunLabs",
-    quote: "The warm visuals and clarity changed how our execs review campaigns.",
+    name: "Dr. Nuwani K.",
+    role: "Dean of Engineering",
+    quote: "I finally approve lab requests with full context and zero email chains.",
   },
   {
-    name: "David Hasan",
-    role: "Product Marketing, Altura",
-    quote: "BrandHive keeps our global team synced without endless check-ins.",
+    name: "Ruwan Senanayake",
+    role: "Facilities Director",
+    quote: "Technicians update tickets on tablets and students see progress instantly.",
   },
   {
-    name: "Mel Torres",
-    role: "Founder, Nook Studio",
-    quote: "Feels like having an embedded design partner that actually understands growth.",
+    name: "Ishara Fernando",
+    role: "IT Services Lead",
+    quote: "OAuth login + notifications tick every requirement in our security plan.",
   },
 ];
 
@@ -56,10 +56,10 @@ export default function WorkflowSection() {
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-400">Our Agency</p>
-            <h2 className="mt-4 text-4xl font-semibold text-slate-900">Data-powered creativity with warmth.</h2>
+            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-400">Governance</p>
+            <h2 className="mt-4 text-4xl font-semibold text-slate-900">Auditability without friction.</h2>
             <p className="mt-4 text-slate-600">
-              We believe emotions and evidence can co-exist. Our dashboards keep strategy transparent while the design language feels calm and human.
+              CampusFlow captures every touch—from OAuth login to technician updates—so accreditation reviews, SOC checks, and semester planning all reference the same immutable trail.
             </p>
 
             <div className="mt-10 space-y-5">
@@ -80,7 +80,7 @@ export default function WorkflowSection() {
             </div>
 
             <button className="mt-8 rounded-full bg-gradient-to-r from-orange-500 to-rose-500 px-8 py-3 text-sm font-semibold text-white shadow-[0_15px_35px_rgba(249,115,22,.35)]">
-              Read more
+              View compliance pack
             </button>
           </div>
 
@@ -93,11 +93,11 @@ export default function WorkflowSection() {
           >
             <div className="rounded-[32px] border border-orange-100 bg-white/90 p-8 shadow-[0_30px_80px_rgba(15,23,42,.08)]">
               <p className="text-xs uppercase tracking-[0.4em] text-orange-300">insight mural</p>
-              <h3 className="mt-2 text-3xl font-semibold text-slate-900">Campaign intelligence</h3>
-              <p className="text-sm text-slate-500">All touchpoints layered into one friendly dashboard.</p>
+              <h3 className="mt-2 text-3xl font-semibold text-slate-900">Campus intelligence</h3>
+              <p className="text-sm text-slate-500">Bookings, incidents, and notifications layered into one friendly dashboard.</p>
 
               <div className="mt-8 grid gap-5">
-                {["Brand health", "Launch velocity", "Retention"].map((metric, index) => (
+                {["Utilization", "Approval speed", "SLA success"].map((metric, index) => (
                   <div key={metric} className="rounded-2xl bg-orange-50/60 p-4">
                     <div className="flex items-center justify-between text-sm font-semibold text-slate-600">
                       <span>{metric}</span>
@@ -141,9 +141,9 @@ export default function WorkflowSection() {
 
         <div id="testimonials" className="mt-24">
           <div className="text-center">
-            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-400">What clients say</p>
-            <h2 className="mt-4 text-4xl font-semibold text-slate-900">Human stories, real results.</h2>
-            <p className="mt-3 text-slate-500">See how teams describe working inside the BrandHive dashboard.</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-400">What campuses say</p>
+            <h2 className="mt-4 text-4xl font-semibold text-slate-900">Operational calm, proven.</h2>
+            <p className="mt-3 text-slate-500">Administrators, technicians, and IT leads share how CampusFlow fits their daily workflow.</p>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">

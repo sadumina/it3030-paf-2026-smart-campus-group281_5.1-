@@ -34,21 +34,21 @@ export default function CTASection() {
               <div className="rounded-2xl bg-white/15 p-3">
                 <Sparkles className="h-6 w-6" />
               </div>
-              <span className="text-sm font-semibold uppercase tracking-[0.4em]">Ready?</span>
+              <span className="text-sm font-semibold uppercase tracking-[0.4em]">Campus ready</span>
             </div>
-            <h2 className="mt-6 text-4xl font-semibold text-white">Ready to get started?</h2>
+            <h2 className="mt-6 text-4xl font-semibold text-white">Ready to streamline bookings and incidents?</h2>
             <p className="mt-3 text-white/80">
-              Schedule a strategy call or jump straight into the dashboard. We’ll help you set up campaigns, migrate data, and train your team.
+              Plug in your Google OAuth keys, import resources, and let CampusFlow handle catalogue updates, approvals, ticketing, and notifications from one browser tab.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 text-white/80 sm:flex-row">
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-white" />
-                Faster onboarding with curated templates.
+                Module A–D templates included.
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-white" />
-                Live people, not chatbots.
+                Notification center + audit feed.
               </div>
             </div>
 
@@ -74,9 +74,9 @@ export default function CTASection() {
             className="rounded-[28px] border border-white/30 bg-white/10 p-6 text-white"
           >
             <p className="text-sm uppercase tracking-[0.4em] text-white/60">Need help?</p>
-            <h3 className="mt-2 text-2xl font-semibold">Talk to a strategist</h3>
+            <h3 className="mt-2 text-2xl font-semibold">Talk to an operations coach</h3>
             <p className="mt-2 text-white/80">+94 71 555 2314</p>
-            <p className="text-white/70">hello@brandhive.co</p>
+            <p className="text-white/70">ops@campusflow.io</p>
             <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-white/15 py-3 text-sm font-semibold">
               <PhoneCall className="h-4 w-4" />
               Contact us
