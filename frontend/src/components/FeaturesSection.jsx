@@ -1,179 +1,119 @@
 import { motion } from "framer-motion";
-import {
-  Calendar,
-  CheckCircle,
-  AlertCircle,
-  Zap,
-} from "lucide-react";
+import { MessageCircle, ClipboardCheck, CreditCard, ShieldCheck } from "lucide-react";
+
+const steps = [
+  {
+    icon: MessageCircle,
+    title: "Contact us",
+    copy: "Drop your brief or challenges and meet the squad in 24 hours.",
+  },
+  {
+    icon: ClipboardCheck,
+    title: "Consult",
+    copy: "We sketch a journey map, show moodboards, and align on KPIs.",
+  },
+  {
+    icon: CreditCard,
+    title: "Place order",
+    copy: "Streamlined proposals, transparent pricing, and milestone tracking.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Payment",
+    copy: "Secure checkout plus live support as we launch together.",
+  },
+];
 
 export default function FeaturesSection() {
-  const features = [
-    {
-      icon: Calendar,
-      title: "Smart Booking System",
-      description:
-        "Intuitive scheduling with conflict detection, resource allocation, and instant confirmations.",
-      gradient: "from-purple-500 to-pink-500",
-      bgGradient: "from-purple-50 to-pink-50",
-    },
-    {
-      icon: CheckCircle,
-      title: "Intelligent Approvals",
-      description:
-        "Automated approval workflows with customizable rules and instant notifications.",
-      gradient: "from-blue-500 to-cyan-400",
-      bgGradient: "from-blue-50 to-cyan-50",
-    },
-    {
-      icon: AlertCircle,
-      title: "Incident Management",
-      description:
-        "Real-time incident tracking, prioritization, and assignment to the right teams.",
-      gradient: "from-pink-500 to-red-500",
-      bgGradient: "from-pink-50 to-red-50",
-    },
-    {
-      icon: Zap,
-      title: "Rapid Resolution",
-      description:
-        "AI-powered solutions and automated workflows to resolve issues in minutes, not hours.",
-      gradient: "from-cyan-400 to-blue-500",
-      bgGradient: "from-cyan-50 to-blue-50",
-    },
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 },
-    },
-  };
-
   return (
-    <section
-      id="features"
-      className="relative py-24 bg-gradient-to-b from-white via-purple-50/20 to-white overflow-hidden"
-    >
-      {/* Decorative Elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          animate={{
-            x: [0, 50, -50, 0],
-            y: [0, -80, 80, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute -top-32 -right-32 w-96 h-96 bg-gradient-to-r from-blue-300 to-cyan-300 rounded-full filter blur-3xl opacity-15"
-        />
-        <motion.div
-          animate={{
-            x: [0, -60, 60, 0],
-            y: [0, 100, -100, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute -bottom-32 -left-32 w-96 h-96 bg-gradient-to-r from-purple-300 to-pink-300 rounded-full filter blur-3xl opacity-15"
-        />
-      </div>
+    <section id="solutions" className="relative py-24">
+      <div className="absolute inset-x-0 top-12 mx-auto h-[70%] max-w-5xl rounded-[50px] bg-[#fff0e0] blur-[120px]" />
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="overflow-hidden rounded-[40px] bg-gradient-to-br from-[#fff6ed] via-[#ffe3cc] to-[#ffd3bf] p-10 shadow-[0_40px_120px_rgba(249,115,22,.18)]">
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-500">Simple solutions</p>
+              <h2 className="mt-4 text-4xl font-semibold text-slate-900">We understand no two businesses are alike.</h2>
+              <p className="mt-4 text-slate-600">
+                Tap into our human-centered process that blends research, craft, and automation. Every phase is visible inside BrandHive so you always know what is next.
+              </p>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <div className="inline-block mb-4 px-4 py-2 bg-gradient-to-r from-purple-100 to-cyan-100 rounded-full border border-purple-200/50 backdrop-blur-sm">
-            <span className="bg-gradient-to-r from-purple-600 to-cyan-600 bg-clip-text text-transparent font-semibold text-sm">
-              Core Features
-            </span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Everything You Need
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Comprehensive campus management solutions in one powerful platform
-          </p>
-        </motion.div>
+              <div className="mt-8 space-y-5">
+                {steps.map((step, index) => {
+                  const Icon = step.icon;
+                  return (
+                    <div key={step.title} className="flex items-start gap-4 rounded-2xl border border-white/40 bg-white/60 p-4">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 font-semibold">
+                        {String(index + 1).padStart(2, "0")}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2 text-lg font-semibold text-slate-900">
+                          <Icon className="h-5 w-5 text-orange-400" />
+                          {step.title}
+                        </div>
+                        <p className="text-sm text-slate-600">{step.copy}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-        {/* Feature Cards */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
-        >
-          {features.map((feature, index) => {
-            const Icon = feature.icon;
-            return (
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <button className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-orange-500 shadow-lg shadow-orange-200/70">
+                  Get started
+                </button>
+                <button className="rounded-full border border-white/60 px-8 py-3 text-sm font-semibold text-white/80">
+                  Read more
+                </button>
+              </div>
+            </div>
+
+            <div className="relative">
               <motion.div
-                key={index}
-                variants={itemVariants}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className={`group relative p-8 rounded-2xl bg-gradient-to-br ${feature.bgGradient} backdrop-blur-xl border border-white/40 overflow-hidden transition-all duration-300`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="rounded-[32px] border border-white/60 bg-white/80 p-8 backdrop-blur"
               >
-                {/* Animated Border on Hover */}
-                <div
-                  className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none`}
-                  style={{
-                    padding: "2px",
-                    WebkitMask:
-                      "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                    WebkitMaskComposite: "xor",
-                    maskComposite: "exclude",
-                  }}
-                />
-
-                {/* Content */}
-                <div className="relative z-10">
-                  {/* Icon Container */}
-                  <div
-                    className={`mb-6 inline-flex p-3 rounded-xl bg-gradient-to-r ${feature.gradient} bg-opacity-20 group-hover:bg-opacity-30 transition-all duration-300`}
-                  >
-                    <Icon
-                      className={`w-6 h-6 bg-gradient-to-r ${feature.gradient} bg-clip-text text-transparent`}
-                    />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.4em] text-orange-300">workflow</p>
+                    <h3 className="text-2xl font-semibold text-slate-900">Live project board</h3>
                   </div>
-
-                  {/* Text */}
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">
-                    {feature.title}
-                  </h3>
-                  <p className="text-gray-600 leading-relaxed">
-                    {feature.description}
-                  </p>
+                  <span className="rounded-full bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-500">In progress</span>
                 </div>
 
-                {/* Glow Effect */}
-                <div
-                  className={`absolute inset-0 bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-10 blur-xl transition-all duration-300 -z-10`}
-                />
+                <div className="mt-8 space-y-5">
+                  {["Discovery", "Design", "Delivery"].map((phase, index) => (
+                    <div key={phase} className="rounded-2xl border border-orange-50 bg-orange-50/40 p-4">
+                      <div className="flex items-center justify-between text-sm font-semibold text-slate-600">
+                        <span>{phase}</span>
+                        <span>{index === 0 ? "Done" : index === 1 ? "Now" : "Next"}</span>
+                      </div>
+                      <div className="mt-3 flex items-center gap-3">
+                        <div className="flex -space-x-3">
+                          {[1, 2, 3].map((avatar) => (
+                            <div
+                              key={`${phase}-${avatar}`}
+                              className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-tr from-orange-400 to-rose-400"
+                            />
+                          ))}
+                        </div>
+                        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-300">team</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-8 rounded-2xl bg-gradient-to-r from-orange-100 to-pink-100 p-5">
+                  <p className="text-sm font-semibold text-orange-500">Client note</p>
+                  <p className="text-slate-700">“The warm dashboard makes it effortless to track every milestone.”</p>
+                </div>
               </motion.div>
-            );
-          })}
-        </motion.div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

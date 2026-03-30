@@ -1,114 +1,88 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, PhoneCall } from "lucide-react";
 
 export default function CTASection() {
   const navigate = useNavigate();
 
   return (
-    <section
-      id="cta"
-      className="relative py-24 overflow-hidden"
-    >
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-600 via-blue-600 to-cyan-500" />
+    <section id="cta" className="relative py-24">
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-amber-500 to-rose-500" />
 
-      {/* Animated Blobs */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0">
         <motion.div
-          animate={{
-            x: [0, 100, -100, 0],
-            y: [0, -50, 50, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-1/2 left-1/4 w-96 h-96 bg-white rounded-full filter blur-3xl opacity-10"
+          animate={{ x: [0, 80, -20, 0], y: [0, -20, 20, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-16 left-12 h-64 w-64 rounded-full bg-white/10 blur-3xl"
         />
         <motion.div
-          animate={{
-            x: [0, -80, 80, 0],
-            y: [0, 60, -60, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-1/3 right-1/4 w-80 h-80 bg-white rounded-full filter blur-3xl opacity-10"
+          animate={{ x: [0, -60, 20, 0], y: [0, 40, -10, 0] }}
+          transition={{ duration: 28, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-white/10 blur-[120px]"
         />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center"
-        >
-          {/* Icon */}
-          <motion.div
-            animate={{
-              y: [0, -10, 0],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="flex justify-center mb-8"
-          >
-            <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-lg">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div>
-          </motion.div>
-
-          {/* Heading */}
-          <h2 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
-            Transform Your
-            <br />
-            Campus Today
-          </h2>
-
-          {/* Description */}
-          <p className="text-xl text-white/90 max-w-2xl mx-auto mb-12 leading-relaxed">
-            Join hundreds of universities already using InnovateU to streamline operations, boost productivity, and create better campus experiences.
-          </p>
-
-          {/* Buttons */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-10 rounded-[40px] border border-white/30 bg-white/5 p-10 backdrop-blur-lg lg:grid-cols-[2fr,1fr]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8"
+            transition={{ duration: 0.6 }}
           >
-            <button
-              onClick={() => navigate("/login")}
-              className="group px-8 py-4 bg-white text-blue-600 rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-white/50 transition-all duration-300 transform hover:scale-105 flex items-center gap-2"
-            >
-              Get Started Free
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="px-8 py-4 bg-white/20 backdrop-blur-lg border border-white/40 text-white rounded-full font-bold text-lg hover:bg-white/30 transition-all duration-300">
-              Schedule Demo
-            </button>
+            <div className="flex items-center gap-3 text-white/90">
+              <div className="rounded-2xl bg-white/15 p-3">
+                <Sparkles className="h-6 w-6" />
+              </div>
+              <span className="text-sm font-semibold uppercase tracking-[0.4em]">Ready?</span>
+            </div>
+            <h2 className="mt-6 text-4xl font-semibold text-white">Ready to get started?</h2>
+            <p className="mt-3 text-white/80">
+              Schedule a strategy call or jump straight into the dashboard. We’ll help you set up campaigns, migrate data, and train your team.
+            </p>
+
+            <div className="mt-8 flex flex-col gap-3 text-white/80 sm:flex-row">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-white" />
+                Faster onboarding with curated templates.
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-white" />
+                Live people, not chatbots.
+              </div>
+            </div>
+
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+              <button
+                onClick={() => navigate("/login")}
+                className="flex items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-semibold text-orange-500"
+              >
+                Get Started
+                <ArrowRight className="h-5 w-5" />
+              </button>
+              <button className="flex items-center justify-center gap-2 rounded-full border border-white/60 px-8 py-4 text-sm font-semibold text-white/90">
+                Book a call
+              </button>
+            </div>
           </motion.div>
 
-          {/* Trust Badge */}
-          <motion.p
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-white/80 font-medium"
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="rounded-[28px] border border-white/30 bg-white/10 p-6 text-white"
           >
-            ✓ 14-day free trial • No credit card required • Cancel anytime
-          </motion.p>
-        </motion.div>
+            <p className="text-sm uppercase tracking-[0.4em] text-white/60">Need help?</p>
+            <h3 className="mt-2 text-2xl font-semibold">Talk to a strategist</h3>
+            <p className="mt-2 text-white/80">+94 71 555 2314</p>
+            <p className="text-white/70">hello@brandhive.co</p>
+            <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-white/15 py-3 text-sm font-semibold">
+              <PhoneCall className="h-4 w-4" />
+              Contact us
+            </button>
+          </motion.div>
+        </div>
       </div>
     </section>
   );

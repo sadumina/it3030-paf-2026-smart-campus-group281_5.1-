@@ -32,146 +32,68 @@ export default function Footer() {
   };
 
   return (
-    <footer className="relative bg-gradient-to-b from-white to-gray-50 border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <footer className="relative border-t border-orange-100 bg-gradient-to-b from-white to-[#fff5ea]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12"
         >
-          {/* Brand */}
-          <motion.div variants={itemVariants}>
-            <div className="text-2xl font-bold bg-gradient-to-r from-purple-600 via-blue-500 to-cyan-400 bg-clip-text text-transparent mb-4">
-              InnovateU
+          <motion.div variants={itemVariants} className="flex flex-col gap-4 rounded-[32px] border border-orange-100 bg-white/80 p-8 text-center shadow-[0_20px_60px_rgba(15,23,42,.08)]">
+            <div className="text-2xl font-black tracking-tight text-transparent bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500 bg-clip-text">
+              BrandHive
             </div>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              Transforming campus operations with intelligent automation and AI.
-            </p>
+            <p className="text-sm text-slate-500">Warm dashboards for marketing, product, and student engagement teams.</p>
           </motion.div>
 
-          {/* Product Links */}
-          <motion.div variants={itemVariants}>
-            <h4 className="font-semibold text-gray-900 mb-4">Product</h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Features
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Pricing
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Solutions
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Security
-                </a>
-              </li>
-            </ul>
-          </motion.div>
-
-          {/* Company Links */}
-          <motion.div variants={itemVariants}>
-            <h4 className="font-semibold text-gray-900 mb-4">Company</h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  About
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Careers
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </motion.div>
-
-          {/* Legal Links */}
-          <motion.div variants={itemVariants}>
-            <h4 className="font-semibold text-gray-900 mb-4">Legal</h4>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Privacy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Terms
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Cookies
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-purple-600 transition-colors text-sm">
-                  Compliance
-                </a>
-              </li>
-            </ul>
-          </motion.div>
-        </motion.div>
-
-        {/* Divider */}
-        <div className="border-t border-gray-200 my-8" />
-
-        {/* Bottom Section */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="flex flex-col md:flex-row items-center justify-between"
-        >
-          {/* Copyright */}
-          <motion.p
-            variants={itemVariants}
-            className="text-gray-600 text-sm text-center md:text-left"
-          >
-            © {currentYear} InnovateU Center. All rights reserved.
-          </motion.p>
-
-          {/* Social Icons */}
           <motion.div
             variants={containerVariants}
-            className="flex gap-4 mt-6 md:mt-0"
+            className="mt-12 grid grid-cols-1 gap-10 text-sm text-slate-600 sm:grid-cols-2 lg:grid-cols-4"
           >
-            {social.map((item, index) => {
-              const Icon = item.icon;
-              return (
-                <motion.a
-                  key={index}
-                  variants={itemVariants}
-                  href={item.href}
-                  className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gradient-to-r hover:from-purple-500 hover:to-blue-500 hover:text-white transition-all duration-300 transform hover:scale-110"
-                  title={item.name}
-                >
-                  <Icon className="w-5 h-5" />
-                </motion.a>
-              );
-            })}
+            {[
+              { title: "Company", links: ["About", "Culture", "Careers", "Press"] },
+              { title: "Services", links: ["Brand systems", "Campaign ops", "Automation", "Advisory"] },
+              { title: "Resources", links: ["Guide", "Case studies", "Newsletter", "Events"] },
+              { title: "Support", links: ["Contact", "Status", "Security", "Terms"] },
+            ].map((column) => (
+              <motion.div key={column.title} variants={itemVariants}>
+                <h4 className="text-base font-semibold text-slate-900">{column.title}</h4>
+                <ul className="mt-4 space-y-2">
+                  {column.links.map((link) => (
+                    <li key={link}>
+                      <a href="#" className="transition-colors hover:text-orange-500">
+                        {link}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </motion.div>
+            ))}
           </motion.div>
+
+          <div className="mt-12 border-t border-orange-100 pt-8 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <motion.p variants={itemVariants} className="text-sm text-slate-500">
+              © {currentYear} BrandHive Studio. All rights reserved.
+            </motion.p>
+
+            <motion.div variants={containerVariants} className="flex gap-3">
+              {social.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <motion.a
+                    key={item.name}
+                    variants={itemVariants}
+                    href={item.href}
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-orange-100 bg-white text-orange-400 transition-all hover:-translate-y-1 hover:bg-gradient-to-r hover:from-orange-500 hover:to-rose-500 hover:text-white"
+                    title={item.name}
+                  >
+                    <Icon className="h-4 w-4" />
+                  </motion.a>
+                );
+              })}
+            </motion.div>
+          </div>
         </motion.div>
       </div>
     </footer>

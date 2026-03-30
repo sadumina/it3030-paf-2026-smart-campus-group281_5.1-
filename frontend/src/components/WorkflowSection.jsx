@@ -1,185 +1,172 @@
 import { motion } from "framer-motion";
-import { BookOpen, CheckCircle, AlertCircle, Wrench } from "lucide-react";
+import { PieChart, Target, TrendingUp, Quote, Star } from "lucide-react";
+
+const agencyHighlights = [
+  {
+    title: "Analytics-first decisions",
+    copy: "Our analysts turn messy dashboards into poetic prompts you can act on.",
+    icon: PieChart,
+  },
+  {
+    title: "Creative sprints",
+    copy: "Weekly rituals keep copy, design, and dev shipping in one rhythm.",
+    icon: Target,
+  },
+  {
+    title: "ROI playbooks",
+    copy: "Proactive experiments and automation recipes to scale what works.",
+    icon: TrendingUp,
+  },
+];
+
+const testimonials = [
+  {
+    name: "Anjali Perera",
+    role: "CX Lead, SunLabs",
+    quote: "The warm visuals and clarity changed how our execs review campaigns.",
+  },
+  {
+    name: "David Hasan",
+    role: "Product Marketing, Altura",
+    quote: "BrandHive keeps our global team synced without endless check-ins.",
+  },
+  {
+    name: "Mel Torres",
+    role: "Founder, Nook Studio",
+    quote: "Feels like having an embedded design partner that actually understands growth.",
+  },
+];
 
 export default function WorkflowSection() {
-  const steps = [
-    {
-      icon: BookOpen,
-      title: "Booking",
-      description: "Users request resources or spaces",
-      gradient: "from-purple-500 to-pink-500",
-      number: "01",
-    },
-    {
-      icon: CheckCircle,
-      title: "Approval",
-      description: "Instant verification and approval",
-      gradient: "from-blue-500 to-cyan-400",
-      number: "02",
-    },
-    {
-      icon: AlertCircle,
-      title: "Incident",
-      description: "Issues are automatically detected",
-      gradient: "from-pink-500 to-red-500",
-      number: "03",
-    },
-    {
-      icon: Wrench,
-      title: "Resolution",
-      description: "Quick fixes and status updates",
-      gradient: "from-cyan-400 to-blue-500",
-      number: "04",
-    },
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, x: -30 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.6 },
-    },
-  };
-
   return (
-    <section
-      id="workflow"
-      className="relative py-24 bg-gradient-to-b from-white via-blue-50/20 to-white overflow-hidden"
-    >
-      {/* Background Blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <section id="agency" className="relative overflow-hidden bg-white py-24">
+      <div className="absolute inset-0">
         <motion.div
-          animate={{
-            y: [0, 30, -30, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-1/4 left-0 w-80 h-80 bg-gradient-to-r from-purple-300 to-pink-300 rounded-full filter blur-3xl opacity-10"
+          animate={{ x: [0, 20, -20, 0] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-10 left-10 h-64 w-64 rounded-full bg-gradient-to-br from-orange-100 to-transparent blur-[90px]"
         />
         <motion.div
-          animate={{
-            y: [0, -40, 40, 0],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute bottom-1/4 right-0 w-80 h-80 bg-gradient-to-r from-cyan-300 to-blue-300 rounded-full filter blur-3xl opacity-10"
+          animate={{ x: [0, -30, 30, 0] }}
+          transition={{ duration: 35, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-0 right-0 h-80 w-80 rounded-full bg-gradient-to-tr from-[#ffe5d0] to-transparent blur-[150px]"
         />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <div className="inline-block mb-4 px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 rounded-full border border-blue-200/50 backdrop-blur-sm">
-            <span className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent font-semibold text-sm">
-              Workflow Process
-            </span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Simple 4-Step Process
-          </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            From request to resolution in minutes, not days
-          </p>
-        </motion.div>
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-400">Our Agency</p>
+            <h2 className="mt-4 text-4xl font-semibold text-slate-900">Data-powered creativity with warmth.</h2>
+            <p className="mt-4 text-slate-600">
+              We believe emotions and evidence can co-exist. Our dashboards keep strategy transparent while the design language feels calm and human.
+            </p>
 
-        {/* Workflow Steps */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="relative"
-        >
-          {/* Connecting Line */}
-          <div className="hidden lg:block absolute top-32 left-0 right-0 h-1 bg-gradient-to-r from-purple-300 via-blue-300 to-cyan-300 rounded-full" />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <motion.div
-                  key={index}
-                  variants={itemVariants}
-                  className="relative"
-                >
-                  {/* Step Card */}
-                  <div className="flex flex-col items-center text-center">
-                    {/* Number Badge */}
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      className={`relative mb-6 w-20 h-20 rounded-2xl bg-gradient-to-br ${step.gradient} flex items-center justify-center text-white font-bold text-2xl shadow-lg hover:shadow-2xl transition-all duration-300`}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-2xl" />
-                      <span className="relative z-10">{step.number}</span>
-                    </motion.div>
-
-                    {/* Icon */}
-                    <motion.div
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.8 }}
-                      className={`mb-4 p-3 rounded-xl bg-gradient-to-r ${step.gradient} bg-opacity-15`}
-                    >
-                      <Icon
-                        className={`w-6 h-6 bg-gradient-to-r ${step.gradient} bg-clip-text text-transparent`}
-                      />
-                    </motion.div>
-
-                    {/* Content */}
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
-                      {step.title}
-                    </h3>
-                    <p className="text-gray-600 leading-relaxed">
-                      {step.description}
-                    </p>
-                  </div>
-
-                  {/* Arrow for desktop */}
-                  {index < steps.length - 1 && (
-                    <div className="hidden lg:block absolute top-8 -right-12 text-cyan-400">
-                      <svg
-                        className="w-6 h-6"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
+            <div className="mt-10 space-y-5">
+              {agencyHighlights.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.title} className="flex gap-4 rounded-3xl border border-orange-100 bg-white/80 p-4 shadow-sm">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500">
+                      <Icon className="h-5 w-5" />
                     </div>
-                  )}
-                </motion.div>
-              );
-            })}
+                    <div>
+                      <p className="text-base font-semibold text-slate-900">{item.title}</p>
+                      <p className="text-sm text-slate-500">{item.copy}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <button className="mt-8 rounded-full bg-gradient-to-r from-orange-500 to-rose-500 px-8 py-3 text-sm font-semibold text-white shadow-[0_15px_35px_rgba(249,115,22,.35)]">
+              Read more
+            </button>
           </div>
-        </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="relative"
+          >
+            <div className="rounded-[32px] border border-orange-100 bg-white/90 p-8 shadow-[0_30px_80px_rgba(15,23,42,.08)]">
+              <p className="text-xs uppercase tracking-[0.4em] text-orange-300">insight mural</p>
+              <h3 className="mt-2 text-3xl font-semibold text-slate-900">Campaign intelligence</h3>
+              <p className="text-sm text-slate-500">All touchpoints layered into one friendly dashboard.</p>
+
+              <div className="mt-8 grid gap-5">
+                {["Brand health", "Launch velocity", "Retention"].map((metric, index) => (
+                  <div key={metric} className="rounded-2xl bg-orange-50/60 p-4">
+                    <div className="flex items-center justify-between text-sm font-semibold text-slate-600">
+                      <span>{metric}</span>
+                      <span>{index === 0 ? "82" : index === 1 ? "94" : "76"}%</span>
+                    </div>
+                    <div className="mt-3 h-3 rounded-full bg-white">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: index === 0 ? "82%" : index === 1 ? "94%" : "76%" }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.2 }}
+                        className="h-3 rounded-full bg-gradient-to-r from-orange-500 via-amber-500 to-rose-500"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-10 flex items-center gap-4 rounded-2xl border border-orange-50 bg-white p-4 shadow-sm">
+                <div className="rounded-2xl bg-orange-500/10 p-3 text-orange-500">
+                  <Quote className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Weekly insight drop</p>
+                  <p className="text-xs text-slate-500">Handwritten notes from strategists + action items.</p>
+                </div>
+              </div>
+            </div>
+
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 4, repeat: Infinity }}
+              className="absolute -right-6 bottom-10 rounded-2xl border border-orange-100 bg-white p-4 shadow-lg"
+            >
+              <p className="text-xs uppercase tracking-[0.3em] text-orange-300">net promoter</p>
+              <p className="text-3xl font-semibold text-slate-900">76</p>
+              <p className="text-sm text-slate-500">industry leading</p>
+            </motion.div>
+          </motion.div>
+        </div>
+
+        <div id="testimonials" className="mt-24">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-400">What clients say</p>
+            <h2 className="mt-4 text-4xl font-semibold text-slate-900">Human stories, real results.</h2>
+            <p className="mt-3 text-slate-500">See how teams describe working inside the BrandHive dashboard.</p>
+          </div>
+
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {testimonials.map((testimonial) => (
+              <motion.div
+                key={testimonial.name}
+                whileHover={{ y: -6 }}
+                className="rounded-[28px] border border-orange-100 bg-white/90 p-6 shadow-[0_20px_50px_rgba(15,23,42,.07)]"
+              >
+                <div className="flex items-center gap-2 text-amber-400">
+                  {Array.from({ length: 5 }).map((_, index) => (
+                    <Star key={`${testimonial.name}-${index}`} className="h-4 w-4 fill-current" />
+                  ))}
+                </div>
+                <p className="mt-4 text-slate-600">“{testimonial.quote}”</p>
+                <div className="mt-6">
+                  <p className="text-base font-semibold text-slate-900">{testimonial.name}</p>
+                  <p className="text-sm text-slate-500">{testimonial.role}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );
