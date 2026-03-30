@@ -20,7 +20,7 @@ export default function Navbar() {
     >
       <div className="mx-auto flex h-20 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <button onClick={() => navigate("/")} className="text-2xl font-semibold text-slate-900">
-          Campus<span className="text-orange-500">OS</span>
+          Clever<span className="text-orange-500">Campus</span>
         </button>
 
         <nav className="hidden items-center gap-8 text-sm font-semibold text-slate-500 md:flex">

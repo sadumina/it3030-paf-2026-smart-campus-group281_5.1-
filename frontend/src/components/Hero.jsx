@@ -33,10 +33,10 @@ export default function Hero() {
           className="space-y-8"
         >
           <div className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-1 text-sm font-semibold text-orange-600 shadow-sm">
-            Smart campus platform
+            Clever Campus platform
           </div>
           <h1 className="text-4xl font-semibold leading-tight text-slate-900 sm:text-5xl">
-            We create <span className="text-orange-500">smart campus solutions</span>
+            Clever Campus builds <span className="text-orange-500">smart campus solutions</span>
           </h1>
           <p className="text-lg text-slate-600">
             Modern booking and incident management that keeps facilities, admins, and technicians aligned inside a single clean workspace.

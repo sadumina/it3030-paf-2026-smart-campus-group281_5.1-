@@ -5,7 +5,7 @@ const testimonials = [
   {
     name: "Dr. Ayana Reed",
     role: "Operations Director",
-    comment: "CampusHub feels like an Apple-level experience for our campus teams. Clean, calm, and insanely usable.",
+    comment: "Clever Campus feels like an Apple-level experience for our campus teams. Clean, calm, and insanely usable.",
   },
   {
     name: "Lewis Gardner",

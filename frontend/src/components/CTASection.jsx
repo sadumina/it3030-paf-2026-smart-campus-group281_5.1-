@@ -35,9 +35,9 @@ export default function CTASection() {
               </div>
               <span className="text-sm font-semibold uppercase tracking-[0.4em] text-white/70">neon control</span>
             </div>
-            <h2 className="mt-6 text-4xl font-semibold text-white">Switch on the always-live campus dashboard</h2>
+            <h2 className="mt-6 text-4xl font-semibold text-white">Switch on the always-live Clever Campus dashboard</h2>
             <p className="mt-3 text-white/70">
-              Deploy the Smart Campus Operations Hub in hours, not weeks. Connect OAuth, import your resources, and watch every booking, ticket, and notification glow in real time.
+              Deploy the Clever Campus Operations Hub in hours, not weeks. Connect OAuth, import your resources, and watch every booking, ticket, and notification glow in real time.
             </p>
 
             <div className="mt-8 grid gap-4 text-white/70 sm:grid-cols-2">
