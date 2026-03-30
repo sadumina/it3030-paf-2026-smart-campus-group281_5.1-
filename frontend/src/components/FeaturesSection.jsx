@@ -1,119 +1,86 @@
 import { motion } from "framer-motion";
-import { MessageCircle, ClipboardCheck, CreditCard, ShieldCheck } from "lucide-react";
+import { CalendarCheck, AlertTriangle, Bell, ShieldCheck } from "lucide-react";
 
-const steps = [
+const features = [
   {
-    icon: MessageCircle,
-    title: "Catalogue",
-    copy: "Faculty staff maintain the live inventory with capacity, location, and status tags.",
+    title: "Smart Booking System",
+    description: "Conflict detection, multi-resource reservations, and animated status pills that never fall asleep.",
+    icon: CalendarCheck,
+    accent: "from-cyan-400/30 to-blue-500/10",
   },
   {
-    icon: ClipboardCheck,
-    title: "Book & approve",
-    copy: "Users submit booking intents; admins review conflicts, note decisions, and assign roles.",
+    title: "Incident Management",
+    description: "Ticket matrix with SLA streaks, evidence uploads, and technician heatmaps in one pane.",
+    icon: AlertTriangle,
+    accent: "from-fuchsia-500/30 to-purple-500/10",
   },
   {
-    icon: CreditCard,
-    title: "Raise incidents",
-    copy: "Any stakeholder can log tickets with attachments, priority, and preferred contact info.",
+    title: "Notification Fabric",
+    description: "Realtime tray for approvals, escalations, and chatty comments routed by roles.",
+    icon: Bell,
+    accent: "from-amber-400/30 to-orange-500/10",
   },
   {
+    title: "Role-Based Access",
+    description: "USER, ADMIN, TECHNICIAN rings with neon audit signatures and OAuth guardrails.",
     icon: ShieldCheck,
-    title: "Resolve & audit",
-    copy: "Technicians update statuses, record resolutions, and CampusFlow logs every step for audits.",
+    accent: "from-emerald-400/30 to-teal-500/10",
   },
 ];
 
 export default function FeaturesSection() {
   return (
-    <section id="solutions" className="relative py-24">
-      <div className="absolute inset-x-0 top-12 mx-auto h-[70%] max-w-5xl rounded-[50px] bg-[#fff0e0] blur-[120px]" />
+    <section id="features" className="relative py-28">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(168,85,247,0.13),_transparent_60%)]" />
+      <div className="pointer-events-none absolute inset-y-0 left-1/2 w-px bg-gradient-to-b from-transparent via-white/20 to-transparent" />
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-[40px] bg-gradient-to-br from-[#fff6ed] via-[#ffe3cc] to-[#ffd3bf] p-10 shadow-[0_40px_120px_rgba(249,115,22,.18)]">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.4em] text-orange-500">Simple solutions</p>
-              <h2 className="mt-4 text-4xl font-semibold text-slate-900">A transparent workflow for campus ops.</h2>
-              <p className="mt-4 text-slate-600">
-                From asset catalogues to incident tickets, every interaction travels through a logged workflow that satisfies IT3030 requirements for auditability and role-based control.
-              </p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="text-center"
+        >
+          <p className="text-sm uppercase tracking-[0.4em] text-white/70">Platform pillars</p>
+          <h2 className="mt-4 text-4xl font-semibold text-white">Edge-to-cloud automations dressed in neon</h2>
+          <p className="mt-3 text-white/60">Every feature tile glows when its automation fires—no more lifeless dashboards.</p>
+        </motion.div>
 
-              <div className="mt-8 space-y-5">
-                {steps.map((step, index) => {
-                  const Icon = step.icon;
-                  return (
-                    <div key={step.title} className="flex items-start gap-4 rounded-2xl border border-white/40 bg-white/60 p-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-orange-500/10 text-orange-500 font-semibold">
-                        {String(index + 1).padStart(2, "0")}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-                          <Icon className="h-5 w-5 text-orange-400" />
-                          {step.title}
-                        </div>
-                        <p className="text-sm text-slate-600">{step.copy}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <button className="rounded-full bg-white px-8 py-3 text-sm font-semibold text-orange-500 shadow-lg shadow-orange-200/70">
-                  Launch a booking
-                </button>
-                <button className="rounded-full border border-white/60 px-8 py-3 text-sm font-semibold text-white/80">
-                  View audit log
-                </button>
-              </div>
-            </div>
-
-            <div className="relative">
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.3 }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.12 } },
+          }}
+          className="mt-14 grid gap-8 md:grid-cols-2"
+        >
+          {features.map((feature) => {
+            const Icon = feature.icon;
+            return (
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-                className="rounded-[32px] border border-white/60 bg-white/80 p-8 backdrop-blur"
+                key={feature.title}
+                variants={{ hidden: { opacity: 0, y: 35 }, visible: { opacity: 1, y: 0 } }}
+                whileHover={{ y: -6 }}
+                className="relative overflow-hidden rounded-[32px] border border-white/10 bg-white/5 p-7 shadow-[0_30px_80px_rgba(9,10,20,0.65)]"
               >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.4em] text-orange-300">workflow</p>
-                        <h3 className="text-2xl font-semibold text-slate-900">Campus approval board</h3>
-                      </div>
-                      <span className="rounded-full bg-orange-50 px-4 py-2 text-sm font-semibold text-orange-500">5 actions due</span>
-                    </div>
-
-                <div className="mt-8 space-y-5">
-                  {["Facility review", "Booking queue", "Incident desk"].map((phase, index) => (
-                    <div key={phase} className="rounded-2xl border border-orange-50 bg-orange-50/40 p-4">
-                      <div className="flex items-center justify-between text-sm font-semibold text-slate-600">
-                        <span>{phase}</span>
-                        <span>{index === 0 ? "Synced" : index === 1 ? "In review" : "Open"}</span>
-                      </div>
-                      <div className="mt-3 flex items-center gap-3">
-                        <div className="flex -space-x-3">
-                          {[1, 2, 3].map((avatar) => (
-                            <div
-                              key={`${phase}-${avatar}`}
-                              className="h-8 w-8 rounded-full border-2 border-white bg-gradient-to-tr from-orange-400 to-rose-400"
-                            />
-                          ))}
-                        </div>
-                        <span className="text-xs font-semibold uppercase tracking-[0.3em] text-orange-300">team</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-8 rounded-2xl bg-gradient-to-r from-orange-100 to-pink-100 p-5">
-                  <p className="text-sm font-semibold text-orange-500">Client note</p>
-                  <p className="text-slate-700">“The warm dashboard makes it effortless to track every milestone.”</p>
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.accent} opacity-70 blur-3xl transition-opacity`} />
+                <div className="relative">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/20 bg-black/20 text-white">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mt-6 text-2xl font-semibold text-white">{feature.title}</h3>
+                  <p className="mt-3 text-sm text-white/70">{feature.description}</p>
+                  <div className="mt-6 flex items-center gap-2 text-xs uppercase tracking-[0.4em] text-white/60">
+                    <span className="h-1.5 w-1.5 rounded-full bg-cyan-300 animate-pulse" />
+                    live signal
+                  </div>
                 </div>
               </motion.div>
-            </div>
-          </div>
-        </div>
+            );
+          })}
+        </motion.div>
       </div>
     </section>
   );
