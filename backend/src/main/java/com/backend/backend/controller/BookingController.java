@@ -4,7 +4,11 @@ import com.backend.backend.dto.BookingRequestDTO;
 import com.backend.backend.model.Booking;
 import com.backend.backend.service.BookingService;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
 import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/bookings")
@@ -18,4 +22,10 @@ public class BookingController {
     public Booking createBooking(@RequestBody BookingRequestDTO request) {
         return bookingService.createBooking(request);
     }
+
+    @GetMapping
+    public List<Booking> getAllBookings() {
+        return bookingService.getAllBookings();
+    }
+    
 }

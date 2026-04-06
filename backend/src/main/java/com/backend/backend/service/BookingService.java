@@ -1,5 +1,7 @@
 package com.backend.backend.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,4 +27,8 @@ public class BookingService {
 
         return bookingRepository.save(booking);
     }    
+
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
 }
