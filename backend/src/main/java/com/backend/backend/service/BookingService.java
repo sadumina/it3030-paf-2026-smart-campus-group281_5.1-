@@ -17,6 +17,17 @@ public class BookingService {
 
     public Booking createBooking(BookingRequestDTO request) {
 
+        List<Booking> conflicts =
+                bookingRepository.findByResourceIdAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
+                        request.getResourceId(),
+                        request.getEndTime(),
+                        request.getStartTime()
+                );
+
+        if (!conflicts.isEmpty()) {
+            throw new RuntimeException("Time slot already booked!");
+        }
+
         Booking booking = new Booking();
         booking.setResourceId(request.getResourceId());
         booking.setUserId(request.getUserId());
