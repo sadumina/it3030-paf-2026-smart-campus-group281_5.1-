@@ -21,7 +21,7 @@ import com.backend.backend.service.UserService;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:5176")
+@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5176" })
 public class UserController {
     @Autowired
     private UserService userService;
