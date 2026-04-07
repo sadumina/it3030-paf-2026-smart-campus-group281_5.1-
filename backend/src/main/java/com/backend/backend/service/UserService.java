@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.backend.backend.model.User;
@@ -14,9 +15,42 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     // Create a new user
     public User createUser(User user) {
+        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         return userRepository.save(user);
+    }
+
+    public User registerUser(String name, String email, String password, String role) {
+        if (userRepository.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRole((role == null || role.isBlank()) ? "STUDENT" : role.toUpperCase());
+        return userRepository.save(user);
+    }
+
+    public Optional<User> loginUser(String email, String password) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isEmpty()) {
+            return Optional.empty();
+        }
+
+        User user = userOptional.get();
+        if (user.getPassword() == null || !passwordEncoder.matches(password, user.getPassword())) {
+            return Optional.empty();
+        }
+
+        return Optional.of(user);
     }
 
     // Get all users
@@ -37,6 +71,11 @@ public class UserService {
     // Update user
     public User updateUser(String id, User user) {
         user.setId(id);
+        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        } else {
+            userRepository.findById(id).ifPresent(existingUser -> user.setPassword(existingUser.getPassword()));
+        }
         return userRepository.save(user);
     }
 

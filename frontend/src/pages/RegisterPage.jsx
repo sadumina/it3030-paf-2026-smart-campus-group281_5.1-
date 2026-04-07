@@ -1,14 +1,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, BadgeCheck } from "lucide-react";
-import { loginUser } from "../services/authService";
+import { ArrowLeft } from "lucide-react";
+import { registerUser } from "../services/authService";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "STUDENT",
+  });
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
@@ -21,46 +26,46 @@ export default function LoginPage() {
     setError("");
     setMessage("");
 
-    if (!form.email.trim() || !form.password.trim()) {
-      setError("Email and password are required.");
+    if (!form.name.trim() || !form.email.trim() || !form.password.trim()) {
+      setError("Please fill all required fields.");
+      return;
+    }
+
+    if (form.password.length < 6) {
+      setError("Password must be at least 6 characters.");
       return;
     }
 
     setLoading(true);
     try {
-      const response = await loginUser({
+      const response = await registerUser({
+        name: form.name.trim(),
         email: form.email.trim(),
         password: form.password,
+        role: form.role,
       });
 
       localStorage.setItem("campusUser", JSON.stringify(response));
-      setMessage(`Welcome back, ${response.name}! Login successful.`);
+      setMessage("Account created successfully. Redirecting to login...");
+      setTimeout(() => navigate("/login"), 1000);
     } catch (requestError) {
-      setError(requestError.message || "Login failed");
+      setError(requestError.message || "Registration failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#fffaf4] via-[#fffdf9] to-[#eef5ff] px-4 py-10">
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-[#fffaf4] via-[#fffdf9] to-[#f2f7ff] px-4 py-10">
       <div className="pointer-events-none absolute inset-0">
-        <motion.div
-          animate={{ x: [0, 30, -30, 0], y: [0, 40, -20, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -left-20 top-14 h-72 w-72 rounded-full bg-orange-200/45 blur-3xl"
-        />
-        <motion.div
-          animate={{ x: [0, -35, 25, 0], y: [0, -30, 30, 0] }}
-          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -right-20 bottom-10 h-80 w-80 rounded-full bg-sky-200/40 blur-3xl"
-        />
+        <div className="absolute -left-16 top-16 h-72 w-72 rounded-full bg-orange-200/40 blur-3xl" />
+        <div className="absolute -right-16 bottom-16 h-80 w-80 rounded-full bg-blue-200/35 blur-3xl" />
       </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 22 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.45 }}
         className="relative z-10 mx-auto w-full max-w-md"
       >
         <button
@@ -75,12 +80,25 @@ export default function LoginPage() {
           <p className="mb-3 inline-flex rounded-full border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-orange-600">
             Clever Campus Platform
           </p>
-          <h1 className="text-3xl font-bold leading-tight text-slate-900">Welcome back</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            Sign in to track bookings, incidents, and service alerts.
-          </p>
+          <h1 className="text-3xl font-bold leading-tight text-slate-900">Create your account</h1>
+          <p className="mt-2 text-sm text-slate-500">Join your smart campus workspace in seconds.</p>
 
-          <form onSubmit={handleSubmit} className="mt-7 space-y-5">
+          <form className="mt-7 space-y-5" onSubmit={handleSubmit}>
+            <div>
+              <label htmlFor="name" className="mb-1.5 block text-sm font-semibold text-slate-700">
+                Full Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={form.name}
+                onChange={handleChange}
+                placeholder="Enter your full name"
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+              />
+            </div>
+
             <div>
               <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-slate-700">
                 Email Address
@@ -97,6 +115,23 @@ export default function LoginPage() {
             </div>
 
             <div>
+              <label htmlFor="role" className="mb-1.5 block text-sm font-semibold text-slate-700">
+                Role
+              </label>
+              <select
+                id="role"
+                name="role"
+                value={form.role}
+                onChange={handleChange}
+                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
+              >
+                <option value="STUDENT">Student</option>
+                <option value="ADMIN">Admin</option>
+                <option value="TECHNICIAN">Technician</option>
+              </select>
+            </div>
+
+            <div>
               <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-slate-700">
                 Password
               </label>
@@ -106,36 +141,31 @@ export default function LoginPage() {
                 type="password"
                 value={form.password}
                 onChange={handleChange}
-                placeholder="Enter your password"
+                placeholder="At least 6 characters"
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
               />
             </div>
 
             {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
-            {message ? (
-              <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-600">
-                <BadgeCheck className="h-4 w-4" />
-                {message}
-              </p>
-            ) : null}
+            {message ? <p className="text-sm font-medium text-emerald-600">{message}</p> : null}
 
             <button
               type="submit"
               disabled={loading}
               className="w-full rounded-xl bg-orange-500 px-6 py-3 font-semibold text-white shadow-lg shadow-orange-500/30 transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Creating account..." : "Register"}
             </button>
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-600">
-            Need an account?{" "}
+            Already have an account?{" "}
             <button
               type="button"
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/login")}
               className="font-semibold text-orange-600 hover:text-orange-700"
             >
-              Register here
+              Sign in
             </button>
           </p>
         </div>
