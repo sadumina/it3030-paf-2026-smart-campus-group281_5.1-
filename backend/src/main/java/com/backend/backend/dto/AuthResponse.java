@@ -3,6 +3,7 @@ package com.backend.backend.dto;
 public class AuthResponse {
     private boolean success;
     private String message;
+    private String token;
     private String id;
     private String name;
     private String email;
@@ -11,13 +12,22 @@ public class AuthResponse {
     public AuthResponse() {
     }
 
-    public AuthResponse(boolean success, String message, String id, String name, String email, String role) {
+    public AuthResponse(boolean success, String message, String token, String id, String name, String email, String role) {
         this.success = success;
         this.message = message;
+        this.token = token;
         this.id = id;
         this.name = name;
         this.email = email;
         this.role = role;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 
     public boolean isSuccess() {
