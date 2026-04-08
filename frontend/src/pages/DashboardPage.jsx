@@ -5,19 +5,19 @@ import { clearAuth, getAuth } from "../services/authStorage";
 
 const roleCards = {
   USER: [
-    { title: "Book Resource", description: "Request room/lab/equipment bookings." },
-    { title: "My Bookings", description: "Track pending and approved bookings." },
-    { title: "Report Incident", description: "Create maintenance and fault tickets." },
+    { title: "Book Resource", description: "Request room/lab/equipment bookings.", icon: "📦", link: null },
+    { title: "My Bookings", description: "Track pending and approved bookings.", icon: "📅", link: null },
+    { title: "Report Incident", description: "Create and track maintenance tickets.", icon: "🎫", link: "/tickets", highlight: true },
   ],
   ADMIN: [
-    { title: "Review Bookings", description: "Approve or reject booking requests." },
-    { title: "Manage Resources", description: "Maintain facility and asset catalogue." },
-    { title: "Role Management", description: "Assign ADMIN/TECHNICIAN permissions." },
+    { title: "Review Bookings", description: "Approve or reject booking requests.", icon: "✅", link: null },
+    { title: "Manage Resources", description: "Maintain facility and asset catalogue.", icon: "🏢", link: null },
+    { title: "Ticketing Control Panel", description: "Manage all incident tickets, assign technicians.", icon: "🛠", link: "/tickets", highlight: true },
   ],
   TECHNICIAN: [
-    { title: "Assigned Tickets", description: "View active maintenance tickets." },
-    { title: "Update Status", description: "Move tickets to IN_PROGRESS/RESOLVED." },
-    { title: "Resolution Notes", description: "Add evidence and closure notes." },
+    { title: "Assigned Tickets", description: "View and resolve your active maintenance tickets.", icon: "🔧", link: "/tickets", highlight: true },
+    { title: "Update Status", description: "Move tickets to IN_PROGRESS / RESOLVED.", icon: "↻", link: "/tickets" },
+    { title: "Resolution Notes", description: "Add evidence and closure notes.", icon: "📝", link: "/tickets" },
   ],
 };
 
@@ -47,12 +47,32 @@ export default function DashboardPage() {
                 Welcome, {auth?.name || "User"} ({auth?.role || "USER"})
               </p>
             </div>
-            <button
-              onClick={handleLogout}
-              className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
-            >
-              Logout
-            </button>
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <button
+                onClick={() => navigate("/tickets")}
+                style={{
+                  padding: "8px 18px",
+                  background: "linear-gradient(135deg, #f97316, #c2410c)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 10,
+                  fontWeight: 600,
+                  fontSize: "0.85rem",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 6,
+                }}
+              >
+                🎫 Ticketing System
+              </button>
+              <button
+                onClick={handleLogout}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </header>
 
@@ -61,19 +81,64 @@ export default function DashboardPage() {
             <h2 className="mb-4 text-lg font-semibold text-slate-900">Module Shortcuts</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               {cards.map((card) => (
-                <article key={card.title} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <h3 className="font-semibold text-slate-900">{card.title}</h3>
-                  <p className="mt-1 text-sm text-slate-600">{card.description}</p>
+                <article
+                  key={card.title}
+                  onClick={() => card.link && navigate(card.link)}
+                  className="rounded-xl border p-4"
+                  style={{
+                    cursor: card.link ? "pointer" : "default",
+                    borderColor: card.highlight ? "#f97316" : "#e2e8f0",
+                    background: card.highlight
+                      ? "linear-gradient(135deg, #fff7ed, #ffedd5)"
+                      : "#f8fafc",
+                    transition: "transform 0.15s, box-shadow 0.15s",
+                    boxShadow: card.highlight ? "0 4px 12px rgba(249,115,22,0.12)" : "none",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (card.link) e.currentTarget.style.transform = "translateY(-2px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                    <span style={{ fontSize: "1.3rem" }}>{card.icon}</span>
+                    <h3 className="font-semibold text-slate-900">{card.title}</h3>
+                    {card.link && (
+                      <span style={{
+                        marginLeft: "auto", fontSize: "0.65rem", fontWeight: 700,
+                        background: "#f97316", color: "#fff", borderRadius: 99,
+                        padding: "2px 8px", letterSpacing: "0.08em",
+                      }}>LIVE</span>
+                    )}
+                  </div>
+                  <p className="text-sm text-slate-600">{card.description}</p>
                 </article>
               ))}
             </div>
 
-            <div className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4">
-              <h3 className="font-semibold text-blue-900">Team integration flow</h3>
-              <p className="mt-1 text-sm text-blue-800">
-                Member 1 handles resources, Member 2 booking workflow, Member 3 incidents, and your auth/notification
-                layer powers secure access and updates across all modules.
+            <div className="mt-5 rounded-xl border border-orange-200 bg-orange-50 p-4">
+              <h3 className="font-semibold text-orange-900">🎫 Module C — Ticketing System Active</h3>
+              <p className="mt-1 text-sm text-orange-800">
+                The Maintenance &amp; Incident Ticketing System is live. Students can raise tickets,
+                Admins can assign technicians, and Technicians can resolve and add resolution notes.
               </p>
+              <button
+                onClick={() => navigate("/tickets")}
+                style={{
+                  marginTop: 10,
+                  padding: "7px 16px",
+                  background: "#f97316",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 8,
+                  fontWeight: 600,
+                  fontSize: "0.82rem",
+                  cursor: "pointer",
+                }}
+              >
+                Open Ticketing System →
+              </button>
             </div>
           </section>
 
