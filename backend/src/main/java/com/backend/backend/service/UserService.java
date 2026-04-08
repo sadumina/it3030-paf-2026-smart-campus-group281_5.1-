@@ -35,8 +35,48 @@ public class UserService {
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole((role == null || role.isBlank()) ? "STUDENT" : role.toUpperCase());
+        user.setRole(normalizeRole(role, "USER"));
         return userRepository.save(user);
+    }
+
+    public User findOrCreateGoogleUser(String name, String email, String role) {
+        Optional<User> existingUser = userRepository.findByEmail(email);
+        if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            if (name != null && !name.isBlank()) {
+                user.setName(name);
+            }
+            if (user.getRole() == null || user.getRole().isBlank()) {
+                user.setRole(normalizeRole(role, "USER"));
+            }
+            return userRepository.save(user);
+        }
+
+        User user = new User();
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword("");
+        user.setRole(normalizeRole(role, "USER"));
+        return userRepository.save(user);
+    }
+
+    public Optional<User> updateUserRole(String id, String role) {
+        return userRepository.findById(id).map(user -> {
+            user.setRole(normalizeRole(role, user.getRole()));
+            return userRepository.save(user);
+        });
+    }
+
+    private String normalizeRole(String role, String fallback) {
+        if (role == null || role.isBlank()) {
+            return fallback;
+        }
+
+        String normalized = role.trim().toUpperCase();
+        if ("STUDENT".equals(normalized)) {
+            return "USER";
+        }
+        return normalized;
     }
 
     public Optional<User> loginUser(String email, String password) {

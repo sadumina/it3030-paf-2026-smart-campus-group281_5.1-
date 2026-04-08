@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { registerUser } from "../services/authService";
+import { saveAuth } from "../services/authStorage";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -45,9 +46,9 @@ export default function RegisterPage() {
         role: form.role,
       });
 
-      localStorage.setItem("campusUser", JSON.stringify(response));
-      setMessage("Account created successfully. Redirecting to login...");
-      setTimeout(() => navigate("/login"), 1000);
+      saveAuth(response);
+      setMessage("Account created successfully. Redirecting to dashboard...");
+      setTimeout(() => navigate("/dashboard"), 700);
     } catch (requestError) {
       setError(requestError.message || "Registration failed");
     } finally {

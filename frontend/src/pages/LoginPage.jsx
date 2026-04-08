@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, BadgeCheck } from "lucide-react";
-import { loginUser } from "../services/authService";
+import { googleLogin, loginUser } from "../services/authService";
+import { saveAuth } from "../services/authStorage";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -10,6 +11,60 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const googleButtonRef = useRef(null);
+
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId || !googleButtonRef.current) {
+      return;
+    }
+
+    const initializeGoogle = () => {
+      if (!window.google || !googleButtonRef.current) {
+        return;
+      }
+
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: async (response) => {
+          if (!response?.credential) {
+            setError("Google sign-in failed");
+            return;
+          }
+
+          try {
+            const authResponse = await googleLogin(response.credential);
+            saveAuth(authResponse);
+            setMessage(`Welcome, ${authResponse.name}!`);
+            navigate("/dashboard");
+          } catch (requestError) {
+            setError(requestError.message || "Google login failed");
+          }
+        },
+      });
+
+      googleButtonRef.current.innerHTML = "";
+      window.google.accounts.id.renderButton(googleButtonRef.current, {
+        theme: "outline",
+        size: "large",
+        shape: "pill",
+        width: 320,
+      });
+    };
+
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+    if (existingScript) {
+      initializeGoogle();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogle;
+    document.body.appendChild(script);
+  }, [navigate]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -33,8 +88,9 @@ export default function LoginPage() {
         password: form.password,
       });
 
-      localStorage.setItem("campusUser", JSON.stringify(response));
+      saveAuth(response);
       setMessage(`Welcome back, ${response.name}! Login successful.`);
+      navigate("/dashboard");
     } catch (requestError) {
       setError(requestError.message || "Login failed");
     } finally {
@@ -126,6 +182,18 @@ export default function LoginPage() {
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
+
+            <div className="pt-2">
+              <p className="mb-2 text-center text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+                or continue with
+              </p>
+              <div ref={googleButtonRef} className="flex justify-center" />
+              {!import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
+                <p className="mt-2 text-center text-xs text-slate-500">
+                  Add VITE_GOOGLE_CLIENT_ID in frontend/.env to enable Google sign-in.
+                </p>
+              ) : null}
+            </div>
           </form>
 
           <p className="mt-6 text-center text-sm text-slate-600">
