@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { createBooking } from "../services/bookingService";
+// This file was removed in favor of a new StudentBookingForm component.
+
+import { createBooking } from "../../services/bookingService";
 
 function BookingForm() {
   const today = new Date().toISOString().split("T")[0];

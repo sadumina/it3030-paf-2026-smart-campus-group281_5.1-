@@ -1,6 +1,7 @@
 package com.backend.backend.repository;
 
 import com.backend.backend.model.Booking;
+import com.backend.backend.model.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,5 +18,8 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
         LocalDateTime endTime,
         LocalDateTime startTime
     );
-    
+
+    List<Booking> findByUserId(String userId);
+
+    List<Booking> findByStatus(BookingStatus status);
 }

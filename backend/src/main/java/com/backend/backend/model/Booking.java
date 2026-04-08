@@ -28,7 +28,3 @@ public class Booking {
     @CreatedDate
     private LocalDateTime createdAt;
 }
-
-enum BookingStatus {
-    PENDING, APPROVED, REJECTED, CANCELLED
-}

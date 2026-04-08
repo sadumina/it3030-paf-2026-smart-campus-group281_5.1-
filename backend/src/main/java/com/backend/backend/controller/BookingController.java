@@ -28,4 +28,29 @@ public class BookingController {
         return bookingService.getAllBookings();
     }
     
+    @GetMapping("/my")
+    public List<Booking> getMyBookings(@RequestParam String userId) {   // temporary
+        return bookingService.getMyBookings(userId);
+    }
+
+    @GetMapping("/{id}")
+    public Booking getBookingById(@PathVariable String id) {
+        return bookingService.getBookingById(id);
+    }
+
+    @PutMapping("/{id}/approve")
+    public Booking approveBooking(@PathVariable String id, @RequestParam(defaultValue = "ADMIN-001") String adminId) {
+        return bookingService.approveBooking(id, adminId);
+    }
+
+    @PutMapping("/{id}/reject")
+    public Booking rejectBooking(@PathVariable String id, @RequestParam String reason) {
+        return bookingService.rejectBooking(id, reason);
+    }
+
+    @PutMapping("/{id}/cancel")
+    public Booking cancelBooking(@PathVariable String id) {
+        return bookingService.cancelBooking(id);
+    }
+
 }
