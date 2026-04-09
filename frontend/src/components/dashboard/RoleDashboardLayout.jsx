@@ -5,6 +5,10 @@ import {
   LogOut,
   Search,
   UserCircle2,
+  Moon,
+  Sun,
+  Download,
+  FileJson,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -18,6 +22,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import NotificationPanel from "../NotificationPanel";
+import { Breadcrumb } from "../Breadcrumb";
+import { useTheme } from "../../context/ThemeContext";
+import { reportExport } from "../../services/reportExport";
+import { notifyAlert } from "../../services/notificationHelper";
 import { clearAuth } from "../../services/authStorage";
 
 function ProfessionalChart({ points = [], color = "#ea580c" }) {
@@ -138,6 +146,7 @@ export default function RoleDashboardLayout({
 }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDark, toggleTheme } = useTheme();
   const userName = auth?.name || "Campus user";
   const userEmail = auth?.email || "user@campus.local";
   const userRole = auth?.role || roleLabel || "USER";
@@ -148,6 +157,16 @@ export default function RoleDashboardLayout({
     .slice(0, 2)
     .map((namePart) => namePart[0]?.toUpperCase())
     .join("") || "CU";
+
+  const handleExportPDF = () => {
+    reportExport.exportDashboardReport(kpis, `dashboard-report-${new Date().toISOString().split('T')[0]}.pdf`);
+    notifyAlert.success('Dashboard report exported as PDF');
+  };
+
+  const handleExportCSV = () => {
+    reportExport.exportToCSV(kpis, `dashboard-data-${new Date().toISOString().split('T')[0]}.csv`);
+    notifyAlert.success('Dashboard data exported as CSV');
+  };
 
   useEffect(() => {
     setLivePoints(getRoleChartSeed(userRole, chartPoints));
@@ -172,11 +191,11 @@ export default function RoleDashboardLayout({
   };
 
   return (
-    <div className="dashboard-page min-h-screen p-3 md:p-4">
-      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
+    <div className="dashboard-page min-h-screen p-3 md:p-4 bg-white dark:bg-slate-950">
+      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-full overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
         <aside
-          className="hidden w-64 flex-col bg-orange-600 p-4 text-white md:flex"
-          style={{ backgroundImage: "linear-gradient(180deg, #ea580c 0%, #f97316 52%, #fb923c 100%)" }}
+          className="hidden w-64 flex-col bg-orange-600 p-4 text-white md:flex dark:bg-slate-800"
+          style={{ backgroundImage: isDark ? "linear-gradient(180deg, #1e293b 0%, #334155 52%, #475569 100%)" : "linear-gradient(180deg, #ea580c 0%, #f97316 52%, #fb923c 100%)" }}
         >
           <div className="mb-6">
             <p className="font-display text-xl font-semibold leading-none">Campus Flow</p>
@@ -224,31 +243,31 @@ export default function RoleDashboardLayout({
           </div>
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col bg-white">
-          <div className="border-b border-slate-200 bg-white px-4 py-2 md:px-6">
+        <div className="flex min-w-0 flex-1 flex-col bg-white dark:bg-slate-900">
+          <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 md:px-6">
             <div className="flex items-center justify-between gap-3">
-              <div className="text-xs font-medium uppercase tracking-widest text-slate-600">
+              <div className="text-xs font-medium uppercase tracking-widest text-slate-600 dark:text-slate-400">
                 Smart Campus Platform
               </div>
 
-              <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5">
+              <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5">
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-600 text-xs font-bold text-white">
                   {initials}
                 </div>
                 <div className="hidden sm:block">
-                  <p className="text-xs font-medium text-slate-900">{userName}</p>
-                  <p className="text-xs text-slate-500">{userEmail}</p>
+                  <p className="text-xs font-medium text-slate-900 dark:text-slate-100">{userName}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{userEmail}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <header className="border-b border-slate-200 bg-white px-4 py-2.5 md:px-6">
+          <header className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 md:px-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">{sectionLabel}</p>
-                <h1 className="mt-0.5 text-lg font-semibold text-slate-900">{dashboardTitle}</h1>
-                <p className="mt-0.5 text-xs text-slate-600">
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">{sectionLabel}</p>
+                <h1 className="mt-0.5 text-lg font-semibold text-slate-900 dark:text-slate-100">{dashboardTitle}</h1>
+                <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
                   {dashboardSubtitle}
                 </p>
               </div>
@@ -256,22 +275,55 @@ export default function RoleDashboardLayout({
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
                 >
                   <Search className="h-3.5 w-3.5" />
                   Search
                 </button>
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                >
+                  <Search className="h-3.5 w-3.5" />
+                  Search
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
                 >
                   <BellDot className="h-3.5 w-3.5" />
                   Alerts
                 </button>
                 <button
                   type="button"
+                  onClick={handleExportPDF}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                  title="Export as PDF"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  PDF
+                </button>
+                <button
+                  type="button"
+                  onClick={handleExportCSV}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                  title="Export as CSV"
+                >
+                  <FileJson className="h-3.5 w-3.5" />
+                  CSV
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleTheme}
+                  className="inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                  title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                >
+                  {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+                </button>
+                <button
+                  type="button"
                   onClick={handleLogout}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 dark:bg-red-700 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700 dark:hover:bg-red-800"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                   Logout
@@ -280,7 +332,11 @@ export default function RoleDashboardLayout({
             </div>
           </header>
 
-          <main className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-5">
+          <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 md:px-6">
+            <Breadcrumb />
+          </div>
+
+          <main className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-5 bg-white dark:bg-slate-900">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {kpis.map((kpi, index) => {
                 const neonColors = [
@@ -304,22 +360,22 @@ export default function RoleDashboardLayout({
             </div>
 
             <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_280px]">
-              <section className="flex flex-col rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+              <section className="flex flex-col rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
                 <div className="mb-4">
-                  <h2 className="text-sm font-semibold text-slate-900">{chartTitle}</h2>
-                  <p className="mt-0.5 text-xs text-slate-600">{chartCaption}</p>
+                  <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{chartTitle}</h2>
+                  <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">{chartCaption}</p>
                 </div>
 
                 <div className="mb-2 flex flex-wrap gap-1.5">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-700">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 text-xs text-orange-700 dark:text-orange-300">
                     <ChartNoAxesCombined className="h-3 w-3" />
                     Primary Metric
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 px-2 py-0.5 text-xs text-pink-700">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 dark:bg-pink-900/30 px-2 py-0.5 text-xs text-pink-700 dark:text-pink-300">
                     <ChartNoAxesCombined className="h-3 w-3" />
                     Secondary Metric
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-700 px-2 py-0.5 text-xs text-slate-700 dark:text-slate-300">
                     Live (2.4s)
                   </span>
                 </div>
@@ -330,13 +386,13 @@ export default function RoleDashboardLayout({
               </section>
 
               <div className="flex flex-col gap-4">
-                <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                  <h2 className="mb-2 text-sm font-semibold text-slate-900">Live Activity</h2>
+                <section className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+                  <h2 className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">Live Activity</h2>
                   <div className="space-y-2">
                     {activityFeed.slice(0, 4).map((item) => (
-                      <article key={item.title} className="rounded-md border border-slate-100 bg-slate-50 p-2">
-                        <p className="text-xs font-medium text-slate-900">{item.title}</p>
-                        <p className="mt-0.5 text-[11px] text-slate-500">{item.meta}</p>
+                      <article key={item.title} className="rounded-md border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 p-2">
+                        <p className="text-xs font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
+                        <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{item.meta}</p>
                       </article>
                     ))}
                   </div>
