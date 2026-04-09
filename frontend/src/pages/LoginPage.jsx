@@ -6,6 +6,8 @@ import { googleLogin, loginUser } from "../services/authService";
 import { saveAuth } from "../services/authStorage";
 import { getDashboardPathForRole } from "../services/roleDashboard";
 
+const GSI_INIT_FLAG = "__smartCampusGsiInitialized";
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
@@ -39,24 +41,27 @@ export default function LoginPage() {
         return;
       }
 
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: async (response) => {
-          if (!response?.credential) {
-            setError("Google sign-in failed");
-            return;
-          }
+      if (!window[GSI_INIT_FLAG]) {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response) => {
+            if (!response?.credential) {
+              setError("Google sign-in failed");
+              return;
+            }
 
-          try {
-            const authResponse = await googleLogin(response.credential);
-            saveAuth(authResponse);
-            setMessage(`Welcome, ${authResponse.name}!`);
-            navigate(getDashboardPathForRole(authResponse.role));
-          } catch (requestError) {
-            setError(requestError.message || "Google login failed");
-          }
-        },
-      });
+            try {
+              const authResponse = await googleLogin(response.credential);
+              saveAuth(authResponse);
+              setMessage(`Welcome, ${authResponse.name}!`);
+              navigate(getDashboardPathForRole(authResponse.role));
+            } catch (requestError) {
+              setError(requestError.message || "Google login failed");
+            }
+          },
+        });
+        window[GSI_INIT_FLAG] = true;
+      }
 
       googleButtonRef.current.innerHTML = "";
       window.google.accounts.id.renderButton(googleButtonRef.current, {

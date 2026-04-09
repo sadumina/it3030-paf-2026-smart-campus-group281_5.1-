@@ -4,6 +4,9 @@ const API_BASE_URL = "http://localhost:8080/api/notifications";
 
 async function parseResponse(response) {
   const data = await response.json().catch(() => ({}));
+  if (response.status === 401 || response.status === 403) {
+    throw new Error("Please sign in again to load notifications");
+  }
   if (!response.ok) {
     throw new Error(data.message || "Request failed");
   }
@@ -11,9 +14,10 @@ async function parseResponse(response) {
 }
 
 function authHeaders() {
+  const token = getToken();
   return {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${getToken()}`,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 }
 
