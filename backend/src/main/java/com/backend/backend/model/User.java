@@ -12,6 +12,9 @@ public class User {
     private String email;
     @JsonIgnore
     private String password;
+    @JsonIgnore
+    private String passwordHash; // For Firebase users: "FIREBASE" or "GOOGLE_OAUTH"
+    private String firebaseUid; // Firebase UID for OAuth users
     private String role;
     private String phone;
     private String department;
@@ -83,6 +86,22 @@ public class User {
         this.department = department;
     }
 
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getFirebaseUid() {
+        return firebaseUid;
+    }
+
+    public void setFirebaseUid(String firebaseUid) {
+        this.firebaseUid = firebaseUid;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -90,6 +109,8 @@ public class User {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", password='[PROTECTED]'" +
+                ", passwordHash='" + passwordHash + '\'' +
+                ", firebaseUid='" + firebaseUid + '\'' +
                 ", role='" + role + '\'' +
                 ", phone='" + phone + '\'' +
                 ", department='" + department + '\'' +
