@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { BadgeCheck, BellRing, CalendarCheck2, Wrench } from "lucide-react";
 import { googleLogin, loginUser } from "../services/authService";
 import { saveAuth } from "../services/authStorage";
+import { getDashboardPathForRole } from "../services/roleDashboard";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export default function LoginPage() {
             const authResponse = await googleLogin(response.credential);
             saveAuth(authResponse);
             setMessage(`Welcome, ${authResponse.name}!`);
-            navigate("/dashboard");
+            navigate(getDashboardPathForRole(authResponse.role));
           } catch (requestError) {
             setError(requestError.message || "Google login failed");
           }
@@ -104,7 +105,7 @@ export default function LoginPage() {
 
       saveAuth(response);
       setMessage(`Welcome back, ${response.name}! Login successful.`);
-      navigate("/dashboard");
+      navigate(getDashboardPathForRole(response.role));
     } catch (requestError) {
       setError(requestError.message || "Login failed");
     } finally {

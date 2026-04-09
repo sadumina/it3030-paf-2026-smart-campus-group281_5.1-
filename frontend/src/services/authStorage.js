@@ -1,4 +1,5 @@
 const AUTH_KEY = "campusAuth";
+const LEGACY_TOKEN_KEY = "authToken";
 
 export function saveAuth(authResponse) {
   if (!authResponse) {
@@ -6,6 +7,11 @@ export function saveAuth(authResponse) {
   }
 
   localStorage.setItem(AUTH_KEY, JSON.stringify(authResponse));
+
+  // Keep legacy key in sync for older API consumers.
+  if (authResponse.token) {
+    localStorage.setItem(LEGACY_TOKEN_KEY, authResponse.token);
+  }
 }
 
 export function getAuth() {
@@ -24,10 +30,11 @@ export function getAuth() {
 
 export function clearAuth() {
   localStorage.removeItem(AUTH_KEY);
+  localStorage.removeItem(LEGACY_TOKEN_KEY);
 }
 
 export function getToken() {
-  return getAuth()?.token || "";
+  return getAuth()?.token || localStorage.getItem(LEGACY_TOKEN_KEY) || "";
 }
 
 export function getRole() {
