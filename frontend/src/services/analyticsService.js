@@ -1,3 +1,5 @@
+import { getToken } from "./authStorage";
+
 const API_BASE_URL = "http://localhost:8080/api/users";
 
 export const fetchAnalyticsSummary = async () => {
@@ -6,7 +8,7 @@ export const fetchAnalyticsSummary = async () => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        Authorization: `Bearer ${getToken()}`,
       },
     });
 
