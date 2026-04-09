@@ -1,5 +1,19 @@
 package com.backend.backend.controller;
 
+import java.util.Map;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.backend.backend.dto.AuthResponse;
 import com.backend.backend.dto.FirebaseLoginRequest;
 import com.backend.backend.dto.FirebaseRegisterRequest;
@@ -8,246 +22,154 @@ import com.backend.backend.service.FirebaseAuthenticationService;
 import com.backend.backend.service.JwtService;
 import com.backend.backend.service.UserService;
 import com.google.firebase.auth.FirebaseToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.Map;
 
-/**
- * Firebase Authentication Controller
- * Handles Firebase-based login, registration, and OAuth
- */
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(originPatterns = { "http://localhost:*", "http://127.0.0.1:*" })
 public class FirebaseAuthController {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(FirebaseAuthController.class);
-    
-    @Autowired
-    private FirebaseAuthenticationService firebaseAuthService;
-    
-    @Autowired
-    private UserService userService;
-    
-    @Autowired
-    private JwtService jwtService;
 
-    /**
-     * Firebase Email/Password Registration
-     * POST /api/auth/firebase-register
-     * 
-     * Registers a new user in Smart Campus database
-     * User is already created in Firebase by SDK
-     */
+    private final FirebaseAuthenticationService firebaseAuthService;
+    private final UserService userService;
+    private final JwtService jwtService;
+
+    public FirebaseAuthController(
+            FirebaseAuthenticationService firebaseAuthService,
+            UserService userService,
+            JwtService jwtService) {
+        this.firebaseAuthService = firebaseAuthService;
+        this.userService = userService;
+        this.jwtService = jwtService;
+    }
+
     @PostMapping("/firebase-register")
-    public ResponseEntity<?> firebaseRegister(@RequestBody FirebaseRegisterRequest request) {
-        try {
-            logger.info("Firebase registration request for: {}", request.getEmail());
-            
-            // Check if user already exists in Smart Campus
-            if (userService.getUserByEmail(request.getEmail()) != null) {
-                return ResponseEntity.badRequest().body(
-                    new AuthResponse(false, "User already registered", null, null)
-                );
-            }
-            
-            // Create user in Smart Campus database
-            User newUser = new User();
-            newUser.setEmail(request.getEmail());
-            newUser.setName(request.getName());
-            newUser.setFirebaseUid(request.getFirebaseUid());
-            newUser.setRole("USER"); // Default role for registration
-            newUser.setPasswordHash("FIREBASE"); // No password hash for Firebase users
-            
-            User savedUser = userService.saveUser(newUser);
-            
-            // Generate JWT token for Smart Campus
-            String token = jwtService.generateToken(savedUser.getEmail(), savedUser.getRole());
-            
-            logger.info("User registered successfully: {}", request.getEmail());
-            
-            return ResponseEntity.ok(new AuthResponse(
-                true,
-                "Registration successful",
-                token,
-                "USER"
-            ));
-            
-        } catch (Exception e) {
-            logger.error("Registration error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new AuthResponse(false, e.getMessage(), null, null)
-            );
+    public ResponseEntity<AuthResponse> firebaseRegister(@RequestBody FirebaseRegisterRequest request) {
+        if (request.getEmail() == null || request.getEmail().isBlank() ||
+                request.getName() == null || request.getName().isBlank() ||
+                request.getFirebaseUid() == null || request.getFirebaseUid().isBlank()) {
+            return new ResponseEntity<>(
+                    new AuthResponse(false, "Name, email and firebaseUid are required", null, null, null, null, null),
+                    HttpStatus.BAD_REQUEST);
         }
+
+        String email = request.getEmail().trim().toLowerCase();
+        Optional<User> existing = userService.getUserByEmail(email);
+        if (existing.isPresent()) {
+            User found = existing.get();
+            String token = jwtService.generateToken(found.getId(), found.getEmail(), found.getRole());
+            return new ResponseEntity<>(
+                    new AuthResponse(true, "User already registered", token, found.getId(), found.getName(), found.getEmail(),
+                            found.getRole()),
+                    HttpStatus.OK);
+        }
+
+        User user = new User();
+        user.setName(request.getName().trim());
+        user.setEmail(email);
+        user.setPassword("");
+        user.setPasswordHash("FIREBASE");
+        user.setFirebaseUid(request.getFirebaseUid().trim());
+        user.setRole("USER");
+
+        User created = userService.createUser(user);
+        String token = jwtService.generateToken(created.getId(), created.getEmail(), created.getRole());
+
+        logger.info("Firebase registration successful for {}", created.getEmail());
+        return new ResponseEntity<>(
+                new AuthResponse(true, "Registration successful", token, created.getId(), created.getName(),
+                        created.getEmail(), created.getRole()),
+                HttpStatus.CREATED);
     }
 
-    /**
-     * Firebase Email/Password Login
-     * POST /api/auth/firebase-login
-     * 
-     * Authenticates user with Firebase and issues Smart Campus JWT
-     */
     @PostMapping("/firebase-login")
-    public ResponseEntity<?> firebaseLogin(@RequestBody FirebaseLoginRequest request) {
-        try {
-            logger.info("Firebase login request for: {}", request.getEmail());
-            
-            // Verify Firebase ID token
-            FirebaseToken decodedToken = firebaseAuthService.verifyIdToken(request.getIdToken());
-            if (decodedToken == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    new AuthResponse(false, "Invalid Firebase token", null, null)
-                );
-            }
-            
-            // Get or create user in Smart Campus
-            User user = userService.getUserByEmail(request.getEmail());
-            if (user == null) {
-                // Create new user if doesn't exist
-                user = new User();
-                user.setEmail(request.getEmail());
-                user.setName(decodedToken.getName() != null ? decodedToken.getName() : "Firebase User");
-                user.setFirebaseUid(request.getFirebaseUid());
-                user.setRole("USER");
-                user.setPasswordHash("FIREBASE");
-                user = userService.saveUser(user);
-                logger.info("New user created: {}", request.getEmail());
-            } else {
-                // Update Firebase UID if not already set
-                if (user.getFirebaseUid() == null) {
-                    user.setFirebaseUid(request.getFirebaseUid());
-                    userService.saveUser(user);
-                }
-            }
-            
-            // Generate JWT token
-            String token = jwtService.generateToken(user.getEmail(), user.getRole());
-            
-            logger.info("User logged in successfully: {}", request.getEmail());
-            
-            return ResponseEntity.ok(new AuthResponse(
-                true,
-                "Login successful",
-                token,
-                user.getRole()
-            ));
-            
-        } catch (Exception e) {
-            logger.error("Login error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new AuthResponse(false, e.getMessage(), null, null)
-            );
+    public ResponseEntity<AuthResponse> firebaseLogin(@RequestBody FirebaseLoginRequest request) {
+        if (request.getIdToken() == null || request.getIdToken().isBlank()) {
+            return new ResponseEntity<>(
+                    new AuthResponse(false, "Firebase ID token is required", null, null, null, null, null),
+                    HttpStatus.BAD_REQUEST);
         }
+
+        FirebaseToken decodedToken = firebaseAuthService.verifyIdToken(request.getIdToken().trim());
+        if (decodedToken == null) {
+            return new ResponseEntity<>(
+                    new AuthResponse(false, "Invalid Firebase token", null, null, null, null, null),
+                    HttpStatus.UNAUTHORIZED);
+        }
+
+        String email = (decodedToken.getEmail() == null ? request.getEmail() : decodedToken.getEmail());
+        if (email == null || email.isBlank()) {
+            return new ResponseEntity<>(
+                    new AuthResponse(false, "Email is required", null, null, null, null, null),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        String normalizedEmail = email.trim().toLowerCase();
+        String firebaseUid = decodedToken.getUid();
+
+        User user = userService.getUserByEmail(normalizedEmail).orElseGet(() -> {
+            User fresh = new User();
+            fresh.setName(decodedToken.getName() != null ? decodedToken.getName() : "Firebase User");
+            fresh.setEmail(normalizedEmail);
+            fresh.setPassword("");
+            fresh.setPasswordHash("FIREBASE");
+            fresh.setFirebaseUid(firebaseUid);
+            fresh.setRole("USER");
+            return userService.createUser(fresh);
+        });
+
+        if (user.getFirebaseUid() == null || user.getFirebaseUid().isBlank()) {
+            user.setFirebaseUid(firebaseUid);
+            user = userService.updateUser(user.getId(), user);
+        }
+
+        String token = jwtService.generateToken(user.getId(), user.getEmail(), user.getRole());
+        logger.info("Firebase login successful for {}", user.getEmail());
+
+        return new ResponseEntity<>(
+                new AuthResponse(true, "Login successful", token, user.getId(), user.getName(), user.getEmail(),
+                        user.getRole()),
+                HttpStatus.OK);
     }
 
-    /**
-     * Firebase Google OAuth Login
-     * POST /api/auth/firebase-google
-     * 
-     * Authenticates user with Google OAuth via Firebase
-     */
     @PostMapping("/firebase-google")
-    public ResponseEntity<?> firebaseGoogleLogin(@RequestBody Map<String, String> request) {
-        try {
-            String idToken = request.get("idToken");
-            logger.info("Firebase Google login request");
-            
-            // Verify Firebase Google token
-            FirebaseToken decodedToken = firebaseAuthService.verifyIdToken(idToken);
-            if (decodedToken == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-                    new AuthResponse(false, "Invalid Firebase token", null, null)
-                );
-            }
-            
-            String email = decodedToken.getEmail();
-            String name = decodedToken.getName();
-            String firebaseUid = decodedToken.getUid();
-            
-            // Get or create user in Smart Campus
-            User user = userService.getUserByEmail(email);
-            if (user == null) {
-                user = new User();
-                user.setEmail(email);
-                user.setName(name);
-                user.setFirebaseUid(firebaseUid);
-                user.setRole("USER");
-                user.setPasswordHash("GOOGLE_OAUTH");
-                user = userService.saveUser(user);
-                logger.info("New Google user created: {}", email);
-            } else if (user.getFirebaseUid() == null) {
-                user.setFirebaseUid(firebaseUid);
-                userService.saveUser(user);
-            }
-            
-            // Generate JWT token
-            String token = jwtService.generateToken(user.getEmail(), user.getRole());
-            
-            logger.info("Google user logged in: {}", email);
-            
-            return ResponseEntity.ok(new AuthResponse(
-                true,
-                "Google login successful",
-                token,
-                user.getRole()
-            ));
-            
-        } catch (Exception e) {
-            logger.error("Google login error: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-                new AuthResponse(false, e.getMessage(), null, null)
-            );
+    public ResponseEntity<AuthResponse> firebaseGoogleLogin(@RequestBody Map<String, String> request) {
+        String idToken = request.get("idToken");
+        if (idToken == null || idToken.isBlank()) {
+            return new ResponseEntity<>(
+                    new AuthResponse(false, "Google ID token is required", null, null, null, null, null),
+                    HttpStatus.BAD_REQUEST);
         }
+
+        FirebaseToken decodedToken = firebaseAuthService.verifyIdToken(idToken.trim());
+        if (decodedToken == null || decodedToken.getEmail() == null || decodedToken.getEmail().isBlank()) {
+            return new ResponseEntity<>(
+                    new AuthResponse(false, "Invalid Firebase token", null, null, null, null, null),
+                    HttpStatus.UNAUTHORIZED);
+        }
+
+        String email = decodedToken.getEmail().trim().toLowerCase();
+        User user = userService.findOrCreateGoogleUser(decodedToken.getName(), email, "USER");
+
+        if (user.getFirebaseUid() == null || user.getFirebaseUid().isBlank()) {
+            user.setFirebaseUid(decodedToken.getUid());
+            user = userService.updateUser(user.getId(), user);
+        }
+
+        String token = jwtService.generateToken(user.getId(), user.getEmail(), user.getRole());
+        logger.info("Firebase Google login successful for {}", user.getEmail());
+
+        return new ResponseEntity<>(
+                new AuthResponse(true, "Google login successful", token, user.getId(), user.getName(),
+                        user.getEmail(), user.getRole()),
+                HttpStatus.OK);
     }
 
-    /**
-     * Check Firebase Status
-     * GET /api/auth/firebase-status
-     */
     @GetMapping("/firebase-status")
-    public ResponseEntity<?> firebaseStatus() {
-        return ResponseEntity.ok(new java.util.HashMap<String, Object>() {{
-            put("initialized", firebaseAuthService.isInitialized());
-            put("message", firebaseAuthService.isInitialized() 
-                ? "Firebase is initialized and ready" 
-                : "Firebase is not initialized");
-        }});
+    public ResponseEntity<Map<String, Object>> firebaseStatus() {
+        boolean initialized = firebaseAuthService.isInitialized();
+        return ResponseEntity.ok(Map.of(
+                "initialized", initialized,
+                "message", initialized ? "Firebase is initialized and ready" : "Firebase is not initialized"));
     }
-}
-
-// DTO classes for Firebase
-class FirebaseRegisterRequest {
-    public String firebaseUid;
-    public String email;
-    public String name;
-    
-    public FirebaseRegisterRequest() {}
-    
-    public FirebaseRegisterRequest(String firebaseUid, String email, String name) {
-        this.firebaseUid = firebaseUid;
-        this.email = email;
-        this.name = name;
-    }
-    
-    // Getters
-    public String getFirebaseUid() { return firebaseUid; }
-    public String getEmail() { return email; }
-    public String getName() { return name; }
-}
-
-class FirebaseLoginRequest {
-    public String firebaseUid;
-    public String email;
-    public String idToken;
-    
-    public FirebaseLoginRequest() {}
-    
-    // Getters
-    public String getFirebaseUid() { return firebaseUid; }
-    public String getEmail() { return email; }
-    public String getIdToken() { return idToken; }
 }
