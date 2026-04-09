@@ -282,16 +282,25 @@ export default function RoleDashboardLayout({
 
           <main className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-5">
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {kpis.map((kpi) => (
-                <article
-                  key={kpi.label}
-                  className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm transition hover:shadow-md"
-                >
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{kpi.label}</p>
-                  <p className="mt-1.5 text-2xl font-bold text-slate-900">{kpi.value}</p>
-                  <p className="mt-0.5 text-xs text-slate-600">{kpi.change}</p>
-                </article>
-              ))}
+              {kpis.map((kpi, index) => {
+                const neonColors = [
+                  { bg: "from-pink-500 via-pink-600 to-red-600", border: "border-pink-400", label: "text-pink-100", value: "text-white", change: "text-pink-100", shadow: "shadow-lg shadow-pink-500/50 hover:shadow-pink-500/80" },
+                  { bg: "from-red-500 via-orange-600 to-yellow-500", border: "border-orange-400", label: "text-orange-100", value: "text-white", change: "text-orange-100", shadow: "shadow-lg shadow-orange-500/50 hover:shadow-orange-500/80" },
+                  { bg: "from-green-400 via-emerald-500 to-cyan-500", border: "border-green-300", label: "text-green-100", value: "text-white", change: "text-green-100", shadow: "shadow-lg shadow-green-500/50 hover:shadow-green-500/80" },
+                  { bg: "from-cyan-400 via-blue-500 to-purple-600", border: "border-cyan-300", label: "text-cyan-100", value: "text-white", change: "text-cyan-100", shadow: "shadow-lg shadow-blue-500/50 hover:shadow-blue-500/80" },
+                ];
+                const color = neonColors[index % 4];
+                return (
+                  <article
+                    key={kpi.label}
+                    className={`rounded-lg border-2 ${color.border} bg-gradient-to-br ${color.bg} p-4 ${color.shadow} transition duration-300 hover:scale-105 cursor-pointer backdrop-blur-sm`}
+                  >
+                    <p className={`text-xs font-semibold ${color.label} uppercase tracking-wider opacity-90`}>{kpi.label}</p>
+                    <p className={`mt-1.5 text-3xl font-black ${color.value}`}>{kpi.value}</p>
+                    <p className={`mt-0.5 text-xs ${color.change} opacity-90`}>{kpi.change}</p>
+                  </article>
+                );
+              })}
             </div>
 
             <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_280px]">
