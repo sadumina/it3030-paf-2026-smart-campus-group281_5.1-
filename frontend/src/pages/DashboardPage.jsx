@@ -10,8 +10,13 @@ import {
 } from "lucide-react";
 
 const userSidebar = [
-  { label: "Overview", icon: LayoutDashboard },
-  { label: "My Bookings", badge: "7", icon: CalendarDays },
+  { label: "Overview", icon: LayoutDashboard, path: "/dashboard" },
+  {
+    label: "My Bookings",
+    badge: "7",
+    icon: CalendarDays,
+    path: "/dashboard/bookings",
+  },
   { label: "New Reservation", icon: PlusCircle },
   { label: "Incident Reports", icon: TriangleAlert },
   { label: "Availability", icon: CalendarClock },

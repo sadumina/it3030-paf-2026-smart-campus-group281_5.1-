@@ -62,7 +62,6 @@ public class AuthController {
                     request.getEmail().trim().toLowerCase(),
                     request.getPassword(),
                     null);  // Force USER role"}}]
-</invoke>
 
 
             String token = jwtService.generateToken(

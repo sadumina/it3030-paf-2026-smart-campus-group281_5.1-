@@ -12,6 +12,9 @@ public class BookingRequestDTO {
     @NotBlank(message = "User ID is required")
     private String userId;
 
+    @NotBlank(message = "Student ID is required")
+    private String studentId;
+
     @NotNull(message = "Start time is required")
     @Future
     private LocalDateTime startTime;

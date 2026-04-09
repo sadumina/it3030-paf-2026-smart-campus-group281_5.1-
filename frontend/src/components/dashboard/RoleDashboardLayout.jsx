@@ -145,6 +145,7 @@ export default function RoleDashboardLayout({
   chartPoints,
   chartColor,
   extraContent,
+  hideDashboardWidgets = false,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -348,70 +349,74 @@ export default function RoleDashboardLayout({
           </div>
 
           <main className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-5 bg-white dark:bg-slate-900">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {kpis.map((kpi, index) => {
-                const neonColors = [
-                  { bg: "from-pink-500 via-pink-600 to-red-600", border: "border-pink-400", label: "text-pink-100", value: "text-white", change: "text-pink-100", shadow: "shadow-lg shadow-pink-500/50 hover:shadow-pink-500/80" },
-                  { bg: "from-red-500 via-orange-600 to-yellow-500", border: "border-orange-400", label: "text-orange-100", value: "text-white", change: "text-orange-100", shadow: "shadow-lg shadow-orange-500/50 hover:shadow-orange-500/80" },
-                  { bg: "from-green-400 via-emerald-500 to-cyan-500", border: "border-green-300", label: "text-green-100", value: "text-white", change: "text-green-100", shadow: "shadow-lg shadow-green-500/50 hover:shadow-green-500/80" },
-                  { bg: "from-cyan-400 via-blue-500 to-purple-600", border: "border-cyan-300", label: "text-cyan-100", value: "text-white", change: "text-cyan-100", shadow: "shadow-lg shadow-blue-500/50 hover:shadow-blue-500/80" },
-                ];
-                const color = neonColors[index % 4];
-                return (
-                  <article
-                    key={kpi.label}
-                    className={`rounded-lg border-2 ${color.border} bg-gradient-to-br ${color.bg} p-4 ${color.shadow} transition duration-300 hover:scale-105 cursor-pointer backdrop-blur-sm`}
-                  >
-                    <p className={`text-xs font-semibold ${color.label} uppercase tracking-wider opacity-90`}>{kpi.label}</p>
-                    <p className={`mt-1.5 text-3xl font-black ${color.value}`}>{kpi.value}</p>
-                    <p className={`mt-0.5 text-xs ${color.change} opacity-90`}>{kpi.change}</p>
-                  </article>
-                );
-              })}
-            </div>
-
-            <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_280px]">
-              <section className="flex flex-col rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
-                <div className="mb-4">
-                  <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{chartTitle}</h2>
-                  <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">{chartCaption}</p>
-                </div>
-
-                <div className="mb-2 flex flex-wrap gap-1.5">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 text-xs text-orange-700 dark:text-orange-300">
-                    <ChartNoAxesCombined className="h-3 w-3" />
-                    Primary Metric
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 dark:bg-pink-900/30 px-2 py-0.5 text-xs text-pink-700 dark:text-pink-300">
-                    <ChartNoAxesCombined className="h-3 w-3" />
-                    Secondary Metric
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-700 px-2 py-0.5 text-xs text-slate-700 dark:text-slate-300">
-                    Live (2.4s)
-                  </span>
-                </div>
-
-                <div className="flex-1 min-h-0 -mx-4">
-                  <ProfessionalChart points={livePoints} color={chartColor} />
-                </div>
-              </section>
-
-              <div className="flex flex-col gap-4">
-                <section className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
-                  <h2 className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">Live Activity</h2>
-                  <div className="space-y-2">
-                    {activityFeed.slice(0, 4).map((item) => (
-                      <article key={item.title} className="rounded-md border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 p-2">
-                        <p className="text-xs font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
-                        <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{item.meta}</p>
+            {!hideDashboardWidgets && (
+              <>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {kpis.map((kpi, index) => {
+                    const neonColors = [
+                      { bg: "from-pink-500 via-pink-600 to-red-600", border: "border-pink-400", label: "text-pink-100", value: "text-white", change: "text-pink-100", shadow: "shadow-lg shadow-pink-500/50 hover:shadow-pink-500/80" },
+                      { bg: "from-red-500 via-orange-600 to-yellow-500", border: "border-orange-400", label: "text-orange-100", value: "text-white", change: "text-orange-100", shadow: "shadow-lg shadow-orange-500/50 hover:shadow-orange-500/80" },
+                      { bg: "from-green-400 via-emerald-500 to-cyan-500", border: "border-green-300", label: "text-green-100", value: "text-white", change: "text-green-100", shadow: "shadow-lg shadow-green-500/50 hover:shadow-green-500/80" },
+                      { bg: "from-cyan-400 via-blue-500 to-purple-600", border: "border-cyan-300", label: "text-cyan-100", value: "text-white", change: "text-cyan-100", shadow: "shadow-lg shadow-blue-500/50 hover:shadow-blue-500/80" },
+                    ];
+                    const color = neonColors[index % 4];
+                    return (
+                      <article
+                        key={kpi.label}
+                        className={`rounded-lg border-2 ${color.border} bg-gradient-to-br ${color.bg} p-4 ${color.shadow} transition duration-300 hover:scale-105 cursor-pointer backdrop-blur-sm`}
+                      >
+                        <p className={`text-xs font-semibold ${color.label} uppercase tracking-wider opacity-90`}>{kpi.label}</p>
+                        <p className={`mt-1.5 text-3xl font-black ${color.value}`}>{kpi.value}</p>
+                        <p className={`mt-0.5 text-xs ${color.change} opacity-90`}>{kpi.change}</p>
                       </article>
-                    ))}
-                  </div>
-                </section>
+                    );
+                  })}
+                </div>
 
-                <NotificationPanel />
-              </div>
-            </div>
+                <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_280px]">
+                  <section className="flex flex-col rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+                    <div className="mb-4">
+                      <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{chartTitle}</h2>
+                      <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">{chartCaption}</p>
+                    </div>
+
+                    <div className="mb-2 flex flex-wrap gap-1.5">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 text-xs text-orange-700 dark:text-orange-300">
+                        <ChartNoAxesCombined className="h-3 w-3" />
+                        Primary Metric
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 dark:bg-pink-900/30 px-2 py-0.5 text-xs text-pink-700 dark:text-pink-300">
+                        <ChartNoAxesCombined className="h-3 w-3" />
+                        Secondary Metric
+                      </span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-700 px-2 py-0.5 text-xs text-slate-700 dark:text-slate-300">
+                        Live (2.4s)
+                      </span>
+                    </div>
+
+                    <div className="flex-1 min-h-0 -mx-4">
+                      <ProfessionalChart points={livePoints} color={chartColor} />
+                    </div>
+                  </section>
+
+                  <div className="flex flex-col gap-4">
+                    <section className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+                      <h2 className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">Live Activity</h2>
+                      <div className="space-y-2">
+                        {activityFeed.slice(0, 4).map((item) => (
+                          <article key={item.title} className="rounded-md border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 p-2">
+                            <p className="text-xs font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
+                            <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{item.meta}</p>
+                          </article>
+                        ))}
+                      </div>
+                    </section>
+
+                    <NotificationPanel />
+                  </div>
+                </div>
+              </>
+            )}
 
             {extraContent ? extraContent : null}
           </main>

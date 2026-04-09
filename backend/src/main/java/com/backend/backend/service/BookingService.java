@@ -40,6 +40,7 @@ public class BookingService {
         Booking booking = new Booking();
         booking.setResourceId(request.getResourceId());
         booking.setUserId(request.getUserId());
+        booking.setStudentId(request.getStudentId());
         booking.setStartTime(request.getStartTime());
         booking.setEndTime(request.getEndTime());
         booking.setPurpose(request.getPurpose());

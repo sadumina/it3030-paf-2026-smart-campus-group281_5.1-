@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createBooking } from "../../services/bookingService";
+import { getAuth } from "../../services/authStorage";
 
 const RESOURCE_OPTIONS = [
   { value: "LAB-01", label: "Computer Lab 01" },
@@ -24,8 +25,8 @@ function StepIndicator({ step }) {
                 i + 1 < step
                   ? "bg-indigo-600 text-white"
                   : i + 1 === step
-                  ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/40"
-                  : "bg-slate-100 text-slate-400"
+                    ? "bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-lg shadow-indigo-500/40"
+                    : "bg-slate-100 text-slate-400"
               }`}
             >
               {i + 1 < step ? "✓" : i + 1}
@@ -51,9 +52,15 @@ function StepIndicator({ step }) {
   );
 }
 
-export default function StudentBookingForm() {
+export default function StudentBookingForm({
+  embedded = false,
+  initialUserId = "",
+  onSuccess,
+  onClose,
+}) {
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
+  const accountUserId = initialUserId || getAuth()?.id || "";
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -62,7 +69,8 @@ export default function StudentBookingForm() {
 
   const [form, setForm] = useState({
     resourceId: "",
-    userId: "",
+    userId: accountUserId,
+    studentId: "",
     date: today,
     startTime: "",
     endTime: "",
@@ -97,7 +105,7 @@ export default function StudentBookingForm() {
       }
     }
     if (step === 3) {
-      if (!form.userId.trim()) {
+      if (!form.studentId.trim()) {
         setError("Please enter your Student ID.");
         return false;
       }
@@ -120,19 +128,24 @@ export default function StudentBookingForm() {
     try {
       const bookingData = {
         resourceId: form.resourceId,
-        userId: form.userId,
+        userId: accountUserId,
+        studentId: form.studentId,
         startTime: `${form.date}T${form.startTime}:00`,
         endTime: `${form.date}T${form.endTime}:00`,
         purpose: form.purpose,
         expectedAttendees: Number(form.expectedAttendees) || 1,
       };
       await createBooking(bookingData);
+      if (embedded && onSuccess) {
+        onSuccess();
+        return;
+      }
       setSuccess(true);
     } catch (err) {
       setError(
         err.response?.data?.message ||
           err.response?.data ||
-          "Failed to submit booking. Please try again."
+          "Failed to submit booking. Please try again.",
       );
     } finally {
       setLoading(false);
@@ -145,33 +158,72 @@ export default function StudentBookingForm() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 flex items-center justify-center p-6">
+      <div
+        className={`${embedded ? "" : "min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 flex items-center justify-center p-6"}`}
+      >
         <div className="bg-white rounded-3xl shadow-2xl p-10 text-center max-w-md w-full">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+            <svg
+              className="w-10 h-10 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2.5}
+                d="M5 13l4 4L19 7"
+              />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-slate-800 mb-2">Booking Submitted!</h2>
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">
+            Booking Submitted!
+          </h2>
           <p className="text-slate-500 mb-2">
-            Your request for <strong>{resourceLabel}</strong> has been submitted.
+            Your request for <strong>{resourceLabel}</strong> has been
+            submitted.
           </p>
           <p className="text-slate-400 text-sm mb-8">
-            Status: <span className="font-semibold text-amber-500">PENDING</span> — an admin will review it shortly.
+            Status:{" "}
+            <span className="font-semibold text-amber-500">PENDING</span> — an
+            admin will review it shortly.
           </p>
           <div className="flex gap-3">
             <button
-              onClick={() => { setSuccess(false); setStep(1); setForm({ resourceId: "", userId: "", date: today, startTime: "", endTime: "", purpose: "", expectedAttendees: 1 }); }}
+              onClick={() => {
+                setSuccess(false);
+                setStep(1);
+                setForm({
+                  resourceId: "",
+                  userId: accountUserId,
+                  studentId: "",
+                  date: today,
+                  startTime: "",
+                  endTime: "",
+                  purpose: "",
+                  expectedAttendees: 1,
+                });
+              }}
               className="flex-1 border-2 border-indigo-100 text-indigo-600 font-semibold py-3 rounded-xl hover:bg-indigo-50 transition"
             >
               New Booking
             </button>
-            <button
-              onClick={() => navigate("/booking")}
-              className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 rounded-xl hover:opacity-90 transition"
-            >
-              Back to Home
-            </button>
+            {embedded ? (
+              <button
+                onClick={() => onClose?.()}
+                className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 rounded-xl hover:opacity-90 transition"
+              >
+                Close
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/dashboard/bookings")}
+                className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold py-3 rounded-xl hover:opacity-90 transition"
+              >
+                Back to Bookings
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -179,22 +231,40 @@ export default function StudentBookingForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 flex items-center justify-center p-6">
+    <div
+      className={`${embedded ? "" : "min-h-screen bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 flex items-center justify-center p-6"}`}
+    >
       <div className="w-full max-w-xl">
         {/* Header */}
-        <div className="text-center mb-6">
-          <button
-            onClick={() => navigate("/booking")}
-            className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm transition mb-4"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back
-          </button>
-          <h1 className="text-3xl font-extrabold text-white">Resource Booking</h1>
-          <p className="text-white/50 text-sm mt-1">Fill in the details to submit your request</p>
-        </div>
+        {!embedded && (
+          <div className="text-center mb-6">
+            <button
+              onClick={() => navigate("/dashboard/bookings")}
+              className="inline-flex items-center gap-2 text-white/60 hover:text-white text-sm transition mb-4"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+              Back
+            </button>
+            <h1 className="text-3xl font-extrabold text-white">
+              Resource Booking
+            </h1>
+            <p className="text-white/50 text-sm mt-1">
+              Fill in the details to submit your request
+            </p>
+          </div>
+        )}
 
         {/* Card */}
         <div className="bg-white rounded-3xl shadow-2xl p-8">
@@ -202,8 +272,16 @@ export default function StudentBookingForm() {
 
           {error && (
             <div className="mb-5 bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3 flex items-center gap-2">
-              <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              <svg
+                className="w-4 h-4 shrink-0"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                  clipRule="evenodd"
+                />
               </svg>
               {error}
             </div>
@@ -212,7 +290,9 @@ export default function StudentBookingForm() {
           {/* Step 1: Resource */}
           {step === 1 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">Select a Resource</h3>
+              <h3 className="text-lg font-bold text-slate-800 mb-4">
+                Select a Resource
+              </h3>
               <div className="grid grid-cols-1 gap-3">
                 {RESOURCE_OPTIONS.map((opt) => (
                   <label
@@ -232,13 +312,23 @@ export default function StudentBookingForm() {
                       className="accent-indigo-600"
                     />
                     <div>
-                      <p className="font-semibold text-slate-700">{opt.label}</p>
+                      <p className="font-semibold text-slate-700">
+                        {opt.label}
+                      </p>
                       <p className="text-xs text-slate-400">{opt.value}</p>
                     </div>
                     {form.resourceId === opt.value && (
                       <span className="ml-auto text-indigo-600">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <svg
+                          className="w-5 h-5"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       </span>
                     )}
@@ -251,9 +341,13 @@ export default function StudentBookingForm() {
           {/* Step 2: Date & Time */}
           {step === 2 && (
             <div className="space-y-5">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">Select Date & Time</h3>
+              <h3 className="text-lg font-bold text-slate-800 mb-4">
+                Select Date & Time
+              </h3>
               <div>
-                <label className="block text-sm font-semibold text-slate-600 mb-1.5">Date</label>
+                <label className="block text-sm font-semibold text-slate-600 mb-1.5">
+                  Date
+                </label>
                 <input
                   type="date"
                   name="date"
@@ -265,7 +359,9 @@ export default function StudentBookingForm() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-600 mb-1.5">Start Time</label>
+                  <label className="block text-sm font-semibold text-slate-600 mb-1.5">
+                    Start Time
+                  </label>
                   <input
                     type="time"
                     name="startTime"
@@ -275,7 +371,9 @@ export default function StudentBookingForm() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-600 mb-1.5">End Time</label>
+                  <label className="block text-sm font-semibold text-slate-600 mb-1.5">
+                    End Time
+                  </label>
                   <input
                     type="time"
                     name="endTime"
@@ -285,37 +383,56 @@ export default function StudentBookingForm() {
                   />
                 </div>
               </div>
-              {form.startTime && form.endTime && form.startTime < form.endTime && (
-                <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-3 text-sm text-indigo-700 flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"/></svg>
-                  Duration: {(() => {
-                    const [sh, sm] = form.startTime.split(":").map(Number);
-                    const [eh, em] = form.endTime.split(":").map(Number);
-                    const mins = (eh * 60 + em) - (sh * 60 + sm);
-                    return `${Math.floor(mins / 60)}h ${mins % 60}m`;
-                  })()}
-                </div>
-              )}
+              {form.startTime &&
+                form.endTime &&
+                form.startTime < form.endTime && (
+                  <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-3 text-sm text-indigo-700 flex items-center gap-2">
+                    <svg
+                      className="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    Duration:{" "}
+                    {(() => {
+                      const [sh, sm] = form.startTime.split(":").map(Number);
+                      const [eh, em] = form.endTime.split(":").map(Number);
+                      const mins = eh * 60 + em - (sh * 60 + sm);
+                      return `${Math.floor(mins / 60)}h ${mins % 60}m`;
+                    })()}
+                  </div>
+                )}
             </div>
           )}
 
           {/* Step 3: Details */}
           {step === 3 && (
             <div className="space-y-5">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">Your Details</h3>
+              <h3 className="text-lg font-bold text-slate-800 mb-4">
+                Your Details
+              </h3>
               <div>
-                <label className="block text-sm font-semibold text-slate-600 mb-1.5">Student ID</label>
+                <label className="block text-sm font-semibold text-slate-600 mb-1.5">
+                  Student ID
+                </label>
                 <input
                   type="text"
-                  name="userId"
+                  name="studentId"
                   placeholder="e.g. STU-2024-001"
-                  value={form.userId}
+                  value={form.studentId}
                   onChange={handleChange}
                   className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-slate-700 transition placeholder-slate-300"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-600 mb-1.5">Purpose of Booking</label>
+                <label className="block text-sm font-semibold text-slate-600 mb-1.5">
+                  Purpose of Booking
+                </label>
                 <textarea
                   name="purpose"
                   rows={3}
@@ -327,7 +444,10 @@ export default function StudentBookingForm() {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-slate-600 mb-1.5">
-                  Expected Attendees: <span className="text-indigo-600 font-bold">{form.expectedAttendees}</span>
+                  Expected Attendees:{" "}
+                  <span className="text-indigo-600 font-bold">
+                    {form.expectedAttendees}
+                  </span>
                 </label>
                 <input
                   type="range"
@@ -339,7 +459,9 @@ export default function StudentBookingForm() {
                   className="w-full accent-indigo-600"
                 />
                 <div className="flex justify-between text-xs text-slate-400 mt-1">
-                  <span>1</span><span>25</span><span>50</span>
+                  <span>1</span>
+                  <span>25</span>
+                  <span>50</span>
                 </div>
               </div>
             </div>
@@ -348,26 +470,55 @@ export default function StudentBookingForm() {
           {/* Step 4: Review */}
           {step === 4 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-slate-800 mb-4">Review Your Booking</h3>
+              <h3 className="text-lg font-bold text-slate-800 mb-4">
+                Review Your Booking
+              </h3>
               <div className="bg-slate-50 rounded-2xl divide-y divide-slate-100">
                 {[
                   { label: "Resource", value: resourceLabel },
-                  { label: "Date", value: new Date(form.date).toLocaleDateString("en-GB", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) },
+                  {
+                    label: "Date",
+                    value: new Date(form.date).toLocaleDateString("en-GB", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    }),
+                  },
                   { label: "Start Time", value: form.startTime },
                   { label: "End Time", value: form.endTime },
-                  { label: "Student ID", value: form.userId },
+                  { label: "Student ID", value: form.studentId },
                   { label: "Purpose", value: form.purpose },
                   { label: "Attendees", value: form.expectedAttendees },
                 ].map((row) => (
-                  <div key={row.label} className="flex justify-between items-start px-4 py-3">
-                    <span className="text-sm text-slate-500 font-medium">{row.label}</span>
-                    <span className="text-sm text-slate-800 font-semibold text-right max-w-[55%]">{row.value}</span>
+                  <div
+                    key={row.label}
+                    className="flex justify-between items-start px-4 py-3"
+                  >
+                    <span className="text-sm text-slate-500 font-medium">
+                      {row.label}
+                    </span>
+                    <span className="text-sm text-slate-800 font-semibold text-right max-w-[55%]">
+                      {row.value}
+                    </span>
                   </div>
                 ))}
               </div>
               <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-sm text-amber-700 flex items-start gap-2">
-                <svg className="w-4 h-4 mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/></svg>
-                Your booking will be submitted as <strong className="ml-1">PENDING</strong>. An admin will approve or reject it.
+                <svg
+                  className="w-4 h-4 mt-0.5 shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Your booking will be submitted as{" "}
+                <strong className="ml-1">PENDING</strong>. An admin will approve
+                or reject it.
               </div>
             </div>
           )}
@@ -398,13 +549,30 @@ export default function StudentBookingForm() {
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                    <svg
+                      className="animate-spin w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v8z"
+                      />
                     </svg>
                     Submitting...
                   </span>
-                ) : "Submit Booking Request"}
+                ) : (
+                  "Submit Booking Request"
+                )}
               </button>
             )}
           </div>

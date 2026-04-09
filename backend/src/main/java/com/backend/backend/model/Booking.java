@@ -16,6 +16,7 @@ public class Booking {
 
     private String resourceId;           // Will link to Module A later
     private String userId;               // Temporary - will come from JWT later
+    private String studentId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String purpose;

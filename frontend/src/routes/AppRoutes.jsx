@@ -1,16 +1,29 @@
 import { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
+import MyBookingsPage from "../pages/MyBookingsPage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
 import AdminUsersPage from "../pages/AdminUsersPage";
 import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 import TechnicianDashboardPage from "../pages/TechnicianDashboardPage";
+
 import ProtectedRoute from "../components/ProtectedRoute";
 import { fetchCurrentUser } from "../services/authService";
-import { clearAuth, getAuth, getToken, saveAuth } from "../services/authStorage";
+import {
+  clearAuth,
+  getAuth,
+  getToken,
+  saveAuth,
+} from "../services/authStorage";
 import { getDashboardPathForRole } from "../services/roleDashboard";
 
 function SessionSync() {
@@ -89,6 +102,15 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/dashboard/bookings"
+          element={
+            <ProtectedRoute allowedRoles={["USER"]}>
+              <MyBookingsPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/admin"
           element={
