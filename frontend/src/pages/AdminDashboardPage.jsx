@@ -7,11 +7,13 @@ import {
   Users,
   Siren,
   ScrollText,
+  BarChart3,
 } from "lucide-react";
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
   { label: "Approvals", badge: "18", icon: ClipboardCheck },
+  { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "Resource Matrix", icon: LayoutGrid },
   { label: "User Management", icon: Users, path: "/admin/users" },
   { label: "Incidents", badge: "6", icon: Siren },

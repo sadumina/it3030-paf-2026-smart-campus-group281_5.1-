@@ -5,6 +5,7 @@ import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
 import AdminUsersPage from "../pages/AdminUsersPage";
+import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 import TechnicianDashboardPage from "../pages/TechnicianDashboardPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 
@@ -44,6 +45,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminUsersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/analytics"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AnalyticsDashboardPage />
             </ProtectedRoute>
           }
         />
