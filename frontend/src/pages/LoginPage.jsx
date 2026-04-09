@@ -1,144 +1,272 @@
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { BadgeCheck, BellRing, CalendarCheck2, Wrench } from "lucide-react";
+import { googleLogin, loginUser } from "../services/authService";
+import { saveAuth } from "../services/authStorage";
+import { getDashboardPathForRole } from "../services/roleDashboard";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const googleButtonRef = useRef(null);
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.45 } },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 14 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: 0.12 + i * 0.08, duration: 0.35 },
+    }),
+  };
+
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId || !googleButtonRef.current) {
+      return;
+    }
+
+    const initializeGoogle = () => {
+      if (!window.google || !googleButtonRef.current) {
+        return;
+      }
+
+      window.google.accounts.id.initialize({
+        client_id: clientId,
+        callback: async (response) => {
+          if (!response?.credential) {
+            setError("Google sign-in failed");
+            return;
+          }
+
+          try {
+            const authResponse = await googleLogin(response.credential);
+            saveAuth(authResponse);
+            setMessage(`Welcome, ${authResponse.name}!`);
+            navigate(getDashboardPathForRole(authResponse.role));
+          } catch (requestError) {
+            setError(requestError.message || "Google login failed");
+          }
+        },
+      });
+
+      googleButtonRef.current.innerHTML = "";
+      window.google.accounts.id.renderButton(googleButtonRef.current, {
+        theme: "outline",
+        size: "large",
+        shape: "pill",
+        width: 320,
+      });
+    };
+
+    const existingScript = document.querySelector('script[src="https://accounts.google.com/gsi/client"]');
+    if (existingScript) {
+      initializeGoogle();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogle;
+    document.body.appendChild(script);
+  }, [navigate]);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setForm((previous) => ({ ...previous, [name]: value }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (!form.email.trim() || !form.password.trim()) {
+      setError("Email and password are required.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await loginUser({
+        email: form.email.trim(),
+        password: form.password,
+      });
+
+      saveAuth(response);
+      setMessage(`Welcome back, ${response.name}! Login successful.`);
+      navigate(getDashboardPathForRole(response.role));
+    } catch (requestError) {
+      setError(requestError.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-purple-50 to-blue-50 flex items-center justify-center px-4">
-      {/* Background Blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="relative h-screen overflow-hidden bg-[#f6f4ee] px-4 py-4 md:px-8 md:py-5">
+      <div className="pointer-events-none absolute inset-0">
         <motion.div
-          animate={{
-            x: [0, 50, -50, 0],
-            y: [0, 100, 50, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full filter blur-3xl opacity-20"
+          animate={{ x: [0, 50, -20, 0], y: [0, 30, -30, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -left-14 top-8 h-80 w-80 rounded-full bg-[#ffb36d]/40 blur-3xl"
         />
         <motion.div
-          animate={{
-            x: [0, -60, 60, 0],
-            y: [0, -100, -50, 0],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-blue-400 to-cyan-300 rounded-full filter blur-3xl opacity-20"
+          animate={{ x: [0, -45, 25, 0], y: [0, -25, 35, 0] }}
+          transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -right-16 bottom-6 h-[26rem] w-[26rem] rounded-full bg-[#7bb8ff]/35 blur-3xl"
         />
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative z-10 w-full max-w-md"
-      >
-        {/* Back Button */}
-        <button
-          onClick={() => navigate("/")}
-          className="flex items-center gap-2 text-gray-600 hover:text-purple-600 transition-colors mb-8 font-medium"
-        >
-          <ArrowLeft className="w-5 h-5" />
-          Back to Home
-        </button>
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col">
+        <div className="grid min-h-0 flex-1 overflow-hidden rounded-[2rem] border border-slate-200/70 bg-white/60 shadow-[0_35px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl lg:grid-cols-[1.08fr_0.92fr]">
+          <motion.section
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.55 }}
+            className="relative overflow-hidden bg-[linear-gradient(148deg,#162845_0%,#2f4f75_36%,#d16e2a_72%,#f39b52_100%)] p-6 text-white md:p-8"
+          >
+            <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-white/15 blur-2xl" />
+            <div className="absolute -bottom-14 left-8 h-44 w-44 rounded-full bg-orange-300/35 blur-2xl" />
+            <div className="absolute right-16 top-28 h-32 w-32 rounded-full bg-[#ffb36d]/30 blur-2xl" />
 
-        {/* Card */}
-        <div className="bg-white/60 backdrop-blur-xl rounded-3xl border border-white/80 p-8 shadow-xl">
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome Back
-            </h1>
-            <p className="text-gray-600">
-              Sign in to your account to continue
+            <p className="inline-flex rounded-full border border-white/30 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#ffdcae]">
+              Campus Operations Hub
             </p>
-          </div>
+            <h1 className="mt-3 text-3xl font-bold leading-tight md:text-4xl">One Login, Full Campus Control</h1>
+            <p className="mt-3 max-w-xl text-sm text-slate-100/90">
+              Access facility bookings, incidents, approvals, and live updates through a secure and role-aware
+              workspace.
+            </p>
 
-          {/* Form */}
-          <form className="space-y-6">
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                placeholder="you@university.edu"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-300"
-              />
+            <div className="mt-5 space-y-2.5">
+              {[
+                {
+                  icon: <CalendarCheck2 className="h-5 w-5" />,
+                  title: "Booking workflow",
+                  subtitle: "PENDING to APPROVED with clear ownership",
+                },
+                {
+                  icon: <Wrench className="h-5 w-5" />,
+                  title: "Incident lifecycle",
+                  subtitle: "OPEN to CLOSED with technician updates",
+                },
+                {
+                  icon: <BellRing className="h-5 w-5" />,
+                  title: "Actionable notifications",
+                  subtitle: "Real-time visibility for all stakeholders",
+                },
+              ].map((item, index) => (
+                <motion.article
+                  key={item.title}
+                  custom={index}
+                  variants={itemVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="flex items-start gap-3 rounded-xl border border-white/25 bg-gradient-to-r from-white/14 to-orange-200/12 p-2.5"
+                >
+                  <div className="mt-0.5 rounded-lg bg-orange-100/20 p-2 text-[#ffe1b9]">{item.icon}</div>
+                  <div>
+                    <p className="text-sm font-semibold text-white">{item.title}</p>
+                    <p className="text-xs text-slate-100/85">{item.subtitle}</p>
+                  </div>
+                </motion.article>
+              ))}
             </div>
+          </motion.section>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 transition-all duration-300"
-              />
-            </div>
+          <motion.section
+            variants={cardVariants}
+            initial="hidden"
+            animate="visible"
+            className="bg-white/85 p-6 md:p-8"
+          >
+            <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">Welcome back</h2>
+            <p className="mt-2 text-sm text-slate-500">Sign in to continue your smart campus workflows.</p>
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
+            <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+              <div>
+                <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-slate-700">
+                  Email Address
+                </label>
                 <input
-                  type="checkbox"
-                  className="w-4 h-4 rounded border-gray-300 text-purple-600"
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="you@university.edu"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-[#0f6e56] focus:ring-4 focus:ring-[#0f6e56]/15"
                 />
-                <span className="text-sm text-gray-600">Remember me</span>
-              </label>
-              <a href="#" className="text-sm text-purple-600 hover:text-purple-700">
-                Forgot password?
-              </a>
-            </div>
+              </div>
 
-            <button
-              type="submit"
-              className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300 transform hover:scale-105"
-            >
-              Sign In
-            </button>
-          </form>
+              <div>
+                <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-slate-700">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-[#0f6e56] focus:ring-4 focus:ring-[#0f6e56]/15"
+                />
+              </div>
 
-          {/* Divider */}
-          <div className="my-6 flex items-center gap-4">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-sm text-gray-600">or</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
+              {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
+              {message ? (
+                <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-600">
+                  <BadgeCheck className="h-4 w-4" />
+                  {message}
+                </p>
+              ) : null}
 
-          {/* Social Login */}
-          <button className="w-full px-6 py-3 bg-white border border-gray-200 rounded-xl font-semibold text-gray-900 hover:bg-gray-50 transition-all duration-300">
-            Continue with Google
-          </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full rounded-2xl bg-[#0f6e56] px-6 py-3 font-semibold text-white shadow-lg shadow-[#0f6e56]/25 transition hover:bg-[#0c5a47] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {loading ? "Signing in..." : "Sign In"}
+              </button>
 
-          {/* Sign Up Link */}
-          <p className="text-center text-sm text-gray-600 mt-6">
-            Don't have an account?{" "}
-            <a href="#" className="text-purple-600 hover:text-purple-700 font-semibold">
-              Sign up
-            </a>
-          </p>
+              <div className="pt-2">
+                <p className="mb-2 text-center text-xs font-semibold uppercase tracking-[0.12em] text-slate-400">
+                  or continue with
+                </p>
+                <div ref={googleButtonRef} className="flex justify-center" />
+                {!import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
+                  <p className="mt-2 text-center text-xs text-slate-500">
+                    Add VITE_GOOGLE_CLIENT_ID in frontend/.env to enable Google sign-in.
+                  </p>
+                ) : null}
+              </div>
+            </form>
+
+            <p className="mt-5 text-center text-sm text-slate-600">
+              Need an account?{" "}
+              <button
+                type="button"
+                onClick={() => navigate("/register")}
+                className="font-semibold text-[#0f6e56] hover:text-[#0c5a47]"
+              >
+                Create one now
+              </button>
+            </p>
+          </motion.section>
         </div>
-
-        {/* Footer Text */}
-        <p className="text-center text-xs text-gray-600 mt-8">
-          By signing in, you agree to our{" "}
-          <a href="#" className="text-purple-600 hover:text-purple-700">
-            Terms of Service
-          </a>{" "}
-          and{" "}
-          <a href="#" className="text-purple-600 hover:text-purple-700">
-            Privacy Policy
-          </a>
-        </p>
-      </motion.div>
+      </div>
     </div>
   );
 }

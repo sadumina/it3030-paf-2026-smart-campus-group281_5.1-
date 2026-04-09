@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "app.jwt.secret",
+      "type": "java.lang.String",
+      "description": "JWT signing secret. Must be at least 32 characters."
+    },
+    {
+      "name": "app.jwt.expiration-ms",
+      "type": "java.lang.Long",
+      "description": "JWT access token expiration time in milliseconds."
+    },
+    {
+      "name": "app.oauth.google.client-id",
+      "type": "java.lang.String",
+      "description": "Google OAuth web client id used to verify ID tokens."
+    }
+  ]
+}

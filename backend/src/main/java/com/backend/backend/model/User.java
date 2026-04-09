@@ -1,5 +1,6 @@
 package com.backend.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,14 +10,19 @@ public class User {
     private String id;
     private String name;
     private String email;
+    @JsonIgnore
+    private String password;
     private String role;
+    private String phone;
+    private String department;
 
     // Constructors
     public User() {}
 
-    public User(String name, String email, String role) {
+    public User(String name, String email, String password, String role) {
         this.name = name;
         this.email = email;
+        this.password = password;
         this.role = role;
     }
 
@@ -53,13 +59,40 @@ public class User {
         this.role = role;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
     @Override
     public String toString() {
         return "User{" +
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
+                ", password='[PROTECTED]'" +
                 ", role='" + role + '\'' +
+                ", phone='" + phone + '\'' +
+                ", department='" + department + '\'' +
                 '}';
     }
 }

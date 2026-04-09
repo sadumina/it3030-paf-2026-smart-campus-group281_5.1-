@@ -45,13 +45,14 @@ export default function Navbar() {
           >
             Login
           </motion.button>
-          <motion.a
-            href="#contact"
+          <motion.button
+            type="button"
             whileHover={{ y: -2 }}
             className="rounded-full bg-orange-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-orange-500/30"
+            onClick={() => navigate("/register")}
           >
             Get Started
-          </motion.a>
+          </motion.button>
         </div>
       </div>
     </motion.header>
