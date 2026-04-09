@@ -151,19 +151,19 @@ export default function AnalyticsDashboardPage() {
     <RoleDashboardLayout
       sectionLabel="Admin Analytics"
       dashboardTitle="Analytics & Reports"
-      dashboardSubtitle="Comprehensive system analytics and performance insights."
+      dashboardSubtitle={error ? `Error: ${error}` : "Comprehensive system analytics and performance insights."}
       roleLabel="ADMIN"
       auth={auth}
       sidebarItems={adminSidebar}
       kpis={analyticsKpis}
       quickActions={[]}
       activityFeed={[
-        { title: "Peak usage at 12:00 PM", meta: "42 concurrent logins" },
-        { title: "Storage at 45% capacity", meta: "Healthy threshold" },
-        { title: "All systems operational", meta: "99.8% uptime" },
+        { title: `Total ${analyticsData?.totalUsers || 0} users registered`, meta: "From database" },
+        { title: `${analyticsData?.technicians || 0} technicians on staff`, meta: "Support team" },
+        { title: `${analyticsData?.admins || 0} admin accounts active`, meta: "System administrators" },
       ]}
-      chartTitle="System Analytics"
-      chartCaption="Real-time performance metrics"
+      chartTitle="User Statistics"
+      chartCaption="Real-time user data from database"
       chartColor="#f97316"
       extraContent={
         <div className="space-y-4">
@@ -208,10 +208,10 @@ export default function AnalyticsDashboardPage() {
           {activeTab === "overview" && (
             <div className="space-y-4">
               {/* User Role Distribution */}
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                  <h3 className="mb-4 text-sm font-semibold text-slate-900">User Role Distribution</h3>
-                  <ResponsiveContainer width="100%" height={250}>
+              <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                <h3 className="mb-4 text-sm font-semibold text-slate-900">User Role Distribution</h3>
+                {userRoleData && userRoleData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={300}>
                     <RechartsePieChart>
                       <Pie
                         data={userRoleData}
@@ -230,31 +230,9 @@ export default function AnalyticsDashboardPage() {
                       <Tooltip />
                     </RechartsePieChart>
                   </ResponsiveContainer>
-                </div>
-
-                {/* Incident Status */}
-                <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                  <h3 className="mb-4 text-sm font-semibold text-slate-900">Incident Status</h3>
-                  <ResponsiveContainer width="100%" height={250}>
-                    <RechartsePieChart>
-                      <Pie
-                        data={incidentData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, value }) => `${name}: ${value}`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="count"
-                      >
-                        {incidentData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </RechartsePieChart>
-                  </ResponsiveContainer>
-                </div>
+                ) : (
+                  <p className="text-sm text-slate-500">No user data available</p>
+                )}
               </div>
             </div>
           )}
@@ -262,48 +240,25 @@ export default function AnalyticsDashboardPage() {
           {/* Users Tab */}
           {activeTab === "users" && (
             <div className="space-y-4">
-              {/* User Growth */}
               <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-slate-900">User Growth Trend</h3>
-                <ResponsiveContainer width="100%" height={350}>
-                  <LineChart data={userGrowthData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="month" stroke="#9ca3af" />
-                    <YAxis stroke="#9ca3af" />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="users"
-                      stroke="#f97316"
-                      strokeWidth={3}
-                      dot={{ fill: "#f97316", r: 4 }}
-                      activeDot={{ r: 6 }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="admins"
-                      stroke="#a855f7"
-                      strokeWidth={2.5}
-                      dot={{ fill: "#a855f7", r: 3.5 }}
-                      activeDot={{ r: 5 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Resource Usage Bar Chart */}
-              <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-slate-900">System Resource Usage</h3>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={resourceUsageData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="resource" stroke="#9ca3af" />
-                    <YAxis stroke="#9ca3af" />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="usage" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+                <h3 className="mb-4 text-sm font-semibold text-slate-900">User Statistics Summary</h3>
+                <div className="grid gap-4 md:grid-cols-3">
+                  <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
+                    <p className="text-xs text-orange-700 font-semibold uppercase">ADMINS</p>
+                    <p className="text-3xl font-bold text-orange-900">{analyticsData?.admins || 0}</p>
+                    <p className="text-xs text-orange-600 mt-1">System administrators</p>
+                  </div>
+                  <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+                    <p className="text-xs text-blue-700 font-semibold uppercase">TECHNICIANS</p>
+                    <p className="text-3xl font-bold text-blue-900">{analyticsData?.technicians || 0}</p>
+                    <p className="text-xs text-blue-600 mt-1">Support staff</p>
+                  </div>
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs text-slate-700 font-semibold uppercase">REGULAR USERS</p>
+                    <p className="text-3xl font-bold text-slate-900">{analyticsData?.regularUsers || 0}</p>
+                    <p className="text-xs text-slate-600 mt-1">Standard accounts</p>
+                  </div>
+                </div>
               </div>
             </div>
           )}
@@ -311,24 +266,6 @@ export default function AnalyticsDashboardPage() {
           {/* Performance Tab */}
           {activeTab === "performance" && (
             <div className="space-y-4">
-              {/* Activity Timeline */}
-              <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-slate-900">Daily Activity Timeline</h3>
-                <ResponsiveContainer width="100%" height={350}>
-                  <BarChart data={activityData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                    <XAxis dataKey="time" stroke="#9ca3af" />
-                    <YAxis stroke="#9ca3af" />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Bar dataKey="logins" fill="#f97316" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="approvals" fill="#10b981" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="edits" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Performance Metrics Grid */}
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
                   <h3 className="mb-3 text-sm font-semibold text-slate-900">API Performance</h3>
