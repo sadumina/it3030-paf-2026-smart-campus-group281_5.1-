@@ -178,4 +178,36 @@ public class UserController {
             return new ResponseEntity<>("Error fetching analytics: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // Update current user's profile
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateCurrentUserProfile(@RequestBody User profileData, Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return new ResponseEntity<>(java.util.Map.of("error", "User not authenticated"), HttpStatus.UNAUTHORIZED);
+        }
+
+        String email = authentication.getName();
+        Optional<User> existingUser = userService.getUserByEmail(email);
+        
+        if (!existingUser.isPresent()) {
+            return new ResponseEntity<>(java.util.Map.of("error", "User not found"), HttpStatus.NOT_FOUND);
+        }
+
+        User user = existingUser.get();
+        
+        // Update profile fields (email cannot be changed)
+        if (profileData.getName() != null && !profileData.getName().trim().isEmpty()) {
+            user.setName(profileData.getName());
+        }
+        if (profileData.getPhone() != null) {
+            user.setPhone(profileData.getPhone());
+        }
+        if (profileData.getDepartment() != null) {
+            user.setDepartment(profileData.getDepartment());
+        }
+
+        User updatedUser = userService.updateUser(user.getId(), user);
+        
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
 }
