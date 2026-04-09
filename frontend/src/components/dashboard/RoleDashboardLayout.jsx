@@ -23,9 +23,11 @@ import {
 } from "recharts";
 import NotificationPanel from "../NotificationPanel";
 import { Breadcrumb } from "../Breadcrumb";
+import { UserProfileModal } from "./UserProfileModal";
 import { useTheme } from "../../context/ThemeContext";
 import { reportExport } from "../../services/reportExport";
 import { notifyAlert } from "../../services/notificationHelper";
+import { userProfileService } from "../../services/userProfileService";
 import { clearAuth } from "../../services/authStorage";
 
 function ProfessionalChart({ points = [], color = "#ea580c" }) {
@@ -151,12 +153,25 @@ export default function RoleDashboardLayout({
   const userEmail = auth?.email || "user@campus.local";
   const userRole = auth?.role || roleLabel || "USER";
   const [livePoints, setLivePoints] = useState(() => getRoleChartSeed(userRole, chartPoints));
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [currentUserProfile, setCurrentUserProfile] = useState(auth || {});
   const initials = userName
     .split(" ")
     .filter(Boolean)
     .slice(0, 2)
     .map((namePart) => namePart[0]?.toUpperCase())
     .join("") || "CU";
+
+  const handleProfileUpdate = async (profileData) => {
+    try {
+      const updatedProfile = await userProfileService.updateProfile(profileData);
+      setCurrentUserProfile(updatedProfile);
+      notifyAlert.success('Your profile has been updated successfully');
+    } catch (error) {
+      notifyAlert.error(error.message || 'Failed to update profile');
+      throw error;
+    }
+  };
 
   const handleExportPDF = () => {
     reportExport.exportDashboardReport(kpis, `dashboard-report-${new Date().toISOString().split('T')[0]}.pdf`);
@@ -250,7 +265,10 @@ export default function RoleDashboardLayout({
                 Smart Campus Platform
               </div>
 
-              <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5">
+              <div
+                onClick={() => setIsProfileModalOpen(true)}
+                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 cursor-pointer transition hover:bg-slate-50 dark:hover:bg-slate-700"
+              >
                 <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-600 text-xs font-bold text-white">
                   {initials}
                 </div>
@@ -406,6 +424,13 @@ export default function RoleDashboardLayout({
           </main>
         </div>
       </div>
+
+      <UserProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        user={currentUserProfile}
+        onUpdateProfile={handleProfileUpdate}
+      />
     </div>
   );
 }
