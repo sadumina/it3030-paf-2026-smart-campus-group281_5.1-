@@ -12,6 +12,8 @@ import {
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
 import { fetchAllUsers, removeUser, updateUserRole } from "../services/adminUserService";
+import { ConfirmationModal } from "../components/ConfirmationModal";
+import { createNotification, notificationTypes, notificationPriorities } from "../services/advancedNotificationService";
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
@@ -32,6 +34,7 @@ export default function AdminUsersPage() {
   const [error, setError] = useState("");
   const [roleDrafts, setRoleDrafts] = useState({});
   const [actionMessage, setActionMessage] = useState("");
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, userId: null, userName: null, isLoading: false });
 
   const loadUsers = async () => {
     setError("");
@@ -78,51 +81,131 @@ export default function AdminUsersPage() {
       const nextRole = roleDrafts[userId] || "USER";
       await updateUserRole(userId, nextRole);
       await loadUsers();
-      setActionMessage("User role updated successfully.");
+      
+      // Show success notification
+      if (window.notificationCenter) {
+        window.notificationCenter.addNotification(
+          createNotification('Role Updated', {
+            type: notificationTypes.SUCCESS,
+            message: `User role changed to ${nextRole}`,
+            priority: notificationPriorities.NORMAL,
+            duration: 4000,
+            icon: '✓',
+          })
+        );
+      }
     } catch (requestError) {
-      setError(requestError.message || "Unable to update role");
+      const errorMsg = requestError.message || "Unable to update role";
+      
+      // Show error notification
+      if (window.notificationCenter) {
+        window.notificationCenter.addNotification(
+          createNotification('Update Failed', {
+            type: notificationTypes.ERROR,
+            message: errorMsg,
+            priority: notificationPriorities.HIGH,
+            duration: 0,
+            icon: '✕',
+          })
+        );
+      }
+      setError(errorMsg);
     }
   };
 
-  const handleDeleteUser = async (userId, userName) => {
-    const confirmed = window.confirm(`Delete ${userName}? This action cannot be undone.`);
-    if (!confirmed) {
-      return;
-    }
+  const handleDeleteUser = (userId, userName) => {
+    // Open confirmation modal instead of browser confirm
+    setConfirmModal({
+      isOpen: true,
+      userId,
+      userName,
+      isLoading: false,
+    });
+  };
 
+  const handleConfirmDelete = async () => {
+    const { userId } = confirmModal;
+    setConfirmModal((prev) => ({ ...prev, isLoading: true }));
     setActionMessage("");
+    
     try {
       await removeUser(userId);
       await loadUsers();
-      setActionMessage("User removed successfully.");
+      setConfirmModal({ isOpen: false, userId: null, userName: null, isLoading: false });
+      
+      // Show success notification
+      if (window.notificationCenter) {
+        window.notificationCenter.addNotification(
+          createNotification('User Removed', {
+            type: notificationTypes.SUCCESS,
+            message: `${confirmModal.userName || 'User'} has been removed successfully`,
+            priority: notificationPriorities.NORMAL,
+            duration: 4000,
+            icon: '✓',
+          })
+        );
+      }
     } catch (requestError) {
-      setError(requestError.message || "Unable to delete user");
+      const errorMsg = requestError.message || "Unable to delete user";
+      setConfirmModal({ isOpen: false, userId: null, userName: null, isLoading: false });
+      
+      // Show error notification
+      if (window.notificationCenter) {
+        window.notificationCenter.addNotification(
+          createNotification('Deletion Failed', {
+            type: notificationTypes.ERROR,
+            message: errorMsg,
+            priority: notificationPriorities.HIGH,
+            duration: 0,
+            icon: '✕',
+          })
+        );
+      }
+      setError(errorMsg);
     }
   };
 
+  const handleCancelDelete = () => {
+    setConfirmModal({ isOpen: false, userId: null, userName: null, isLoading: false });
+  };
+
   return (
-    <RoleDashboardLayout
-      sectionLabel="Admin Command Center"
-      dashboardTitle="User Management"
-      dashboardSubtitle="View all accounts, update roles, and remove users."
-      roleLabel="ADMIN"
-      auth={auth}
-      sidebarItems={adminSidebar}
-      kpis={[
-        { label: "Total Accounts", value: String(stats.total), change: "All registered users" },
-        { label: "Admins", value: String(stats.admins), change: "Privileged access" },
-        { label: "Technicians", value: String(stats.technicians), change: "Support staff" },
-        { label: "Users", value: String(stats.regularUsers), change: "Standard accounts" },
-      ]}
-      quickActions={[]}
-      activityFeed={[
-        { title: "Use role assign to update access instantly", meta: "Role changes are JWT-based" },
-        { title: "Delete removes account permanently", meta: "Use with caution" },
-        { title: "Current admin cannot be deleted", meta: "Self-protection enabled" },
-      ]}
-      chartTitle="User trend"
-      chartCaption="Live account activity trend."
-      chartColor="#ea580c"
+    <>
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmModal.isOpen}
+        title={`Delete ${confirmModal.userName}?`}
+        message={`This action cannot be undone. The user account will be permanently removed.`}
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        confirmColor="red"
+        isLoading={confirmModal.isLoading}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
+
+      <RoleDashboardLayout
+        sectionLabel="Admin Command Center"
+        dashboardTitle="User Management"
+        dashboardSubtitle="View all accounts, update roles, and remove users."
+        roleLabel="ADMIN"
+        auth={auth}
+        sidebarItems={adminSidebar}
+        kpis={[
+          { label: "Total Accounts", value: String(stats.total), change: "All registered users" },
+          { label: "Admins", value: String(stats.admins), change: "Privileged access" },
+          { label: "Technicians", value: String(stats.technicians), change: "Support staff" },
+          { label: "Users", value: String(stats.regularUsers), change: "Standard accounts" },
+        ]}
+        quickActions={[]}
+        activityFeed={[
+          { title: "Use role assign to update access instantly", meta: "Role changes are JWT-based" },
+          { title: "Delete removes account permanently", meta: "Use with caution" },
+          { title: "Current admin cannot be deleted", meta: "Self-protection enabled" },
+        ]}
+        chartTitle="User trend"
+        chartCaption="Live account activity trend."
+        chartColor="#ea580c"
       extraContent={
         <section className="dashboard-soft-in rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -231,6 +314,7 @@ export default function AdminUsersPage() {
           )}
         </section>
       }
-    />
+      />
+    </>
   );
 }
