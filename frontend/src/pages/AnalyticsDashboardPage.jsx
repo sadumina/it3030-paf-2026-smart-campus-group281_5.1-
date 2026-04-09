@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart3,
   PieChart,
@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
+import { fetchAnalyticsSummary } from "../services/analyticsService";
 import {
   BarChart,
   Bar,
@@ -25,8 +26,6 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  ScatterChart,
-  Scatter,
 } from "recharts";
 
 const adminSidebar = [
