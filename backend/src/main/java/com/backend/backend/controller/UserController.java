@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import com.backend.backend.model.User;
 import com.backend.backend.service.UserService;
 
@@ -95,10 +97,54 @@ public class UserController {
         }
     }
 
+    // Check current user's role (diagnostic endpoint)
+    @GetMapping("/check-role")
+    public ResponseEntity<?> checkCurrentUserRole(Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return new ResponseEntity<>(java.util.Map.of("error", "No authentication"), HttpStatus.UNAUTHORIZED);
+        }
+
+        String email = authentication.getName();
+        java.util.List<String> roles = authentication.getAuthorities().stream()
+                .map(auth -> auth.getAuthority())
+                .toList();
+
+        Optional<User> user = userService.getUserByEmail(email);
+        if (!user.isPresent()) {
+            return new ResponseEntity<>(java.util.Map.of(
+                    "email", email,
+                    "jwtRoles", roles,
+                    "databaseRole", "USER NOT FOUND"
+            ), HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(java.util.Map.of(
+                "email", email,
+                "jwtRoles", roles,
+                "databaseRole", user.get().getRole(),
+                "isAdmin", "ADMIN".equalsIgnoreCase(user.get().getRole())
+        ), HttpStatus.OK);
+    }
+
     // Get analytics data
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/analytics/summary")
-    public ResponseEntity<?> getAnalyticsSummary() {
+    public ResponseEntity<?> getAnalyticsSummary(Authentication authentication) {
         try {
+            // Verify that the current user is ADMIN by checking database
+            if (authentication == null || authentication.getName() == null) {
+                return new ResponseEntity<>("Unauthorized: No authentication", HttpStatus.UNAUTHORIZED);
+            }
+            
+            Optional<User> currentUser = userService.getUserByEmail(authentication.getName());
+            if (!currentUser.isPresent()) {
+                return new ResponseEntity<>("Unauthorized: User not found", HttpStatus.UNAUTHORIZED);
+            }
+            
+            if (!"ADMIN".equalsIgnoreCase(currentUser.get().getRole())) {
+                return new ResponseEntity<>("Forbidden: Only ADMIN users can access analytics", HttpStatus.FORBIDDEN);
+            }
+            
             List<User> allUsers = userService.getAllUsers();
             
             long adminCount = allUsers.stream()
