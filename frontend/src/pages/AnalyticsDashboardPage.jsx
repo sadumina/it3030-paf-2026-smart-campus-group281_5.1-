@@ -93,12 +93,58 @@ const CustomTooltip = ({ active, payload, label }) => {
 export default function AnalyticsDashboardPage() {
   const auth = getAuth();
   const [activeTab, setActiveTab] = useState("overview");
+  const [analyticsData, setAnalyticsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const loadAnalytics = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchAnalyticsSummary();
+        setAnalyticsData(data);
+        setError("");
+      } catch (err) {
+        setError("Failed to load analytics data");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAnalytics();
+  }, []);
+
+  if (loading) {
+    return (
+      <RoleDashboardLayout
+        sectionLabel="Admin Analytics"
+        dashboardTitle="Analytics & Reports"
+        dashboardSubtitle="Loading analytics data..."
+        roleLabel="ADMIN"
+        auth={auth}
+        sidebarItems={adminSidebar}
+        kpis={[]}
+        quickActions={[]}
+        activityFeed={[]}
+        chartTitle="System Analytics"
+        chartCaption="Loading..."
+        chartColor="#f97316"
+      />
+    );
+  }
 
   const analyticsKpis = [
-    { label: "Total Users", value: "25", change: "+3 this month" },
-    { label: "Active Sessions", value: "12", change: "Real-time" },
-    { label: "Incidents Resolved", value: "34", change: "92% SLA" },
-    { label: "System Uptime", value: "99.8%", change: "Excellent" },
+    { label: "Total Users", value: String(analyticsData?.totalUsers || 0), change: `${analyticsData?.admins || 0} admins` },
+    { label: "Active Sessions", value: String(analyticsData?.activeSessions || 0), change: "Real-time" },
+    { label: "Technicians", value: String(analyticsData?.technicians || 0), change: "Support staff" },
+    { label: "System Uptime", value: analyticsData?.systemUptime || "99.8%", change: "Excellent" },
+  ];
+
+  const userRoleData = analyticsData?.roleDistribution || [
+    { name: "Admin", value: 0, fill: "#a855f7" },
+    { name: "Technician", value: 0, fill: "#3b82f6" },
+    { name: "User", value: 0, fill: "#64748b" },
   ];
 
   return (
