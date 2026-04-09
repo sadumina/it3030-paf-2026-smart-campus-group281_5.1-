@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Edit2, Save, Mail, User, Phone, Building2, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, Edit2, Save, Mail, User, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { notifyAlert } from '../../services/notificationHelper';
 
@@ -8,8 +8,6 @@ export const UserProfileModal = ({ isOpen, onClose, user, onUpdateProfile }) => 
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
-    phone: user?.phone || '',
-    department: user?.department || '',
   });
   const [isSaving, setIsSaving] = useState(false);
   const [focusedField, setFocusedField] = useState(null);
@@ -44,8 +42,6 @@ export const UserProfileModal = ({ isOpen, onClose, user, onUpdateProfile }) => 
     setFormData({
       name: user?.name || '',
       email: user?.email || '',
-      phone: user?.phone || '',
-      department: user?.department || '',
     });
     setIsEditing(false);
   };
@@ -116,7 +112,7 @@ export const UserProfileModal = ({ isOpen, onClose, user, onUpdateProfile }) => 
               initial="hidden"
               animate="visible"
               exit="exit"
-              className="relative w-full max-w-md overflow-hidden rounded-2xl border border-slate-200/20 dark:border-slate-700/20 bg-white dark:bg-slate-900 shadow-2xl"
+              className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200/20 dark:border-slate-700/20 bg-white dark:bg-slate-900 shadow-2xl"
             >
               {/* Gradient Background */}
               <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-400/10 to-transparent dark:from-orange-500/5 rounded-full blur-3xl -z-10" />
@@ -151,7 +147,7 @@ export const UserProfileModal = ({ isOpen, onClose, user, onUpdateProfile }) => 
               {/* Content */}
               <motion.div variants={contentVariants} initial="hidden" animate="visible" className="px-6 py-6">
                 {/* Avatar Section */}
-                <motion.div variants={itemVariants} className="mb-8 flex flex-col items-center">
+                <motion.div variants={itemVariants} className="mb-6 flex flex-col items-center">
                   <motion.div
                     variants={avatarVariants}
                     whileHover="hover"
@@ -173,7 +169,7 @@ export const UserProfileModal = ({ isOpen, onClose, user, onUpdateProfile }) => 
                   </motion.div>
                 </motion.div>
 
-                {/* Form Fields */}
+                {/* Form Fields - Simplified */}
                 <motion.div className="space-y-4">
                   {/* Name Field */}
                   <motion.div variants={itemVariants} className="group">
@@ -228,90 +224,6 @@ export const UserProfileModal = ({ isOpen, onClose, user, onUpdateProfile }) => 
                     >
                       {formData.email || <span className="text-slate-400">Not set</span>}
                     </motion.div>
-                    <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
-                      <AlertCircle className="h-3 w-3" />
-                      Email cannot be changed. Contact admin to modify.
-                    </motion.p>
-                  </motion.div>
-
-                  {/* Phone Field */}
-                  <motion.div variants={itemVariants} className="group">
-                    <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">
-                      <motion.div whileHover={{ rotate: 10 }} className="text-orange-600 dark:text-orange-400">
-                        <Phone className="h-4 w-4" />
-                      </motion.div>
-                      Phone Number
-                    </label>
-                    {isEditing ? (
-                      <motion.input
-                        key="phone-edit"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        onFocus={() => setFocusedField('phone')}
-                        onBlur={() => setFocusedField(null)}
-                        className={`w-full rounded-lg border-2 px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 transition-all duration-200 ${
-                          focusedField === 'phone'
-                            ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-900/20 shadow-lg shadow-orange-500/20'
-                            : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500'
-                        } focus:outline-none`}
-                        placeholder="Enter your phone number"
-                      />
-                    ) : (
-                      <motion.div
-                        key="phone-view"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800 dark:to-slate-800/50 px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100 group-hover:shadow-md transition-shadow"
-                      >
-                        {formData.phone || <span className="text-slate-400">Not set</span>}
-                      </motion.div>
-                    )}
-                  </motion.div>
-
-                  {/* Department Field */}
-                  <motion.div variants={itemVariants} className="group">
-                    <label className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">
-                      <motion.div whileHover={{ rotate: 10 }} className="text-orange-600 dark:text-orange-400">
-                        <Building2 className="h-4 w-4" />
-                      </motion.div>
-                      Department
-                    </label>
-                    {isEditing ? (
-                      <motion.input
-                        key="department-edit"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                        type="text"
-                        name="department"
-                        value={formData.department}
-                        onChange={handleInputChange}
-                        onFocus={() => setFocusedField('department')}
-                        onBlur={() => setFocusedField(null)}
-                        className={`w-full rounded-lg border-2 px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100 placeholder-slate-400 transition-all duration-200 ${
-                          focusedField === 'department'
-                            ? 'border-orange-500 bg-orange-50/50 dark:bg-orange-900/20 shadow-lg shadow-orange-500/20'
-                            : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-slate-400 dark:hover:border-slate-500'
-                        } focus:outline-none`}
-                        placeholder="Enter your department"
-                      />
-                    ) : (
-                      <motion.div
-                        key="department-view"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-r from-slate-50 to-slate-100/50 dark:from-slate-800 dark:to-slate-800/50 px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100 group-hover:shadow-md transition-shadow"
-                      >
-                        {formData.department || <span className="text-slate-400">Not set</span>}
-                      </motion.div>
-                    )}
                   </motion.div>
                 </motion.div>
               </motion.div>
