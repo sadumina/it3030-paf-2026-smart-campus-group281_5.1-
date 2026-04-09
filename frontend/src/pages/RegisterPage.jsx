@@ -61,7 +61,8 @@ export default function RegisterPage() {
         name: form.name.trim(),
         email: form.email.trim(),
         password: form.password,
-        role: form.role,
+        // Note: Backend validates and forces role to USER for new registrations
+        // Roles are only assigned by admins via /api/users/{id}/role
       });
 
       saveAuth(response);
@@ -151,20 +152,13 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="role" className="mb-1.5 block text-sm font-semibold text-slate-700">
-                  Role
-                </label>
-                <select
-                  id="role"
-                  name="role"
-                  value={form.role}
-                  onChange={handleChange}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-[#a1452b] focus:ring-4 focus:ring-[#a1452b]/15"
-                >
-                  <option value="STUDENT">Student</option>
-                  <option value="ADMIN">Admin</option>
-                  <option value="TECHNICIAN">Technician</option>
-                </select>
+                <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
+                  <p className="text-xs font-semibold text-blue-900">Account Type</p>
+                  <p className="mt-1 text-sm font-medium text-blue-800">Student Account</p>
+                  <p className="mt-1 text-xs text-blue-700">
+                    You're creating a student account. Admin and technician roles are assigned by administrators only.
+                  </p>
+                </div>
               </div>
 
               <div>

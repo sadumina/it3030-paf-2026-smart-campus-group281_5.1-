@@ -31,11 +31,15 @@ public class UserService {
             throw new IllegalArgumentException("Email already in use");
         }
 
+        // Validate that only USER/STUDENT roles are used during registration
+        validateRegistrationRole(role);
+
         User user = new User();
         user.setName(name);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole(normalizeRole(role, "USER"));
+        // Force USER role for all new registrations
+        user.setRole("USER");
         return userRepository.save(user);
     }
 
@@ -47,7 +51,8 @@ public class UserService {
                 user.setName(name);
             }
             if (user.getRole() == null || user.getRole().isBlank()) {
-                user.setRole(normalizeRole(role, "USER"));
+                // For Google auth, default to USER
+                user.setRole("USER");
             }
             return userRepository.save(user);
         }
@@ -56,7 +61,8 @@ public class UserService {
         user.setName(name);
         user.setEmail(email);
         user.setPassword("");
-        user.setRole(normalizeRole(role, "USER"));
+        // For Google auth new users, default to USER
+        user.setRole("USER");
         return userRepository.save(user);
     }
 
@@ -67,6 +73,11 @@ public class UserService {
         });
     }
 
+    /**
+     * Normalize and validate role for registration.
+     * During REGISTRATION: Only USER role is allowed.
+     * Role assignments (ADMIN, TECHNICIAN) must go through role update endpoint with admin verification.
+     */
     private String normalizeRole(String role, String fallback) {
         if (role == null || role.isBlank()) {
             return fallback;
@@ -76,7 +87,30 @@ public class UserService {
         if ("STUDENT".equals(normalized)) {
             return "USER";
         }
+        // During registration, only USER role is allowed
+        // ADMIN and TECHNICIAN roles must be assigned by admins
         return normalized;
+    }
+
+    /**
+     * Validate role during registration - ONLY allow USER role.
+     */
+    private void validateRegistrationRole(String role) {
+        if (role == null || role.isBlank()) {
+            // Default to USER is fine
+            return;
+        }
+
+        String normalized = role.trim().toUpperCase();
+        // Allow STUDENT (will be converted to USER) or empty
+        if ("STUDENT".equals(normalized) || "USER".equals(normalized)) {
+            return;
+        }
+        // Reject ADMIN, TECHNICIAN, or any other role during registration
+        throw new IllegalArgumentException(
+            "Invalid registration role: " + normalized + ". Only student accounts can be created. "
+            + "Admin and technician roles are assigned by administrators."
+        );
     }
 
     public Optional<User> loginUser(String email, String password) {

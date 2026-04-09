@@ -55,11 +55,15 @@ public class AuthController {
         }
 
         try {
+            // Security: Ignore role from client - all new registrations start as USER
+            // Admin/Technician roles are assigned by admins only
             User createdUser = userService.registerUser(
                     request.getName().trim(),
                     request.getEmail().trim().toLowerCase(),
                     request.getPassword(),
-                    request.getRole());
+                    null);  // Force USER role"}}]
+</invoke>
+
 
             String token = jwtService.generateToken(
                     createdUser.getId(),
