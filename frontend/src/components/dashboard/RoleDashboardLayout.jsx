@@ -7,55 +7,100 @@ import {
   UserCircle2,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import NotificationPanel from "../NotificationPanel";
 import { clearAuth } from "../../services/authStorage";
 
-function SparkLineChart({ points = [], color = "#ea580c" }) {
-  const safePoints = points.length > 1 ? points : [20, 25, 22, 30, 28, 34, 36];
-  const min = Math.min(...safePoints);
-  const max = Math.max(...safePoints);
-  const range = Math.max(max - min, 1);
+function ProfessionalChart({ points = [], color = "#ea580c" }) {
+  const safePoints = points.length > 1 ? points : [28, 32, 30, 38, 36, 44, 42, 48, 50, 54, 52, 58, 60, 64];
+  
+  // Generate chart data with comparison metric
+  const chartData = safePoints.map((value, index) => ({
+    time: `${index * 10}m`,
+    "Primary Metric": value,
+    "Secondary Metric": Math.max(10, value - 15 + (Math.sin(index * 0.5) * 6)),
+  }));
 
-  const polyline = safePoints
-    .map((value, index) => {
-      const x = (index / (safePoints.length - 1)) * 100;
-      const y = 100 - ((value - min) / range) * 100;
-      return `${x},${y}`;
-    })
-    .join(" ");
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="rounded-lg border border-slate-200 bg-white p-2 shadow-lg">
+          <p className="text-xs font-semibold text-slate-900">{payload[0].payload.time}</p>
+          {payload.map((entry, index) => (
+            <p key={index} className="text-xs font-medium" style={{ color: entry.color }}>
+              {entry.name}: {entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
-    <svg viewBox="0 0 100 100" className="h-56 w-full" preserveAspectRatio="none" role="img" aria-label="Trend chart">
-      <defs>
-        <linearGradient id="dashboard-chart-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.28" />
-          <stop offset="100%" stopColor={color} stopOpacity="0.02" />
-        </linearGradient>
-      </defs>
-      <g>
-        {[20, 40, 60, 80].map((tick) => (
-          <line
-            key={tick}
-            x1="0"
-            y1={tick}
-            x2="100"
-            y2={tick}
-            stroke="#fed7aa"
-            strokeWidth="0.7"
-            strokeDasharray="2 3"
-          />
-        ))}
-      </g>
-      <polyline points={`0,100 ${polyline} 100,100`} fill="url(#dashboard-chart-fill)" stroke="none" />
-      <polyline
-        points={polyline}
-        fill="none"
-        stroke={color}
-        strokeWidth="2.4"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <ResponsiveContainer width="100%" height={400}>
+      <AreaChart
+        data={chartData}
+        margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+      >
+        <defs>
+          <linearGradient id="colorPrimary" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#f97316" stopOpacity={0.4} />
+            <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="colorSecondary" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#ec4899" stopOpacity={0.3} />
+            <stop offset="95%" stopColor="#ec4899" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={true} />
+        <XAxis
+          dataKey="time"
+          stroke="#9ca3af"
+          style={{ fontSize: "11px" }}
+          tick={{ fill: "#6b7280" }}
+        />
+        <YAxis
+          stroke="#9ca3af"
+          style={{ fontSize: "11px" }}
+          tick={{ fill: "#6b7280" }}
+        />
+        <Tooltip content={<CustomTooltip />} />
+        <Legend
+          wrapperStyle={{ fontSize: "12px", paddingTop: "20px" }}
+          iconType="circle"
+        />
+        <Area
+          type="monotone"
+          dataKey="Secondary Metric"
+          stroke="#ec4899"
+          strokeWidth={2.5}
+          fillOpacity={1}
+          fill="url(#colorSecondary)"
+          dot={{ fill: "#ec4899", r: 3, strokeWidth: 1.5, stroke: "#fff" }}
+          activeDot={{ r: 5, fill: "#ec4899", stroke: "#fff", strokeWidth: 2 }}
+        />
+        <Area
+          type="monotone"
+          dataKey="Primary Metric"
+          stroke="#f97316"
+          strokeWidth={3}
+          fillOpacity={1}
+          fill="url(#colorPrimary)"
+          dot={{ fill: "#f97316", r: 3.5, strokeWidth: 1.5, stroke: "#fff" }}
+          activeDot={{ r: 5.5, fill: "#f97316", stroke: "#fff", strokeWidth: 2 }}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
   );
 }
 
@@ -128,26 +173,23 @@ export default function RoleDashboardLayout({
 
   return (
     <div className="dashboard-page min-h-screen p-3 md:p-4">
-      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-[1450px] overflow-hidden rounded-[2rem] border border-orange-200 bg-white shadow-[0_30px_80px_rgba(194,65,12,0.2)]">
-        <div className="dashboard-glow dashboard-glow-left" />
-        <div className="dashboard-glow dashboard-glow-right" />
-
+      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
         <aside
-          className="hidden w-72 flex-col bg-campusOrange-600 p-5 text-white md:flex"
+          className="hidden w-64 flex-col bg-orange-600 p-4 text-white md:flex"
           style={{ backgroundImage: "linear-gradient(180deg, #ea580c 0%, #f97316 52%, #fb923c 100%)" }}
         >
-          <div className="mb-8">
-            <p className="font-display text-3xl font-semibold leading-none">Campus Flow</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.2em] text-orange-100">{roleLabel}</p>
+          <div className="mb-6">
+            <p className="font-display text-xl font-semibold leading-none">Campus Flow</p>
+            <p className="mt-0.5 text-xs uppercase tracking-widest text-orange-100">{roleLabel}</p>
           </div>
 
-          <nav className="space-y-2">
+          <nav className="space-y-1.5">
             {sidebarItems.map((item) => {
               const ItemIcon = item.icon;
               const isActive = item.path && location.pathname === item.path;
               const itemClassName = isActive
-                ? "flex w-full items-center justify-between rounded-xl border border-white/45 bg-white/25 px-3 py-2 text-sm font-semibold text-white transition"
-                : "flex w-full items-center justify-between rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm font-medium text-white transition hover:bg-white/20";
+                ? "flex w-full items-center justify-between rounded-lg border border-white/40 bg-white/25 px-3 py-2 text-xs font-semibold text-white transition"
+                : "flex w-full items-center justify-between rounded-lg border border-white/0 bg-white/0 px-3 py-2 text-xs font-medium text-white transition hover:bg-white/15";
 
               return (
               <button
@@ -161,11 +203,11 @@ export default function RoleDashboardLayout({
                 className={itemClassName}
               >
                 <span className="inline-flex items-center gap-2">
-                  {ItemIcon ? <ItemIcon className="h-4 w-4 text-orange-100" /> : null}
+                  {ItemIcon ? <ItemIcon className="h-4 w-4" /> : null}
                   {item.label}
                 </span>
                 {item.badge ? (
-                  <span className="rounded-full bg-orange-100/95 px-2 py-0.5 text-xs font-semibold text-orange-700">
+                  <span className="rounded-full bg-orange-200 px-1.5 py-0.5 text-xs font-semibold text-orange-900">
                     {item.badge}
                   </span>
                 ) : null}
@@ -174,141 +216,128 @@ export default function RoleDashboardLayout({
             })}
           </nav>
 
-          <div className="mt-auto rounded-2xl border border-white/25 bg-white/15 p-4">
-            <p className="text-[11px] uppercase tracking-[0.16em] text-orange-100">System pulse</p>
-            <p className="mt-1 text-xs text-orange-50">
-              Real-time campus workflows are synchronized for approvals, maintenance, and service requests.
+          <div className="mt-auto rounded-lg border border-white/25 bg-white/10 p-3">
+            <p className="text-xs uppercase tracking-wider text-orange-100">System Status</p>
+            <p className="mt-1 text-xs font-light text-orange-50">
+              Campus systems online and synchronized.
             </p>
           </div>
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col bg-orange-50/45">
-          <div className="border-b border-orange-100 bg-white px-4 py-2.5 md:px-6">
+        <div className="flex min-w-0 flex-1 flex-col bg-white">
+          <div className="border-b border-slate-200 bg-white px-4 py-2 md:px-6">
             <div className="flex items-center justify-between gap-3">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
+              <div className="text-xs font-medium uppercase tracking-widest text-slate-600">
                 Smart Campus Platform
               </div>
 
-              <div className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-2.5 py-1.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-campusOrange-600 text-xs font-bold text-white">
+              <div className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-1.5">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-600 text-xs font-bold text-white">
                   {initials}
                 </div>
                 <div className="hidden sm:block">
-                  <p className="text-xs font-semibold leading-tight text-slate-900">{userName}</p>
-                  <p className="text-[11px] text-slate-500">{userEmail}</p>
+                  <p className="text-xs font-medium text-slate-900">{userName}</p>
+                  <p className="text-xs text-slate-500">{userEmail}</p>
                 </div>
-                <UserCircle2 className="h-4 w-4 text-campusOrange-600" />
               </div>
             </div>
           </div>
 
-          <header className="border-b border-orange-100 bg-white/85 px-4 py-3 backdrop-blur-sm md:px-6">
+          <header className="border-b border-slate-200 bg-white px-4 py-2.5 md:px-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-campusOrange-600">{sectionLabel}</p>
-                <h1 className="font-display text-2xl font-semibold leading-tight text-slate-900 md:text-3xl">{dashboardTitle}</h1>
-                <p className="text-sm text-slate-600">
-                  {dashboardSubtitle} Welcome, {userName} ({userRole}).
+                <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">{sectionLabel}</p>
+                <h1 className="mt-0.5 text-lg font-semibold text-slate-900">{dashboardTitle}</h1>
+                <p className="mt-0.5 text-xs text-slate-600">
+                  {dashboardSubtitle}
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <div className="hidden items-center gap-2 rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm text-slate-500 md:flex">
-                  <Search className="h-4 w-4 text-campusOrange-500" />
-                  <span>Search modules</span>
-                </div>
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-campusOrange-700 transition hover:bg-orange-50"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
                 >
-                  <BellDot className="h-4 w-4" />
+                  <Search className="h-3.5 w-3.5" />
+                  Search
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+                >
+                  <BellDot className="h-3.5 w-3.5" />
                   Alerts
                 </button>
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="inline-flex items-center gap-1 rounded-xl bg-campusOrange-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-campusOrange-700"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700"
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="h-3.5 w-3.5" />
                   Logout
                 </button>
               </div>
             </div>
-
-            <div className="mt-3 flex flex-wrap gap-2 md:hidden">
-              {sidebarItems.slice(0, 4).map((item) => (
-                <span
-                  key={item.label}
-                  className="rounded-full border border-orange-200 bg-orange-100/70 px-2.5 py-1 text-xs font-semibold text-campusOrange-700"
-                >
-                  {item.label}
-                </span>
-              ))}
-            </div>
           </header>
 
-          <main className="grid flex-1 gap-4 overflow-y-auto p-4 md:p-6 xl:grid-cols-[1.55fr_0.95fr]">
-            <section className="space-y-4">
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                {kpis.map((kpi) => (
-                  <article
-                    key={kpi.label}
-                    className="dashboard-soft-in rounded-2xl border border-orange-200 bg-white p-4 shadow-[0_10px_25px_rgba(251,146,60,0.12)]"
-                  >
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">{kpi.label}</p>
-                    <p className="mt-1.5 font-display text-2xl font-semibold text-slate-900">{kpi.value}</p>
-                    <p className="mt-1 text-xs font-medium text-campusOrange-700">{kpi.change}</p>
-                  </article>
-                ))}
-              </div>
+          <main className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-5">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {kpis.map((kpi) => (
+                <article
+                  key={kpi.label}
+                  className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm transition hover:shadow-md"
+                >
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{kpi.label}</p>
+                  <p className="mt-1.5 text-2xl font-bold text-slate-900">{kpi.value}</p>
+                  <p className="mt-0.5 text-xs text-slate-600">{kpi.change}</p>
+                </article>
+              ))}
+            </div>
 
-              <section className="dashboard-soft-in rounded-2xl border border-orange-200 bg-white p-4 shadow-[0_16px_35px_rgba(251,146,60,0.12)]">
-                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <h2 className="font-display text-xl font-semibold text-slate-900">{chartTitle}</h2>
-                    <p className="text-sm text-slate-500">{chartCaption}</p>
-                  </div>
-                  <div className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2.5 py-1 text-xs font-semibold text-campusOrange-700">
-                    <ChartNoAxesCombined className="h-3.5 w-3.5" />
-                    Live (2.4s)
-                  </div>
+            <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_280px]">
+              <section className="flex flex-col rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                <div className="mb-4">
+                  <h2 className="text-sm font-semibold text-slate-900">{chartTitle}</h2>
+                  <p className="mt-0.5 text-xs text-slate-600">{chartCaption}</p>
                 </div>
 
-                <SparkLineChart points={livePoints} color={chartColor} />
+                <div className="mb-2 flex flex-wrap gap-1.5">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-700">
+                    <ChartNoAxesCombined className="h-3 w-3" />
+                    Primary Metric
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 px-2 py-0.5 text-xs text-pink-700">
+                    <ChartNoAxesCombined className="h-3 w-3" />
+                    Secondary Metric
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+                    Live (2.4s)
+                  </span>
+                </div>
+
+                <div className="flex-1 min-h-0 -mx-4">
+                  <ProfessionalChart points={livePoints} color={chartColor} />
+                </div>
               </section>
 
-              {quickActions?.length ? (
-                <section className="dashboard-soft-in rounded-2xl border border-orange-200 bg-white p-4 shadow-[0_14px_28px_rgba(251,146,60,0.12)]">
-                  <h2 className="mb-3 font-display text-xl font-semibold text-slate-900">Quick Actions</h2>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    {quickActions.map((action) => (
-                      <article key={action.title} className="rounded-xl border border-orange-100 bg-orange-50/55 p-3">
-                        <p className="text-sm font-semibold text-slate-900">{action.title}</p>
-                        <p className="mt-0.5 text-xs text-slate-600">{action.description}</p>
+              <div className="flex flex-col gap-4">
+                <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                  <h2 className="mb-2 text-sm font-semibold text-slate-900">Live Activity</h2>
+                  <div className="space-y-2">
+                    {activityFeed.slice(0, 4).map((item) => (
+                      <article key={item.title} className="rounded-md border border-slate-100 bg-slate-50 p-2">
+                        <p className="text-xs font-medium text-slate-900">{item.title}</p>
+                        <p className="mt-0.5 text-[11px] text-slate-500">{item.meta}</p>
                       </article>
                     ))}
                   </div>
                 </section>
-              ) : null}
 
-              {extraContent ? extraContent : null}
-            </section>
+                <NotificationPanel />
+              </div>
+            </div>
 
-            <section className="space-y-4">
-              <section className="dashboard-soft-in rounded-2xl border border-orange-200 bg-white p-4 shadow-[0_14px_28px_rgba(251,146,60,0.11)]">
-                <h2 className="mb-3 font-display text-xl font-semibold text-slate-900">Live Activity</h2>
-                <div className="space-y-2.5">
-                  {activityFeed.map((item) => (
-                    <article key={item.title} className="rounded-xl border border-orange-100 bg-orange-50/50 p-3">
-                      <p className="text-sm font-semibold leading-tight text-slate-900">{item.title}</p>
-                      <p className="text-xs text-slate-500">{item.meta}</p>
-                    </article>
-                  ))}
-                </div>
-              </section>
-
-              <NotificationPanel />
-            </section>
+            {extraContent ? extraContent : null}
           </main>
         </div>
       </div>
