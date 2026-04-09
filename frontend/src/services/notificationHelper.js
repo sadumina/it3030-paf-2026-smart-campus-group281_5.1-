@@ -1,4 +1,5 @@
 import { toast } from 'react-toastify';
+import React from 'react';
 
 export const notifyAlert = {
   success: (message) => toast.success(message, {
@@ -38,10 +39,10 @@ export const notifyAlert = {
   }),
 
   escalation: (message, details) => toast.warning(
-    <div>
-      <div className="font-semibold">{message}</div>
-      <div className="text-sm mt-1 opacity-90">{details}</div>
-    </div>,
+    React.createElement('div', null,
+      React.createElement('div', { className: 'font-semibold' }, message),
+      React.createElement('div', { className: 'text-sm mt-1 opacity-90' }, details)
+    ),
     {
       position: 'top-right',
       autoClose: 5000,
@@ -53,10 +54,10 @@ export const notifyAlert = {
   ),
 
   slaBreached: (message, slaValue) => toast.error(
-    <div>
-      <div className="font-semibold">{message}</div>
-      <div className="text-sm mt-1 opacity-90">Current SLA: {slaValue}</div>
-    </div>,
+    React.createElement('div', null,
+      React.createElement('div', { className: 'font-semibold' }, message),
+      React.createElement('div', { className: 'text-sm mt-1 opacity-90' }, `Current SLA: ${slaValue}`)
+    ),
     {
       position: 'top-right',
       autoClose: 5000,
