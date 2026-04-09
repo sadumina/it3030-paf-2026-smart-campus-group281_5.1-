@@ -28,7 +28,7 @@ import com.backend.backend.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5176" })
+@CrossOrigin(originPatterns = { "http://localhost:*", "http://127.0.0.1:*" })
 public class AuthController {
 
         private final UserService userService;
@@ -61,8 +61,7 @@ public class AuthController {
                     request.getName().trim(),
                     request.getEmail().trim().toLowerCase(),
                     request.getPassword(),
-                    null);  // Force USER role"}}]
-</invoke>
+                    null); // Force USER role
 
 
             String token = jwtService.generateToken(
