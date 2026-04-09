@@ -13,6 +13,8 @@ public class User {
     @JsonIgnore
     private String password;
     private String role;
+    private String phone;
+    private String department;
 
     // Constructors
     public User() {}
@@ -65,6 +67,22 @@ public class User {
         this.password = password;
     }
 
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -73,6 +91,8 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='[PROTECTED]'" +
                 ", role='" + role + '\'' +
+                ", phone='" + phone + '\'' +
+                ", department='" + department + '\'' +
                 '}';
     }
 }
