@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -65,9 +66,16 @@ public class UserController {
 
     // Delete user
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+    public ResponseEntity<String> deleteUser(@PathVariable String id, Authentication authentication) {
+        if (authentication != null && authentication.getName() != null) {
+            Optional<User> currentUser = userService.getUserByEmail(authentication.getName());
+            if (currentUser.isPresent() && id.equals(currentUser.get().getId())) {
+                return new ResponseEntity<>("You cannot delete your own admin account", HttpStatus.BAD_REQUEST);
+            }
+        }
+
         userService.deleteUser(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     // Health check endpoint
