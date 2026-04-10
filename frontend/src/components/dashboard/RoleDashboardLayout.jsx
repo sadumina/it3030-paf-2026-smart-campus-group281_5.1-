@@ -210,7 +210,7 @@ export default function RoleDashboardLayout({
     <div className="dashboard-page min-h-screen p-3 md:p-4 bg-white dark:bg-slate-950">
       <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-full overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
         <aside
-          className="hidden w-64 flex-col bg-orange-600 p-4 text-white md:flex dark:bg-slate-800"
+          className="hidden w-64 flex-col bg-orange-600 p-4 text-white md:flex dark:bg-slate-800 "
           style={{ backgroundImage: isDark ? "linear-gradient(180deg, #1e293b 0%, #334155 52%, #475569 100%)" : "linear-gradient(180deg, #ea580c 0%, #f97316 52%, #fb923c 100%)" }}
         >
           <div className="mb-6">

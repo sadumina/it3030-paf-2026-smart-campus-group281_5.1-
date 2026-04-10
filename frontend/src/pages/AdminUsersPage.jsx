@@ -17,7 +17,7 @@ import { createNotification, notificationTypes, notificationPriorities } from ".
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Approvals", badge: "18", icon: ClipboardCheck },
+  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/bookings" },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "Resource Matrix", icon: LayoutGrid },
   { label: "User Management", icon: Users, path: "/admin/users" },
