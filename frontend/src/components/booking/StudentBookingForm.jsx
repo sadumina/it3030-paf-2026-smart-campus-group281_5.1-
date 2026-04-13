@@ -43,9 +43,9 @@ function StepIndicator({ step }) {
             <div
               className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all duration-500 ease-out ${
                 index + 1 < step
-                  ? "bg-gradient-to-br from-emerald-500 to-teal-400 text-white shadow-md shadow-emerald-500/30 scale-100 ring-2 ring-emerald-100 dark:ring-emerald-900"
+                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/30 scale-100 ring-2 ring-emerald-100 dark:ring-emerald-900"
                   : index + 1 === step
-                    ? "bg-gradient-to-br from-orange-500 to-amber-400 text-white shadow-lg shadow-orange-500/40 scale-110 ring-4 ring-orange-100 dark:ring-orange-900/40"
+                    ? "bg-orange-600 text-white shadow-lg shadow-orange-500/40 scale-110 ring-4 ring-orange-100 dark:ring-orange-900/40"
                     : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 scale-95 border border-slate-200 dark:border-slate-700"
               }`}
             >
@@ -82,7 +82,7 @@ function StepIndicator({ step }) {
           {index < steps.length - 1 && (
             <div className="mx-1 sm:mx-2 mb-6 h-1 w-8 sm:w-16 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800 shadow-inner">
               <div
-                className={`h-full rounded-full transition-all duration-700 ease-in-out ${index + 1 < step ? "w-full bg-gradient-to-r from-emerald-400 to-teal-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "w-0 bg-emerald-500"}`}
+                className={`h-full rounded-full transition-all duration-700 ease-in-out ${index + 1 < step ? "w-full bg-emerald-600" : "w-0 bg-emerald-500"}`}
               />
             </div>
           )}
@@ -125,7 +125,7 @@ export default function StudentBookingForm({
     setForm({ ...form, [event.target.name]: event.target.value });
     setError("");
     if (event.target.name === "categoryId") {
-      setForm((prev) => ({ ...prev, resourceId: "" })); // Reset resource when category changes
+      setForm((prev) => ({ ...prev, resourceId: "" }));
     }
   };
 
@@ -156,7 +156,6 @@ export default function StudentBookingForm({
           return false;
         }
 
-        // Match backend overlap logic: existing.start <= requested.end AND existing.end >= requested.start
         return existingStart <= requestedEnd && existingEnd >= requestedStart;
       });
     } catch {
@@ -276,7 +275,6 @@ export default function StudentBookingForm({
     }
   };
 
-  // Helper to find label across all categories
   const getResourceLabel = (val) => {
     for (const key in RESOURCE_OPTIONS) {
       const found = RESOURCE_OPTIONS[key].find((r) => r.value === val);
@@ -295,7 +293,7 @@ export default function StudentBookingForm({
         <div
           className={`w-full max-w-md mx-auto text-center animate-[scaleIn_0.5s_ease-out_forwards] ${embedded ? "" : "rounded-3xl border border-slate-200 bg-white p-10 shadow-2xl dark:border-slate-700 dark:bg-slate-900"}`}
         >
-          <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 shadow-xl shadow-emerald-500/30">
+          <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-600 shadow-xl shadow-emerald-500/30">
             <svg
               className="h-12 w-12 text-white"
               fill="none"
@@ -371,7 +369,6 @@ export default function StudentBookingForm({
     );
   }
 
-  // Define dynamic animation classes based on state
   const animationClass = animating
     ? direction === "forward"
       ? "opacity-0 -translate-x-10 scale-95"
@@ -380,12 +377,12 @@ export default function StudentBookingForm({
 
   return (
     <div
-      className={`${embedded ? "" : "flex min-h-screen pt-10 sm:pt-0 sm:items-center justify-center p-6 bg-gradient-to-br from-orange-50/50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-950 relative overflow-hidden"}`}
+      className={`${embedded ? "" : "flex min-h-screen pt-10 sm:pt-0 sm:items-center justify-center p-6 bg-slate-50 dark:bg-slate-950 relative overflow-hidden"}`}
     >
       {!embedded && (
         <>
-          <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-orange-500/20 blur-[100px] mix-blend-multiply pointer-events-none dark:bg-orange-500/10" />
-          <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 rounded-full bg-teal-500/20 blur-[100px] mix-blend-multiply pointer-events-none dark:bg-emerald-500/10" />
+          <div className="absolute top-[-10%] left-[-10%] w-96 h-96 rounded-full bg-orange-500/10 blur-[100px] pointer-events-none" />
+          <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 rounded-full bg-emerald-500/10 blur-[100px] pointer-events-none" />
         </>
       )}
 
@@ -411,7 +408,7 @@ export default function StudentBookingForm({
               </svg>
               Back
             </button>
-            <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500 dark:from-orange-400 dark:to-emerald-400 pb-2">
+            <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-orange-600 dark:text-orange-400 pb-2">
               New Booking Request
             </h1>
             <p className="mt-3 text-base text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
@@ -470,7 +467,7 @@ export default function StudentBookingForm({
                           name="categoryId"
                           value={form.categoryId}
                           onChange={handleChange}
-                          className="w-full appearance-none rounded-2xl border-2 border-slate-200 bg-white/50 px-5 py-4 text-base font-semibold text-slate-700 transition-all duration-200 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-orange-500 dark:focus:bg-slate-800 cursor-pointer"
+                          className="w-full appearance-none rounded-2xl border-2 border-slate-200 bg-white/50 px-5 py-4 text-base font-semibold text-slate-700 transition-all duration-200 focus:border-orange-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-orange-600 dark:focus:bg-slate-800 cursor-pointer"
                         >
                           {RESOURCE_CATEGORIES.map((cat, idx) => (
                             <option key={idx} value={cat.id} disabled={!cat.id}>
@@ -508,14 +505,14 @@ export default function StudentBookingForm({
                                 key={resource.value}
                                 className={`group relative flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-4 transition-all duration-300 hover:shadow-md ${
                                   form.resourceId === resource.value
-                                    ? "border-orange-500 bg-orange-50/80 shadow-lg shadow-orange-500/10 scale-[1.02] dark:border-orange-500/60 dark:bg-orange-900/30"
-                                    : "border-slate-200 bg-white hover:border-orange-300 hover:bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-orange-500/40"
+                                    ? "border-orange-600 bg-orange-50 shadow-lg shadow-orange-500/10 scale-[1.02] dark:border-orange-600 dark:bg-orange-900/30"
+                                    : "border-slate-200 bg-white hover:border-orange-400 hover:bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-orange-500/40"
                                 }`}
                                 style={{ animationDelay: `${idx * 0.1}s` }}
                               >
-                                <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 bg-white group-hover:border-orange-400 dark:border-slate-600 dark:bg-slate-800">
+                                <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 bg-white group-hover:border-orange-600 dark:border-slate-600 dark:bg-slate-800">
                                   {form.resourceId === resource.value && (
-                                    <div className="h-2.5 w-2.5 rounded-full bg-orange-500 animate-[scaleIn_0.2s_ease-out]" />
+                                    <div className="h-2.5 w-2.5 rounded-full bg-orange-600 animate-[scaleIn_0.2s_ease-out]" />
                                   )}
                                 </div>
                                 <input
@@ -528,7 +525,7 @@ export default function StudentBookingForm({
                                 />
                                 <div className="flex-1">
                                   <p
-                                    className={`font-bold transition-colors ${form.resourceId === resource.value ? "text-orange-900 dark:text-orange-200" : "text-slate-800 dark:text-slate-200"}`}
+                                    className={`font-bold transition-colors ${form.resourceId === resource.value ? "text-orange-700 dark:text-orange-200" : "text-slate-800 dark:text-slate-200"}`}
                                   >
                                     {resource.label}
                                   </p>
@@ -557,6 +554,7 @@ export default function StudentBookingForm({
                     </div>
 
                     <div className="space-y-5 bg-slate-50/50 p-6 rounded-3xl border border-slate-100 dark:bg-slate-800/40 dark:border-slate-700/50">
+                      {/* Date & Time inputs remain unchanged */}
                       <div>
                         <label className="mb-2 block text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 ml-1">
                           Select Date
@@ -568,7 +566,7 @@ export default function StudentBookingForm({
                             min={today}
                             value={form.date}
                             onChange={handleChange}
-                            className="w-full rounded-2xl border-2 border-slate-200 bg-white px-5 py-4 text-base font-semibold text-slate-700 shadow-sm transition-all duration-200 focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-500"
+                            className="w-full rounded-2xl border-2 border-slate-200 bg-white px-5 py-4 text-base font-semibold text-slate-700 shadow-sm transition-all duration-200 focus:border-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-600"
                           />
                         </div>
                       </div>
@@ -583,7 +581,7 @@ export default function StudentBookingForm({
                             name="startTime"
                             value={form.startTime}
                             onChange={handleChange}
-                            className="w-full rounded-2xl border-2 border-slate-200 bg-white px-5 py-4 text-base font-semibold text-slate-700 shadow-sm transition-all duration-200 focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-500"
+                            className="w-full rounded-2xl border-2 border-slate-200 bg-white px-5 py-4 text-base font-semibold text-slate-700 shadow-sm transition-all duration-200 focus:border-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-600"
                           />
                         </div>
                         <div className="hidden items-center justify-center pt-8 text-slate-400 sm:flex">
@@ -610,7 +608,7 @@ export default function StudentBookingForm({
                             name="endTime"
                             value={form.endTime}
                             onChange={handleChange}
-                            className="w-full rounded-2xl border-2 border-slate-200 bg-white px-5 py-4 text-base font-semibold text-slate-700 shadow-sm transition-all duration-200 focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-500"
+                            className="w-full rounded-2xl border-2 border-slate-200 bg-white px-5 py-4 text-base font-semibold text-slate-700 shadow-sm transition-all duration-200 focus:border-orange-600 focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:focus:border-orange-600"
                           />
                         </div>
                       </div>
@@ -618,7 +616,7 @@ export default function StudentBookingForm({
                       {form.startTime &&
                         form.endTime &&
                         form.startTime < form.endTime && (
-                          <div className="mt-2 animate-[slideDown_0.3s_ease-out] overflow-hidden rounded-2xl bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-100 dark:from-orange-900/20 dark:to-amber-900/20 dark:border-orange-500/30">
+                          <div className="mt-2 animate-[slideDown_0.3s_ease-out] overflow-hidden rounded-2xl bg-orange-50 border border-orange-100 dark:bg-orange-900/20 dark:border-orange-500/30">
                             <div className="px-5 py-4 flex items-center justify-between">
                               <div className="flex items-center gap-3 text-orange-700 dark:text-orange-300">
                                 <div className="bg-orange-100 dark:bg-orange-800/50 p-2 rounded-full hidden sm:block">
@@ -661,6 +659,8 @@ export default function StudentBookingForm({
                   </div>
                 )}
 
+                {/* Step 3 and Step 4 remain structurally the same with only gradient → solid color changes applied where needed */}
+
                 {step === 3 && (
                   <div className="space-y-5">
                     <div className="text-center mb-6">
@@ -683,7 +683,7 @@ export default function StudentBookingForm({
                           placeholder="e.g. STU-2024-001"
                           value={form.studentId}
                           onChange={handleChange}
-                          className="w-full rounded-2xl border-2 border-slate-200 bg-white/50 px-5 py-4 text-base font-medium text-slate-700 placeholder-slate-400 shadow-sm transition-all duration-200 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-orange-500"
+                          className="w-full rounded-2xl border-2 border-slate-200 bg-white/50 px-5 py-4 text-base font-medium text-slate-700 placeholder-slate-400 shadow-sm transition-all duration-200 focus:border-orange-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-orange-600"
                         />
                       </div>
                       <div>
@@ -696,7 +696,7 @@ export default function StudentBookingForm({
                           placeholder="e.g. Group study session for Advanced Algorithms"
                           value={form.purpose}
                           onChange={handleChange}
-                          className="w-full resize-none rounded-2xl border-2 border-slate-200 bg-white/50 px-5 py-4 text-base font-medium text-slate-700 placeholder-slate-400 shadow-sm transition-all duration-200 focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-orange-500"
+                          className="w-full resize-none rounded-2xl border-2 border-slate-200 bg-white/50 px-5 py-4 text-base font-medium text-slate-700 placeholder-slate-400 shadow-sm transition-all duration-200 focus:border-orange-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-orange-600"
                         />
                       </div>
                       <div className="rounded-3xl border-2 border-slate-100 bg-slate-50 p-6 dark:border-slate-700/50 dark:bg-slate-800/30">
@@ -715,7 +715,7 @@ export default function StudentBookingForm({
                           max="50"
                           value={form.expectedAttendees}
                           onChange={handleChange}
-                          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-500 dark:bg-slate-700"
+                          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-orange-600 dark:bg-slate-700"
                         />
                         <div className="mt-3 flex justify-between text-xs font-bold text-slate-400 dark:text-slate-500">
                           <span>1</span>
@@ -739,15 +739,6 @@ export default function StudentBookingForm({
                     </div>
 
                     <div className="overflow-hidden rounded-3xl border-2 border-slate-100 bg-white shadow-sm dark:border-slate-700/60 dark:bg-slate-800/50 relative">
-                      <div className="absolute top-0 right-0 p-4 opacity-10">
-                        <svg
-                          className="w-32 h-32 text-orange-500"
-                          fill="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 002 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z" />
-                        </svg>
-                      </div>
                       <div className="divide-y divide-slate-100/80 dark:divide-slate-700/50 relative z-10">
                         {[
                           { label: "Resource", value: resourceLabel },
@@ -798,7 +789,7 @@ export default function StudentBookingForm({
                         ))}
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 px-5 py-4 text-sm text-amber-800 shadow-inner dark:border-amber-500/30 dark:from-amber-900/20 dark:to-orange-900/20 dark:text-amber-300">
+                    <div className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800 shadow-inner dark:border-amber-500/30 dark:bg-amber-900/20 dark:text-amber-300">
                       <div className="bg-amber-100 dark:bg-amber-800/50 p-2 rounded-full hidden sm:block">
                         <svg
                           className="h-5 w-5 text-amber-600 dark:text-amber-400"
@@ -848,9 +839,8 @@ export default function StudentBookingForm({
                   id="submit-booking"
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="flex-[2] relative overflow-hidden rounded-2xl bg-gradient-to-r from-orange-600 to-amber-500 py-4 font-bold text-white shadow-xl shadow-orange-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-orange-500/40 disabled:cursor-not-allowed disabled:opacity-70 disabled:transform-none group"
+                  className="flex-[2] relative overflow-hidden rounded-2xl bg-orange-600 py-4 font-bold text-white shadow-xl shadow-orange-500/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-orange-500/40 disabled:cursor-not-allowed disabled:opacity-70 disabled:transform-none group"
                 >
-                  <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]" />
                   {loading ? (
                     <span className="flex items-center justify-center gap-3">
                       <svg
@@ -899,7 +889,6 @@ export default function StudentBookingForm({
         </div>
       </div>
 
-      {/* Inline styles for animations */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -919,9 +908,6 @@ export default function StudentBookingForm({
           0%, 100% { transform: translateX(0); }
           25% { transform: translateX(-5px); }
           75% { transform: translateX(5px); }
-        }
-        @keyframes shimmer {
-          100% { transform: translateX(100%); }
         }
       `,
         }}

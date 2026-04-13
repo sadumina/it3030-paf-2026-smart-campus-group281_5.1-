@@ -126,7 +126,7 @@ export default function MyBookingsPage() {
         sidebarItems={userSidebar}
         hideDashboardWidgets={true}
         extraContent={
-          <section className="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-gradient-to-b from-white to-slate-50/60 dark:from-slate-900 dark:to-slate-950/70 p-4 shadow-sm ring-1 ring-slate-100/70 dark:ring-slate-800/50 md:p-5">
+          <section className="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-100/70 dark:ring-slate-800/50 md:p-5">
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-4 dark:border-slate-700/80">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-600 dark:text-orange-400">
@@ -150,7 +150,7 @@ export default function MyBookingsPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(true)}
-                  className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-orange-600 to-orange-500 px-3.5 py-2 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:from-orange-500 hover:to-orange-400 hover:shadow-orange-500/30"
+                  className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-3.5 py-2 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-orange-500 hover:shadow-orange-500/30"
                 >
                   <PlusCircle className="h-4 w-4" />
                   Add Booking
@@ -185,6 +185,9 @@ export default function MyBookingsPage() {
                   {stats.rejected}
                 </p>
               </div>
+            </div>
+            <div className="mb-3 flex items-center gap-2">
+              <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">Bookings</p>
             </div>
 
             {loading ? (

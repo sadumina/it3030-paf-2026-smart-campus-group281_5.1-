@@ -24,10 +24,10 @@ export default function BookingDetailsModal({
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
             onClick={(event) => event.stopPropagation()}
-            className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-700/60 dark:bg-slate-900 shadow-orange-500/5"
+            className="flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
           >
-            <div className="shrink-0 flex items-center justify-between border-b border-slate-100 bg-white/95 px-5 py-4 dark:border-slate-800 dark:bg-slate-900/95 relative">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-orange-400/10 to-transparent dark:from-orange-500/10 rounded-full blur-3xl -z-10" />
+            {/* Header */}
+            <div className="shrink-0 flex items-center justify-between border-b border-slate-100 bg-white px-5 py-4 dark:border-slate-800 dark:bg-slate-900">
               <div>
                 <h3 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   Booking Details
@@ -47,8 +47,9 @@ export default function BookingDetailsModal({
               </button>
             </div>
 
+            {/* Content */}
             <div className="overflow-y-auto p-5 relative">
-              <div className="mb-6 rounded-xl border border-orange-100 bg-orange-50/50 p-4 dark:border-orange-500/20 dark:bg-orange-500/5">
+              <div className="mb-6 rounded-xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-500/20 dark:bg-orange-500/5">
                 <p className="text-xs font-medium uppercase tracking-wider text-orange-600 dark:text-orange-400 mb-1">
                   Resource
                 </p>
@@ -58,7 +59,7 @@ export default function BookingDetailsModal({
               </div>
 
               <div className="grid gap-3 text-sm sm:grid-cols-2">
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/40">
                   <p className="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">
                     Booking ID
                   </p>
@@ -66,7 +67,7 @@ export default function BookingDetailsModal({
                     {booking.id}
                   </p>
                 </div>
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/40">
                   <p className="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">
                     Student ID
                   </p>
@@ -74,7 +75,7 @@ export default function BookingDetailsModal({
                     {booking.studentId || "-"}
                   </p>
                 </div>
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/40">
                   <p className="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">
                     Start Time
                   </p>
@@ -82,7 +83,7 @@ export default function BookingDetailsModal({
                     {formatDateTime(booking.startTime)}
                   </p>
                 </div>
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/40">
                   <p className="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">
                     End Time
                   </p>
@@ -90,7 +91,7 @@ export default function BookingDetailsModal({
                     {formatDateTime(booking.endTime)}
                   </p>
                 </div>
-                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+                <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/40">
                   <p className="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">
                     Expected Attendees
                   </p>
@@ -98,7 +99,7 @@ export default function BookingDetailsModal({
                     {booking.expectedAttendees || "-"}
                   </p>
                 </div>
-                <div className="sm:col-span-2 rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50">
+                <div className="sm:col-span-2 rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/40">
                   <p className="mb-1 text-xs font-medium text-slate-500 dark:text-slate-400">
                     Purpose
                   </p>
@@ -109,11 +110,12 @@ export default function BookingDetailsModal({
               </div>
             </div>
 
-            <div className="shrink-0 border-t border-slate-100 bg-slate-50/80 px-5 py-4 dark:border-slate-800 dark:bg-slate-800/80 flex justify-end">
+            {/* Footer */}
+            <div className="shrink-0 border-t border-slate-100 bg-slate-50 px-5 py-4 dark:border-slate-800 dark:bg-slate-800 flex justify-end">
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 border border-slate-200/80 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-colors dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700 dark:hover:border-slate-600"
+                className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 border border-slate-200 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-colors dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700 dark:hover:border-slate-600"
               >
                 Close
               </button>
