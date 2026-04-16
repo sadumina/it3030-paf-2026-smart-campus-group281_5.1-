@@ -30,7 +30,7 @@ import {
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Approvals", badge: "18", icon: ClipboardCheck },
+  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/bookings" },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "User Management", icon: Users, path: "/admin/users" },
   { label: "Incidents", badge: "6", icon: Siren },

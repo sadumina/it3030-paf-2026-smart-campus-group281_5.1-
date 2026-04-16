@@ -26,6 +26,7 @@ import {
 } from "../services/authStorage";
 import { getDashboardPathForRole } from "../services/roleDashboard";
 import AdminBookingsPage from "../pages/AdminBookingsPage";
+import BookingAnalyticsPage from "../pages/BookingAnalyticsPage";
 
 function SessionSync() {
   const location = useLocation();
@@ -149,6 +150,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminBookingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/booking-analytics"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <BookingAnalyticsPage />
             </ProtectedRoute>
           }
         />

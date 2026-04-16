@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ClipboardCheck,
   LayoutGrid,
@@ -9,6 +10,7 @@ import {
   UserRoundCog,
   BarChart3,
   Search,
+  ChartBar,
 } from "lucide-react";
 
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
@@ -78,6 +80,7 @@ function BookingIdDisplay({ id }) {
 
 export default function AdminBookingsPage() {
   const auth = getAuth();
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -344,6 +347,13 @@ export default function AdminBookingsPage() {
                 >
                   <UserRoundCog className="h-3.5 w-3.5" />
                   Refresh
+                </button>
+                <button
+                  onClick={() => navigate("/admin/booking-analytics")}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/80 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm"
+                >
+                  <ChartBar className="h-3.5 w-3.5" />
+                  Analytics
                 </button>
               </div>
             </div>
