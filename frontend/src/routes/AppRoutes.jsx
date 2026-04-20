@@ -8,6 +8,7 @@ import AdminDashboardPage from "../pages/AdminDashboardPage";
 import AdminUsersPage from "../pages/AdminUsersPage";
 import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 import TechnicianDashboardPage from "../pages/TechnicianDashboardPage";
+import InnovationLabPage from "../pages/InnovationLabPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { fetchCurrentUser } from "../services/authService";
 import { clearAuth, getAuth, getToken, saveAuth } from "../services/authStorage";
@@ -118,6 +119,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
               <AnalyticsDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/innovation-lab"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+              <InnovationLabPage />
             </ProtectedRoute>
           }
         />
