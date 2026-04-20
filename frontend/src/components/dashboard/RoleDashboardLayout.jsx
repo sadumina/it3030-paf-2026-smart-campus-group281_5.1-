@@ -146,6 +146,7 @@ export default function RoleDashboardLayout({
   chartPoints,
   chartColor,
   extraContent,
+  showInsightsPanel = true,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -379,48 +380,50 @@ export default function RoleDashboardLayout({
               })}
             </div>
 
-            <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_280px]">
-              <section className="flex flex-col rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
-                <div className="mb-4">
-                  <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{chartTitle}</h2>
-                  <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">{chartCaption}</p>
-                </div>
+            {showInsightsPanel ? (
+              <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_280px]">
+                <section className="flex flex-col rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+                  <div className="mb-4">
+                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{chartTitle}</h2>
+                    <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">{chartCaption}</p>
+                  </div>
 
-                <div className="mb-2 flex flex-wrap gap-1.5">
-                  <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 text-xs text-orange-700 dark:text-orange-300">
-                    <ChartNoAxesCombined className="h-3 w-3" />
-                    Primary Metric
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 dark:bg-pink-900/30 px-2 py-0.5 text-xs text-pink-700 dark:text-pink-300">
-                    <ChartNoAxesCombined className="h-3 w-3" />
-                    Secondary Metric
-                  </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-700 px-2 py-0.5 text-xs text-slate-700 dark:text-slate-300">
-                    Live (2.4s)
-                  </span>
-                </div>
+                  <div className="mb-2 flex flex-wrap gap-1.5">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 text-xs text-orange-700 dark:text-orange-300">
+                      <ChartNoAxesCombined className="h-3 w-3" />
+                      Primary Metric
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 dark:bg-pink-900/30 px-2 py-0.5 text-xs text-pink-700 dark:text-pink-300">
+                      <ChartNoAxesCombined className="h-3 w-3" />
+                      Secondary Metric
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-700 px-2 py-0.5 text-xs text-slate-700 dark:text-slate-300">
+                      Live (2.4s)
+                    </span>
+                  </div>
 
-                <div className="flex-1 min-h-0 -mx-4">
-                  <ProfessionalChart points={livePoints} color={chartColor} />
-                </div>
-              </section>
-
-              <div className="flex flex-col gap-4">
-                <section className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
-                  <h2 className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">Live Activity</h2>
-                  <div className="space-y-2">
-                    {activityFeed.slice(0, 4).map((item) => (
-                      <article key={item.title} className="rounded-md border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 p-2">
-                        <p className="text-xs font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
-                        <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{item.meta}</p>
-                      </article>
-                    ))}
+                  <div className="flex-1 min-h-0 -mx-4">
+                    <ProfessionalChart points={livePoints} color={chartColor} />
                   </div>
                 </section>
 
-                <NotificationPanel />
+                <div className="flex flex-col gap-4">
+                  <section className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
+                    <h2 className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">Live Activity</h2>
+                    <div className="space-y-2">
+                      {activityFeed.slice(0, 4).map((item) => (
+                        <article key={item.title} className="rounded-md border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 p-2">
+                          <p className="text-xs font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
+                          <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{item.meta}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </section>
+
+                  <NotificationPanel />
+                </div>
               </div>
-            </div>
+            ) : null}
 
             {extraContent ? extraContent : null}
           </main>
