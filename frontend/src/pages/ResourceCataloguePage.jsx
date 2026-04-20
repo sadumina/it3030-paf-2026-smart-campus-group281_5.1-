@@ -78,6 +78,7 @@ export default function ResourceCataloguePage() {
       chartTitle="Resource demand snapshot"
       chartCaption="Live-style dashboard visuals with a dedicated catalogue below."
       chartColor="#fb923c"
+      showNotifications={false}
       extraContent={
         <ResourceCatalogueContent
           resources={resources}
