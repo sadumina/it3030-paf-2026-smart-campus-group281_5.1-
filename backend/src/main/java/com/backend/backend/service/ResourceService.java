@@ -30,8 +30,21 @@ public class ResourceService {
     public Resource getResourceById(String id) {
         ensureSampleResources();
         return resourceRepository.findById(id)
-                .map(this::normalizeResourceFields)
+                .map(resource -> {
+                    normalizeResourceFields(resource);
+                    return resource;
+                })
                 .orElseThrow(() -> new NoSuchElementException("Resource not found"));
+    }
+
+    public Resource updateResourceStatus(String id, String status) {
+        ensureSampleResources();
+        String normalizedStatus = normalizeStatusInput(status);
+        Resource resource = resourceRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Resource not found"));
+        resource.setStatus(normalizedStatus);
+        resource.setAvailability("ACTIVE".equals(normalizedStatus) ? "Available" : "Unavailable");
+        return resourceRepository.save(resource);
     }
 
     private boolean matchesType(Resource resource, String type) {
@@ -66,7 +79,7 @@ public class ResourceService {
             return true;
         }
 
-        return getResourceStatus(resource).equalsIgnoreCase(status.trim());
+        return getResourceStatus(resource).equals(normalizeStatusInput(status));
     }
 
     private String getResourceType(Resource resource) {
@@ -92,21 +105,60 @@ public class ResourceService {
     }
 
     private String getResourceStatus(Resource resource) {
-        String status = resource.getStatus();
-        if (status != null && !status.isBlank()) {
-            return status;
+        return normalizeStatusForRead(resource.getStatus(), resource.getAvailability());
+    }
+
+    private String normalizeStatusInput(String status) {
+        String normalized = valueOrEmpty(status)
+                .trim()
+                .toUpperCase(Locale.ROOT)
+                .replace('-', '_')
+                .replace(' ', '_');
+        if (normalized.isBlank()) {
+            throw new IllegalArgumentException("Status is required");
+        }
+        if ("OUTOFSERVICE".equals(normalized)) {
+            return "OUT_OF_SERVICE";
+        }
+        if (!"ACTIVE".equals(normalized) && !"OUT_OF_SERVICE".equals(normalized)) {
+            throw new IllegalArgumentException("Status must be ACTIVE or OUT_OF_SERVICE");
+        }
+        return normalized;
+    }
+
+    private String normalizeStatusForRead(String status, String availability) {
+        String normalized = valueOrEmpty(status)
+                .trim()
+                .toUpperCase(Locale.ROOT)
+                .replace('-', '_')
+                .replace(' ', '_');
+
+        if ("OUTOFSERVICE".equals(normalized)) {
+            return "OUT_OF_SERVICE";
         }
 
-        String availability = resource.getAvailability();
-        if (availability == null || availability.isBlank()) {
-            return "";
+        if ("ACTIVE".equals(normalized)
+                || "AVAILABLE".equals(normalized)
+                || "IN_SERVICE".equals(normalized)
+                || "ONLINE".equals(normalized)) {
+            return "ACTIVE";
         }
 
-        if ("Unavailable".equalsIgnoreCase(availability)) {
-            return "Out of Service";
+        if ("OUT_OF_SERVICE".equals(normalized)
+                || "UNAVAILABLE".equals(normalized)
+                || "INACTIVE".equals(normalized)
+                || "MAINTENANCE".equals(normalized)
+                || "UNDER_MAINTENANCE".equals(normalized)
+                || "OFFLINE".equals(normalized)) {
+            return "OUT_OF_SERVICE";
         }
 
-        return "Active";
+        if ("Unavailable".equalsIgnoreCase(valueOrEmpty(availability))) {
+            return "OUT_OF_SERVICE";
+        }
+
+        // Keep reads resilient even when legacy data contains unexpected statuses.
+        return "ACTIVE";
     }
 
     private String valueOrEmpty(String value) {
@@ -219,12 +271,10 @@ public class ResourceService {
             }
         }
 
-        if (resource.getStatus() == null || resource.getStatus().isBlank()) {
-            String normalizedStatus = getResourceStatus(resource);
-            if (!normalizedStatus.isBlank()) {
-                resource.setStatus(normalizedStatus);
-                changed = true;
-            }
+        String normalizedStatus = getResourceStatus(resource);
+        if (!normalizedStatus.equals(valueOrEmpty(resource.getStatus()))) {
+            resource.setStatus(normalizedStatus);
+            changed = true;
         }
 
         if (resource.getCapacity() == null) {

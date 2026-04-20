@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchResourceById } from "../../../services/resourceService";
 
 function getStatusStyles(status) {
@@ -66,9 +66,15 @@ export default function ResourceCard({ resource, isAdmin = false, onEdit, onStat
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [detailsError, setDetailsError] = useState("");
   const [currentStatus, setCurrentStatus] = useState(getStatusLabel(resource));
+  const [statusUpdating, setStatusUpdating] = useState(false);
+  const [statusError, setStatusError] = useState("");
 
   const typeLabel = getTypeLabel(resource);
   const capacityLabel = resource.capacity ?? "-";
+
+  useEffect(() => {
+    setCurrentStatus(getStatusLabel(resource));
+  }, [resource]);
 
   async function handleViewDetails() {
     if (isExpanded) {
@@ -93,11 +99,19 @@ export default function ResourceCard({ resource, isAdmin = false, onEdit, onStat
     }
   }
 
-  function handleStatusToggle() {
+  async function handleStatusToggle() {
     const nextStatus = currentStatus === "ACTIVE" ? "OUT_OF_SERVICE" : "ACTIVE";
-    setCurrentStatus(nextStatus);
-    if (onStatusToggle) {
-      onStatusToggle(resource, nextStatus);
+    setStatusError("");
+    setStatusUpdating(true);
+    try {
+      if (onStatusToggle) {
+        await onStatusToggle(resource, nextStatus);
+      }
+      setCurrentStatus(nextStatus);
+    } catch (error) {
+      setStatusError(error.message || "Unable to update status.");
+    } finally {
+      setStatusUpdating(false);
     }
   }
 
@@ -148,11 +162,19 @@ export default function ResourceCard({ resource, isAdmin = false, onEdit, onStat
           <button
             type="button"
             onClick={handleStatusToggle}
+            disabled={statusUpdating}
             className="inline-flex items-center rounded-lg border border-orange-300 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100 dark:border-orange-700 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/50"
           >
-            {currentStatus === "ACTIVE" ? "Set Out of Service" : "Mark Active"}
+            {statusUpdating
+              ? "Updating..."
+              : currentStatus === "ACTIVE"
+                ? "Set Out of Service"
+                : "Mark Active"}
           </button>
         </div>
+      ) : null}
+      {statusError ? (
+        <p className="mt-2 text-xs font-medium text-rose-600 dark:text-rose-300">{statusError}</p>
       ) : null}
 
       {isExpanded ? (

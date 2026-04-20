@@ -11,7 +11,7 @@ import {
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
 import ResourceCatalogueContent from "../features/resources/components/ResourceCatalogueContent";
-import { fetchResources } from "../services/resourceService";
+import { fetchResources, updateResourceStatus } from "../services/resourceService";
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
@@ -36,39 +36,56 @@ export default function AdminResourceMatrixPage() {
   const [error, setError] = useState("");
   const [filters, setFilters] = useState(defaultFilters);
 
+  async function loadResources(activeGuard = () => true, silent = false) {
+    try {
+      if (!silent) {
+        setLoading(true);
+      }
+      setError("");
+      const normalizedCapacity =
+        filters.minCapacity === "" || Number.isNaN(Number(filters.minCapacity))
+          ? ""
+          : Number(filters.minCapacity);
+
+      const data = await fetchResources({
+        ...filters,
+        minCapacity: normalizedCapacity,
+      });
+
+      if (activeGuard()) {
+        setResources(data);
+      }
+    } catch (loadError) {
+      if (activeGuard()) {
+        setError(loadError.message || "Unable to load resource matrix.");
+      }
+    } finally {
+      if (activeGuard() && !silent) {
+        setLoading(false);
+      }
+    }
+  }
+
   useEffect(() => {
     let active = true;
-    const debounceTimer = setTimeout(async () => {
-      try {
-        setLoading(true);
-        setError("");
-        const normalizedCapacity =
-          filters.minCapacity === "" || Number.isNaN(Number(filters.minCapacity))
-            ? ""
-            : Number(filters.minCapacity);
-
-        const data = await fetchResources({
-          ...filters,
-          minCapacity: normalizedCapacity,
-        });
-
-        if (active) {
-          setResources(data);
-        }
-      } catch (loadError) {
-        if (active) {
-          setError(loadError.message || "Unable to load resource matrix.");
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
+    const debounceTimer = setTimeout(() => {
+      loadResources(() => active);
     }, 350);
 
     return () => {
       active = false;
       clearTimeout(debounceTimer);
+    };
+  }, [filters]);
+
+  useEffect(() => {
+    let active = true;
+    const intervalId = setInterval(() => {
+      loadResources(() => active, true);
+    }, 5000);
+    return () => {
+      active = false;
+      clearInterval(intervalId);
     };
   }, [filters]);
 
@@ -80,6 +97,13 @@ export default function AdminResourceMatrixPage() {
       ...current,
       [field]: nextValue,
     }));
+  }
+
+  async function handleStatusToggle(resource, nextStatus) {
+    const updated = await updateResourceStatus(resource?.id, nextStatus);
+    setResources((current) =>
+      current.map((item) => (item.id === resource.id ? { ...item, ...updated } : item)),
+    );
   }
 
   return (
@@ -121,6 +145,7 @@ export default function AdminResourceMatrixPage() {
           loading={loading}
           error={error}
           isAdmin
+          onStatusToggle={handleStatusToggle}
         />
       }
     />

@@ -63,3 +63,18 @@ export async function fetchResourceById(resourceId) {
   const data = await parseResponse(response);
   return data && typeof data === "object" ? data : null;
 }
+
+export async function updateResourceStatus(resourceId, status) {
+  if (!resourceId) {
+    throw new Error("Resource id is required");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/${resourceId}/status`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ status }),
+  });
+
+  const data = await parseResponse(response);
+  return data && typeof data === "object" ? data : null;
+}
