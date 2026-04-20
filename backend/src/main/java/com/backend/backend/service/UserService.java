@@ -246,6 +246,13 @@ public class UserService {
         return Optional.of(user);
     }
 
+    public Optional<User> recordSuccessfulLogin(String userId) {
+        return userRepository.findById(userId).map(user -> {
+            user.setLastLoginAt(System.currentTimeMillis());
+            return userRepository.save(user);
+        });
+    }
+
     // Get all users
     public List<User> getAllUsers() {
         return userRepository.findAll();
