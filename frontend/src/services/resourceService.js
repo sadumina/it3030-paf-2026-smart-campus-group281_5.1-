@@ -3,17 +3,24 @@ import { getToken } from "./authStorage";
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8081/api"}/resources`;
 
 async function parseResponse(response) {
-  const data = await response.json().catch(() => []);
+  const data = await response.json().catch(() => null);
 
   if (!response.ok) {
-    throw new Error(data.message || "Failed to fetch resources");
+    throw new Error(data?.message || "Failed to fetch resources");
   }
 
-  return Array.isArray(data) ? data : [];
+  return data;
+}
+
+function getAuthHeaders() {
+  const token = getToken();
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
 }
 
 export async function fetchResources(filters = {}) {
-  const token = getToken();
   const params = new URLSearchParams();
 
   if (filters.type && filters.type !== "ALL") {
@@ -36,11 +43,23 @@ export async function fetchResources(filters = {}) {
 
   const response = await fetch(requestUrl, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    headers: getAuthHeaders(),
   });
 
-  return parseResponse(response);
+  const data = await parseResponse(response);
+  return Array.isArray(data) ? data : [];
+}
+
+export async function fetchResourceById(resourceId) {
+  if (!resourceId) {
+    throw new Error("Resource id is required");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/${resourceId}`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+
+  const data = await parseResponse(response);
+  return data && typeof data === "object" ? data : null;
 }

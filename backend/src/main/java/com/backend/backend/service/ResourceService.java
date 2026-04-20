@@ -2,6 +2,7 @@ package com.backend.backend.service;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,13 @@ public class ResourceService {
                 .filter(resource -> matchesLocation(resource, location))
                 .filter(resource -> matchesStatus(resource, status))
                 .toList();
+    }
+
+    public Resource getResourceById(String id) {
+        ensureSampleResources();
+        return resourceRepository.findById(id)
+                .map(this::normalizeResourceFields)
+                .orElseThrow(() -> new NoSuchElementException("Resource not found"));
     }
 
     private boolean matchesType(Resource resource, String type) {
@@ -167,28 +175,9 @@ public class ResourceService {
         boolean hasChanges = false;
 
         for (Resource resource : resources) {
-            if (resource.getType() == null || resource.getType().isBlank()) {
-                String normalizedType = getResourceType(resource);
-                if (!normalizedType.isBlank()) {
-                    resource.setType(normalizedType);
-                    hasChanges = true;
-                }
-            }
-
-            if (resource.getStatus() == null || resource.getStatus().isBlank()) {
-                String normalizedStatus = getResourceStatus(resource);
-                if (!normalizedStatus.isBlank()) {
-                    resource.setStatus(normalizedStatus);
-                    hasChanges = true;
-                }
-            }
-
-            if (resource.getCapacity() == null) {
-                Integer normalizedCapacity = getFallbackCapacity(resource);
-                if (normalizedCapacity != null) {
-                    resource.setCapacity(normalizedCapacity);
-                    hasChanges = true;
-                }
+            boolean changed = normalizeResourceFields(resource);
+            if (changed) {
+                hasChanges = true;
             }
         }
 
@@ -217,5 +206,35 @@ public class ResourceService {
         }
 
         return null;
+    }
+
+    private boolean normalizeResourceFields(Resource resource) {
+        boolean changed = false;
+
+        if (resource.getType() == null || resource.getType().isBlank()) {
+            String normalizedType = getResourceType(resource);
+            if (!normalizedType.isBlank()) {
+                resource.setType(normalizedType);
+                changed = true;
+            }
+        }
+
+        if (resource.getStatus() == null || resource.getStatus().isBlank()) {
+            String normalizedStatus = getResourceStatus(resource);
+            if (!normalizedStatus.isBlank()) {
+                resource.setStatus(normalizedStatus);
+                changed = true;
+            }
+        }
+
+        if (resource.getCapacity() == null) {
+            Integer normalizedCapacity = getFallbackCapacity(resource);
+            if (normalizedCapacity != null) {
+                resource.setCapacity(normalizedCapacity);
+                changed = true;
+            }
+        }
+
+        return changed;
     }
 }
