@@ -5,7 +5,7 @@ export function normalizeRole(role) {
 export function getDashboardPathForRole(role) {
   const normalized = normalizeRole(role);
 
-  if (normalized === "ADMIN") {
+  if (normalized === "ADMIN" || normalized === "SUPER_ADMIN") {
     return "/admin";
   }
 
