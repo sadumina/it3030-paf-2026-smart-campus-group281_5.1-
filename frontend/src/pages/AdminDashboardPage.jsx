@@ -8,6 +8,7 @@ import {
   Siren,
   ScrollText,
   BarChart3,
+  Sparkles,
 } from "lucide-react";
 
 const adminSidebar = [
@@ -16,6 +17,7 @@ const adminSidebar = [
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "Resource Matrix", icon: LayoutGrid },
   { label: "User Management", icon: Users, path: "/admin/users" },
+  { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
   { label: "Incidents", badge: "6", icon: Siren },
   { label: "Audit Trail", icon: ScrollText },
 ];

@@ -8,6 +8,7 @@ import {
   Users,
   UserRoundCog,
   BarChart3,
+  Sparkles,
 } from "lucide-react";
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
@@ -21,6 +22,7 @@ const adminSidebar = [
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "Resource Matrix", icon: LayoutGrid },
   { label: "User Management", icon: Users, path: "/admin/users" },
+  { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
   { label: "Incidents", badge: "6", icon: Siren },
   { label: "Audit Trail", icon: ScrollText },
 ];
@@ -37,6 +39,11 @@ function canAdminManageRole(role) {
   return normalized === "USER" || normalized === "TECHNICIAN";
 }
 
+function isPrivilegedRole(role) {
+  const normalized = normalizeRole(role);
+  return normalized === "ADMIN" || normalized === "SUPER_ADMIN";
+}
+
 export default function AdminUsersPage() {
   const auth = getAuth();
   const actorRole = normalizeRole(auth?.role);
@@ -46,6 +53,7 @@ export default function AdminUsersPage() {
   const [error, setError] = useState("");
   const [roleDrafts, setRoleDrafts] = useState({});
   const [actionMessage, setActionMessage] = useState("");
+  const [activeTab, setActiveTab] = useState("standard");
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, userId: null, userName: null, isLoading: false });
 
   const loadUsers = async () => {
@@ -82,6 +90,18 @@ export default function AdminUsersPage() {
   }, [users]);
 
   const roleOptions = isSuperAdmin ? ROLE_OPTIONS_SUPER_ADMIN : ROLE_OPTIONS_ADMIN;
+
+  const standardUsers = useMemo(
+    () => users.filter((user) => !isPrivilegedRole(user.role)),
+    [users]
+  );
+
+  const privilegedUsers = useMemo(
+    () => users.filter((user) => isPrivilegedRole(user.role)),
+    [users]
+  );
+
+  const displayedUsers = activeTab === "privileged" ? privilegedUsers : standardUsers;
 
   const handleRoleDraft = (userId, nextRole) => {
     setRoleDrafts((previous) => ({
@@ -230,18 +250,59 @@ export default function AdminUsersPage() {
         <section className="dashboard-soft-in rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-sm font-semibold text-slate-900">All Users</h2>
-              <p className="mt-0.5 text-xs text-slate-600">Manage user accounts and permissions</p>
+              <h2 className="text-sm font-semibold text-slate-900">
+                {activeTab === "privileged" ? "Admin and Super Admin Accounts" : "User and Technician Accounts"}
+              </h2>
+              <p className="mt-0.5 text-xs text-slate-600">
+                {activeTab === "privileged"
+                  ? "High-privilege role management for platform governance"
+                  : "Standard account management for day-to-day operations"}
+              </p>
             </div>
-            <button
-              type="button"
-              onClick={loadUsers}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
-            >
-              <UserRoundCog className="h-3.5 w-3.5" />
-              Refresh
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setActiveTab("standard")}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                  activeTab === "standard"
+                    ? "border-orange-300 bg-orange-50 text-orange-700"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                }`}
+              >
+                Users and Technicians ({standardUsers.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (isSuperAdmin) {
+                    setActiveTab("privileged");
+                  }
+                }}
+                disabled={!isSuperAdmin}
+                className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                  activeTab === "privileged"
+                    ? "border-purple-300 bg-purple-50 text-purple-700"
+                    : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                } disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                Admins and Super Admins ({privilegedUsers.length})
+              </button>
+              <button
+                type="button"
+                onClick={loadUsers}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50"
+              >
+                <UserRoundCog className="h-3.5 w-3.5" />
+                Refresh
+              </button>
+            </div>
           </div>
+
+          {!isSuperAdmin ? (
+            <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-700">
+              Admin accounts can manage only USER and TECHNICIAN profiles. Privileged account management is SUPER_ADMIN only.
+            </div>
+          ) : null}
 
           {actionMessage ? (
             <div className="mb-3 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">
@@ -271,7 +332,7 @@ export default function AdminUsersPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white">
-                  {users.map((user) => {
+                  {displayedUsers.map((user) => {
                     const isSelf = user.id === auth?.id;
                     const selectedRole = roleDrafts[user.id] || (user.role || "USER").toUpperCase();
                     const targetRole = normalizeRole(user.role);
@@ -333,6 +394,15 @@ export default function AdminUsersPage() {
                       </tr>
                     );
                   })}
+                  {!displayedUsers.length ? (
+                    <tr>
+                      <td colSpan={5} className="px-4 py-8 text-center text-sm text-slate-500">
+                        {activeTab === "privileged"
+                          ? "No admin or super admin accounts found."
+                          : "No user or technician accounts found."}
+                      </td>
+                    </tr>
+                  ) : null}
                 </tbody>
               </table>
             </div>
