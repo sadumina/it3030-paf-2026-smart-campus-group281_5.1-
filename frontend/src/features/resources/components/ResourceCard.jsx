@@ -60,14 +60,14 @@ function getStatusLabel(resource) {
   return "ACTIVE";
 }
 
-export default function ResourceCard({ resource }) {
+export default function ResourceCard({ resource, isAdmin = false, onEdit, onStatusToggle }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [details, setDetails] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [detailsError, setDetailsError] = useState("");
+  const [currentStatus, setCurrentStatus] = useState(getStatusLabel(resource));
 
   const typeLabel = getTypeLabel(resource);
-  const statusLabel = getStatusLabel(resource);
   const capacityLabel = resource.capacity ?? "-";
 
   async function handleViewDetails() {
@@ -93,6 +93,14 @@ export default function ResourceCard({ resource }) {
     }
   }
 
+  function handleStatusToggle() {
+    const nextStatus = currentStatus === "ACTIVE" ? "OUT_OF_SERVICE" : "ACTIVE";
+    setCurrentStatus(nextStatus);
+    if (onStatusToggle) {
+      onStatusToggle(resource, nextStatus);
+    }
+  }
+
   return (
     <article className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-800">
       <div className="flex items-start justify-between gap-3">
@@ -106,8 +114,8 @@ export default function ResourceCard({ resource }) {
             {resource.name}
           </h3>
         </div>
-        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusStyles(statusLabel)}`}>
-          {statusLabel}
+        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusStyles(currentStatus)}`}>
+          {currentStatus}
         </span>
       </div>
 
@@ -127,6 +135,25 @@ export default function ResourceCard({ resource }) {
       >
         {isExpanded ? "Hide Details" : "View Details"}
       </button>
+
+      {isAdmin ? (
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3 dark:border-slate-700">
+          <button
+            type="button"
+            onClick={() => onEdit?.(resource)}
+            className="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            onClick={handleStatusToggle}
+            className="inline-flex items-center rounded-lg border border-orange-300 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100 dark:border-orange-700 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/50"
+          >
+            {currentStatus === "ACTIVE" ? "Set Out of Service" : "Mark Active"}
+          </button>
+        </div>
+      ) : null}
 
       {isExpanded ? (
         <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-900">

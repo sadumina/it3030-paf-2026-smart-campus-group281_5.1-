@@ -7,6 +7,7 @@ export default function ResourceCatalogueContent({
   onFilterChange,
   loading,
   error,
+  isAdmin = false,
 }) {
   return (
     <section className="space-y-4">
@@ -40,7 +41,7 @@ export default function ResourceCatalogueContent({
       {!loading && !error && resources.length > 0 ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {resources.map((resource) => (
-            <ResourceCard key={resource.id || resource.name} resource={resource} />
+            <ResourceCard key={resource.id || resource.name} resource={resource} isAdmin={isAdmin} />
           ))}
         </div>
       ) : null}

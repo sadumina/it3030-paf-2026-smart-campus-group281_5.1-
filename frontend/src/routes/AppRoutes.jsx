@@ -6,6 +6,7 @@ import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
 import ResourceCataloguePage from "../pages/ResourceCataloguePage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
+import AdminResourceMatrixPage from "../pages/AdminResourceMatrixPage";
 import AdminUsersPage from "../pages/AdminUsersPage";
 import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 import TechnicianDashboardPage from "../pages/TechnicianDashboardPage";
@@ -103,6 +104,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/resources"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AdminResourceMatrixPage />
             </ProtectedRoute>
           }
         />
