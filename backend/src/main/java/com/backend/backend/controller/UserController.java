@@ -31,9 +31,19 @@ public class UserController {
 
     // Create a new user
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User createdUser = userService.createUser(user);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    public ResponseEntity<?> createUser(@RequestBody User user, Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return new ResponseEntity<>(java.util.Map.of("message", "Unauthorized"), HttpStatus.UNAUTHORIZED);
+        }
+
+        try {
+            User createdUser = userService.createUserAsActor(authentication.getName(), user);
+            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+        } catch (SecurityException ex) {
+            return new ResponseEntity<>(java.util.Map.of("message", ex.getMessage()), HttpStatus.FORBIDDEN);
+        } catch (IllegalArgumentException ex) {
+            return new ResponseEntity<>(java.util.Map.of("message", ex.getMessage()), HttpStatus.BAD_REQUEST);
+        }
     }
 
     // Get all users
@@ -68,16 +78,20 @@ public class UserController {
 
     // Delete user
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable String id, Authentication authentication) {
-        if (authentication != null && authentication.getName() != null) {
-            Optional<User> currentUser = userService.getUserByEmail(authentication.getName());
-            if (currentUser.isPresent() && id.equals(currentUser.get().getId())) {
-                return new ResponseEntity<>("You cannot delete your own admin account", HttpStatus.BAD_REQUEST);
-            }
+    public ResponseEntity<?> deleteUser(@PathVariable String id, Authentication authentication) {
+        if (authentication == null || authentication.getName() == null) {
+            return new ResponseEntity<>(java.util.Map.of("message", "Unauthorized"), HttpStatus.UNAUTHORIZED);
         }
 
-        userService.deleteUser(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        try {
+            boolean deleted = userService.deleteUserAsActor(authentication.getName(), id);
+            if (!deleted) {
+                return new ResponseEntity<>(java.util.Map.of("message", "User not found"), HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (SecurityException ex) {
+            return new ResponseEntity<>(java.util.Map.of("message", ex.getMessage()), HttpStatus.FORBIDDEN);
+        }
     }
 
     // Health check endpoint
@@ -122,12 +136,13 @@ public class UserController {
                 "email", email,
                 "jwtRoles", roles,
                 "databaseRole", user.get().getRole(),
-                "isAdmin", "ADMIN".equalsIgnoreCase(user.get().getRole())
+                "isAdmin", "ADMIN".equalsIgnoreCase(user.get().getRole()),
+                "isSuperAdmin", "SUPER_ADMIN".equalsIgnoreCase(user.get().getRole())
         ), HttpStatus.OK);
     }
 
     // Get analytics data
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
     @GetMapping("/analytics/summary")
     public ResponseEntity<?> getAnalyticsSummary(Authentication authentication) {
         try {
@@ -141,8 +156,9 @@ public class UserController {
                 return new ResponseEntity<>("Unauthorized: User not found", HttpStatus.UNAUTHORIZED);
             }
             
-            if (!"ADMIN".equalsIgnoreCase(currentUser.get().getRole())) {
-                return new ResponseEntity<>("Forbidden: Only ADMIN users can access analytics", HttpStatus.FORBIDDEN);
+            String currentRole = currentUser.get().getRole();
+            if (!"ADMIN".equalsIgnoreCase(currentRole) && !"SUPER_ADMIN".equalsIgnoreCase(currentRole)) {
+                return new ResponseEntity<>("Forbidden: Only ADMIN or SUPER_ADMIN users can access analytics", HttpStatus.FORBIDDEN);
             }
             
             List<User> allUsers = userService.getAllUsers();
