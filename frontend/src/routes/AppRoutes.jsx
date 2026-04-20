@@ -45,7 +45,7 @@ function SessionSync() {
         const inUserArea = location.pathname.startsWith("/dashboard");
 
         if (
-          (inAdminArea && role !== "ADMIN") ||
+          (inAdminArea && role !== "ADMIN" && role !== "SUPER_ADMIN") ||
           (inTechnicianArea && role !== "TECHNICIAN") ||
           (inUserArea && role !== "USER")
         ) {
@@ -92,7 +92,7 @@ export default function AppRoutes() {
         <Route
           path="/admin"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
               <AdminDashboardPage />
             </ProtectedRoute>
           }
@@ -108,7 +108,7 @@ export default function AppRoutes() {
         <Route
           path="/admin/users"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
               <AdminUsersPage />
             </ProtectedRoute>
           }
@@ -116,7 +116,7 @@ export default function AppRoutes() {
         <Route
           path="/admin/analytics"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN"]}>
+            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
               <AnalyticsDashboardPage />
             </ProtectedRoute>
           }
