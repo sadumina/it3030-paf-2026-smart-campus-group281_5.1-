@@ -201,17 +201,36 @@ public class AuthController {
                 HttpStatus.OK);
     }
 
-    @PatchMapping("/users/{id}/role")
-        @PreAuthorize("hasRole('ADMIN')")
-        public ResponseEntity<AuthResponse> updateRole(@PathVariable String id,
-            @RequestBody RoleUpdateRequest request) {
+        @PatchMapping("/users/{id}/role")
+                @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
+                public ResponseEntity<AuthResponse> updateRole(@PathVariable String id,
+                        @RequestBody RoleUpdateRequest request,
+                        Authentication authentication) {
         if (request.getRole() == null || request.getRole().isBlank()) {
             return new ResponseEntity<>(
                     new AuthResponse(false, "Role is required", null, null, null, null, null),
                     HttpStatus.BAD_REQUEST);
         }
 
-        Optional<User> updated = userService.updateUserRole(id, request.getRole());
+                if (authentication == null || authentication.getName() == null) {
+                        return new ResponseEntity<>(
+                                        new AuthResponse(false, "Unauthorized", null, null, null, null, null),
+                                        HttpStatus.UNAUTHORIZED);
+                }
+
+                Optional<User> updated;
+                try {
+                        updated = userService.updateUserRoleAsActor(authentication.getName(), id, request.getRole());
+                } catch (SecurityException ex) {
+                        return new ResponseEntity<>(
+                                        new AuthResponse(false, ex.getMessage(), null, null, null, null, null),
+                                        HttpStatus.FORBIDDEN);
+                } catch (IllegalArgumentException ex) {
+                        return new ResponseEntity<>(
+                                        new AuthResponse(false, ex.getMessage(), null, null, null, null, null),
+                                        HttpStatus.BAD_REQUEST);
+                }
+
         if (updated.isEmpty()) {
             return new ResponseEntity<>(
                     new AuthResponse(false, "User not found", null, null, null, null, null),
