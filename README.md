@@ -1,125 +1,198 @@
-# 📘 PAF Project – Smart Management System
+# Smart Study Operation Hub
 
-## 🔷 Project Overview
-This project is a full-stack web application developed using **Spring Boot (Java)** and **React.js**. It demonstrates how to design and implement a scalable enterprise-grade system with proper separation of concerns between frontend and backend.
+## Overview
 
----
+Smart Study Operation Hub is a full-stack web application built as part of the IT3030 Programming Advanced Framework (PAF) course. The system is designed to support smart campus learning by providing students and educators with tools to manage study sessions, track academic progress, collaborate with peers, and access learning resources.
 
-## 🎯 Purpose of the Project
-- Build a real-world enterprise web application  
-- Implement secure user management (authentication & profile handling)  
-- Demonstrate RESTful API design using Spring Boot  
-- Integrate frontend and backend efficiently  
-- Apply clean architecture and best practices  
+The application follows a client-server architecture with a React frontend and a Spring Boot backend, connected to a cloud-hosted MongoDB database.
 
 ---
 
-## 🧩 Key Features
-- 🔐 User Registration & Authentication  
-- 👤 User Profile Management  
-- 🌐 Responsive Modern UI  
-- 🔄 RESTful API Integration  
-- 🗄️ Database CRUD Operations  
-- ⚡ Scalable Backend Architecture  
+## Purpose
+
+The primary goals of this project are:
+
+- Provide a centralized platform for managing student academic activities on a smart campus
+- Implement user registration, authentication, and profile management
+- Demonstrate RESTful API design and integration between a modern frontend and backend
+- Apply clean layered architecture principles (controller, service, repository, model)
+- Utilize a NoSQL document database for flexible and scalable data storage
 
 ---
 
-## 🏗️ Tech Stack
+## Key Features
+
+- User registration and login
+- User profile management (create, read, update, delete)
+- Responsive landing page with feature highlights and statistics
+- RESTful API with full CRUD support for user entities
+- MongoDB Atlas cloud database integration
+- Health check and database connection verification endpoints
+
+---
+
+## Tech Stack
 
 ### Frontend
-- React.js (Vite / Create React App)
-- Tailwind CSS / CSS Modules
-- Axios (API communication)
+
+| Technology | Version | Purpose |
+|---|---|---|
+| React | 19.x | UI component framework |
+| Vite | 8.x | Build tool and development server |
+| Tailwind CSS | 4.x | Utility-first CSS styling |
+| PostCSS / Autoprefixer | — | CSS processing pipeline |
+| ESLint | 9.x | Code linting and quality enforcement |
 
 ### Backend
-- Spring Boot (Java 21)
-- Spring Web (REST APIs)
-- Spring Data JPA / Hibernate
-- Spring Security (optional)
+
+| Technology | Version | Purpose |
+|---|---|---|
+| Java | 17 | Programming language |
+| Spring Boot | 4.0.5 | Application framework |
+| Spring Web | — | REST API layer |
+| Spring Data MongoDB | — | MongoDB ODM and repository abstraction |
+| Maven | — | Build and dependency management |
 
 ### Database
-- MySQL / PostgreSQL
 
-### Tools & Environment
-- Git & GitHub
-- Postman (API Testing)
-- Maven / Gradle
-- VS Code / IntelliJ IDEA
+| Technology | Purpose |
+|---|---|
+| MongoDB Atlas | Cloud-hosted NoSQL document database |
 
----
+### Tools
 
-## 👥 Team Members
-
-| Name | Responsibilities |
-|------|----------------|
-| Your Name | Project Setup & Database Integration |
-| Your Name | Module C Implementation |
-| Your Name | Module E – User Management |
+- Git and GitHub for version control
+- Postman for API testing
+- IntelliJ IDEA / VS Code for development
 
 ---
 
-## ⚙️ Functional Modules
+## Project Structure
 
-### 🔹 Module C
-- Core system functionalities  
-- Business logic implementation  
-- Data processing  
-
-### 🔹 Module E (User Management)
-- User Registration  
-- User Login  
-- Profile Management  
-- Input Validation & Error Handling  
-- Secure API Communication  
-
----
-
-## 📁 Project Structure
-PAF-Project/
-│
+```
+it3030-paf-2026-smart-campus-group281/
 ├── frontend/
-│ ├── src/
-│ │ ├── pages/
-│ │ ├── components/
-│ │ ├── services/
-│ │ └── App.jsx
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── tailwind.config.js
+│   └── vite.config.js
 │
 ├── backend/
-│ ├── src/main/java/com/project/
-│ │ ├── controller/
-│ │ ├── service/
-│ │ ├── repository/
-│ │ ├── model/
-│ │ └── config/
-│ │
-│ └── resources/
-│ ├── application.yml
-│ └── application.properties
+│   └── src/
+│       ├── main/
+│       │   ├── java/com/backend/backend/
+│       │   │   ├── config/
+│       │   │   │   └── MongoConfig.java
+│       │   │   ├── controller/
+│       │   │   │   └── UserController.java
+│       │   │   ├── model/
+│       │   │   │   └── User.java
+│       │   │   ├── repository/
+│       │   │   │   └── UserRepository.java
+│       │   │   ├── service/
+│       │   │   │   └── UserService.java
+│       │   │   └── BackendApplication.java
+│       │   └── resources/
+│       │       └── application.properties
+│       └── test/
+│           └── java/com/backend/backend/
+│               └── BackendApplicationTests.java
 │
 └── README.md
+```
 
 ---
 
-## 🚀 How to Run the Project
+## API Endpoints
 
-### 1. Clone Repository
+All endpoints are prefixed with `/api/users`.
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/users` | Create a new user |
+| GET | `/api/users` | Retrieve all users |
+| GET | `/api/users/{id}` | Retrieve a user by ID |
+| GET | `/api/users/email/{email}` | Retrieve a user by email |
+| PUT | `/api/users/{id}` | Update a user by ID |
+| DELETE | `/api/users/{id}` | Delete a user by ID |
+| GET | `/api/users/health` | Backend health check |
+| GET | `/api/users/db-test` | MongoDB connection test |
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18 or higher
+- Java 17 or higher
+- Maven 3.x
+- A MongoDB Atlas account (or local MongoDB instance)
+
+### Clone the Repository
+
 ```bash
-git clone <your-repo-url>
-cd PAF-Project
+git clone <repository-url>
+cd it3030-paf-2026-smart-campus-group281
+```
 
-2. Run Backend (Spring Boot)
+### Running the Backend
+
+1. Navigate to the backend directory:
+
+```bash
 cd backend
+```
+
+2. Configure your MongoDB connection in `src/main/resources/application.properties`:
+
+```properties
+spring.data.mongodb.uri=<your-mongodb-connection-string>
+```
+
+3. Start the Spring Boot application:
+
+```bash
 ./mvnw spring-boot:run
+```
 
-Or if Maven installed:
-mvn spring-boot:run
+The backend will be available at `http://localhost:8080`.
 
-3. Run Frontend (React)
+### Running the Frontend
 
+1. Navigate to the frontend directory:
+
+```bash
 cd frontend
+```
+
+2. Install dependencies:
+
+```bash
 npm install
+```
 
-🧠 Conclusion
+3. Start the development server:
 
-This project demonstrates the development of a modern full-stack enterprise system using Spring Boot and React. It follows best practices in backend architecture, frontend design, and system integration.
+```bash
 npm run dev
+```
+
+The frontend will be available at `http://localhost:5173`.
+
+---
+
+## Course Information
+
+- Course: IT3030 – Programming Advanced Framework (PAF)
+- Academic Year: 2026
+- Group: 281

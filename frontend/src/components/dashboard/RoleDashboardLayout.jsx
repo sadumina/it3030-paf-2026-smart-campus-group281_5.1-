@@ -4,6 +4,7 @@ import {
   ChartNoAxesCombined,
   LogOut,
   Search,
+  House,
   UserCircle2,
   Moon,
   Sun,
@@ -291,6 +292,14 @@ export default function RoleDashboardLayout({
               </div>
 
               <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("/")}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                >
+                  <House className="h-3.5 w-3.5" />
+                  Landing Page
+                </button>
                 <button
                   type="button"
                   className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"

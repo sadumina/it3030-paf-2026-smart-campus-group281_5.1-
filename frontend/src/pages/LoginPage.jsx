@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { BadgeCheck, BellRing, CalendarCheck2, Wrench } from "lucide-react";
 import { googleLogin, loginUser } from "../services/authService";
@@ -10,11 +10,14 @@ const GSI_INIT_FLAG = "__smartCampusGsiInitialized";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const googleButtonRef = useRef(null);
+  const loginRole = new URLSearchParams(location.search).get("role");
+  const isStudentLogin = loginRole?.toLowerCase() === "student";
 
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -196,8 +199,17 @@ export default function LoginPage() {
             animate="visible"
             className="bg-white/85 p-6 md:p-8"
           >
+            {isStudentLogin ? (
+              <p className="inline-flex rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-emerald-700">
+                Student Login
+              </p>
+            ) : null}
             <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">Welcome back</h2>
-            <p className="mt-2 text-sm text-slate-500">Sign in to continue your smart campus workflows.</p>
+            <p className="mt-2 text-sm text-slate-500">
+              {isStudentLogin
+                ? "Sign in with your student account to continue your smart campus workflows."
+                : "Sign in to continue your smart campus workflows."}
+            </p>
 
             <form onSubmit={handleSubmit} className="mt-5 space-y-4">
               <div>
