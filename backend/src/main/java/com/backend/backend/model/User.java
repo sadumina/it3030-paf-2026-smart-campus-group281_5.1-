@@ -18,6 +18,7 @@ public class User {
     private String role;
     private String phone;
     private String department;
+    private Long lastLoginAt;
 
     // Constructors
     public User() {}
@@ -102,6 +103,14 @@ public class User {
         this.firebaseUid = firebaseUid;
     }
 
+    public Long getLastLoginAt() {
+        return lastLoginAt;
+    }
+
+    public void setLastLoginAt(Long lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -114,6 +123,7 @@ public class User {
                 ", role='" + role + '\'' +
                 ", phone='" + phone + '\'' +
                 ", department='" + department + '\'' +
+                ", lastLoginAt='" + lastLoginAt + '\'' +
                 '}';
     }
 }
