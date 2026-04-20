@@ -8,6 +8,7 @@ import {
   ClipboardCheck,
   Siren,
   ScrollText,
+  Sparkles,
 } from "lucide-react";
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
@@ -33,6 +34,7 @@ const adminSidebar = [
   { label: "Approvals", badge: "18", icon: ClipboardCheck },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "User Management", icon: Users, path: "/admin/users" },
+  { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
   { label: "Incidents", badge: "6", icon: Siren },
   { label: "Audit Trail", icon: ScrollText },
 ];
