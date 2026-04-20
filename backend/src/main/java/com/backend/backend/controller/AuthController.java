@@ -102,7 +102,7 @@ public class AuthController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        User foundUser = user.get();
+        User foundUser = userService.recordSuccessfulLogin(user.get().getId()).orElse(user.get());
         String token = jwtService.generateToken(
                 foundUser.getId(),
                 foundUser.getEmail(),
@@ -140,6 +140,8 @@ public class AuthController {
                 googleUserInfo.name(),
                 googleUserInfo.email().trim().toLowerCase(),
                 request.getRole());
+
+        user = userService.recordSuccessfulLogin(user.getId()).orElse(user);
 
         String token = jwtService.generateToken(user.getId(), user.getEmail(), user.getRole());
         return new ResponseEntity<>(
