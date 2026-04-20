@@ -4,6 +4,7 @@ import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
+import ResourceCataloguePage from "../pages/ResourceCataloguePage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
 import AdminUsersPage from "../pages/AdminUsersPage";
 import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
@@ -86,6 +87,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["USER"]}>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/resources"
+          element={
+            <ProtectedRoute allowedRoles={["USER"]}>
+              <ResourceCataloguePage />
             </ProtectedRoute>
           }
         />

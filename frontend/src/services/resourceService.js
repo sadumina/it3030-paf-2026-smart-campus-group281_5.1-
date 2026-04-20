@@ -1,0 +1,46 @@
+import { getToken } from "./authStorage";
+
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8081/api"}/resources`;
+
+async function parseResponse(response) {
+  const data = await response.json().catch(() => []);
+
+  if (!response.ok) {
+    throw new Error(data.message || "Failed to fetch resources");
+  }
+
+  return Array.isArray(data) ? data : [];
+}
+
+export async function fetchResources(filters = {}) {
+  const token = getToken();
+  const params = new URLSearchParams();
+
+  if (filters.type && filters.type !== "ALL") {
+    params.set("type", filters.type);
+  }
+
+  if (filters.minCapacity !== "" && filters.minCapacity !== null && filters.minCapacity !== undefined) {
+    params.set("minCapacity", filters.minCapacity);
+  }
+
+  if (filters.location?.trim()) {
+    params.set("location", filters.location.trim());
+  }
+
+  if (filters.status && filters.status !== "ALL") {
+    params.set("status", filters.status);
+  }
+
+  const requestUrl = params.toString() ? `${API_BASE_URL}?${params.toString()}` : API_BASE_URL;
+
+  const response = await fetch(requestUrl, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  return parseResponse(response);
+}
