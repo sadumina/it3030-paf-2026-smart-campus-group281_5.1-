@@ -25,10 +25,22 @@ const adminSidebar = [
   { label: "Audit Trail", icon: ScrollText },
 ];
 
-const ROLE_OPTIONS = ["USER", "TECHNICIAN", "ADMIN"];
+const ROLE_OPTIONS_ADMIN = ["USER", "TECHNICIAN"];
+const ROLE_OPTIONS_SUPER_ADMIN = ["USER", "TECHNICIAN", "ADMIN", "SUPER_ADMIN"];
+
+function normalizeRole(role) {
+  return (role || "USER").toUpperCase();
+}
+
+function canAdminManageRole(role) {
+  const normalized = normalizeRole(role);
+  return normalized === "USER" || normalized === "TECHNICIAN";
+}
 
 export default function AdminUsersPage() {
   const auth = getAuth();
+  const actorRole = normalizeRole(auth?.role);
+  const isSuperAdmin = actorRole === "SUPER_ADMIN";
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -62,11 +74,14 @@ export default function AdminUsersPage() {
   const stats = useMemo(() => {
     const total = users.length;
     const admins = users.filter((user) => (user.role || "").toUpperCase() === "ADMIN").length;
+    const superAdmins = users.filter((user) => (user.role || "").toUpperCase() === "SUPER_ADMIN").length;
     const technicians = users.filter((user) => (user.role || "").toUpperCase() === "TECHNICIAN").length;
     const regularUsers = users.filter((user) => (user.role || "").toUpperCase() === "USER").length;
 
-    return { total, admins, technicians, regularUsers };
+    return { total, admins, superAdmins, technicians, regularUsers };
   }, [users]);
+
+  const roleOptions = isSuperAdmin ? ROLE_OPTIONS_SUPER_ADMIN : ROLE_OPTIONS_ADMIN;
 
   const handleRoleDraft = (userId, nextRole) => {
     setRoleDrafts((previous) => ({
@@ -185,14 +200,19 @@ export default function AdminUsersPage() {
       />
 
       <RoleDashboardLayout
-        sectionLabel="Admin Command Center"
+        sectionLabel={isSuperAdmin ? "Super Admin Command Center" : "Admin Command Center"}
         dashboardTitle="User Management"
-        dashboardSubtitle="View all accounts, update roles, and remove users."
-        roleLabel="ADMIN"
+        dashboardSubtitle={
+          isSuperAdmin
+            ? "Manage all accounts including ADMIN and SUPER_ADMIN roles."
+            : "Manage USER and TECHNICIAN accounts."
+        }
+        roleLabel={actorRole}
         auth={auth}
         sidebarItems={adminSidebar}
         kpis={[
           { label: "Total Accounts", value: String(stats.total), change: "All registered users" },
+          { label: "Super Admins", value: String(stats.superAdmins), change: "Highest privilege" },
           { label: "Admins", value: String(stats.admins), change: "Privileged access" },
           { label: "Technicians", value: String(stats.technicians), change: "Support staff" },
           { label: "Users", value: String(stats.regularUsers), change: "Standard accounts" },
@@ -254,9 +274,14 @@ export default function AdminUsersPage() {
                   {users.map((user) => {
                     const isSelf = user.id === auth?.id;
                     const selectedRole = roleDrafts[user.id] || (user.role || "USER").toUpperCase();
+                    const targetRole = normalizeRole(user.role);
+                    const canManageTarget = isSuperAdmin || canAdminManageRole(targetRole);
+                    const canApplyRole = !isSelf && canManageTarget;
+                    const canRemoveUser = !isSelf && canManageTarget;
 
                     const getRoleBadgeColor = (role) => {
                       const roleUpper = role.toUpperCase();
+                      if (roleUpper === "SUPER_ADMIN") return "bg-rose-100 text-rose-700 border-rose-200";
                       if (roleUpper === "ADMIN") return "bg-purple-100 text-purple-700 border-purple-200";
                       if (roleUpper === "TECHNICIAN") return "bg-blue-100 text-blue-700 border-blue-200";
                       return "bg-slate-100 text-slate-700 border-slate-200";
@@ -276,10 +301,10 @@ export default function AdminUsersPage() {
                             <select
                               value={selectedRole}
                               onChange={(event) => handleRoleDraft(user.id, event.target.value)}
-                              disabled={isSelf}
+                              disabled={!canApplyRole}
                               className="rounded-md border border-slate-200 bg-white px-2 py-1.5 text-xs font-medium text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
                             >
-                              {ROLE_OPTIONS.map((role) => (
+                              {roleOptions.map((role) => (
                                 <option key={role} value={role}>
                                   {role}
                                 </option>
@@ -288,7 +313,7 @@ export default function AdminUsersPage() {
                             <button
                               type="button"
                               onClick={() => handleAssignRole(user.id)}
-                              disabled={isSelf}
+                              disabled={!canApplyRole}
                               className="rounded-md bg-orange-600 px-2.5 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-50"
                             >
                               Apply
@@ -299,7 +324,7 @@ export default function AdminUsersPage() {
                           <button
                             type="button"
                             onClick={() => handleDeleteUser(user.id, user.name || "this user")}
-                            disabled={isSelf}
+                            disabled={!canRemoveUser}
                             className="rounded-md border border-red-200 bg-red-50 px-2.5 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             Remove

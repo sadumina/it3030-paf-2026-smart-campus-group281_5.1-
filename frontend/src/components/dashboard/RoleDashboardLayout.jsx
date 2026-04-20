@@ -120,7 +120,7 @@ function getRoleChartSeed(roleLabel, externalSeed) {
     return externalSeed;
   }
 
-  if (roleLabel === "ADMIN") {
+  if (roleLabel === "ADMIN" || roleLabel === "SUPER_ADMIN") {
     return [42, 40, 47, 45, 54, 52, 60, 57, 63, 61, 68, 66, 74, 79];
   }
 

@@ -42,13 +42,21 @@ const adminActivity = [
 ];
 
 export default function AdminDashboardPage() {
+  const auth = getAuth();
+  const currentRole = (auth?.role || "ADMIN").toUpperCase();
+  const isSuperAdmin = currentRole === "SUPER_ADMIN";
+
   return (
     <RoleDashboardLayout
-      sectionLabel="Admin Command Center"
+      sectionLabel={isSuperAdmin ? "Super Admin Command Center" : "Admin Command Center"}
       dashboardTitle="Campus Operations Dashboard"
-      dashboardSubtitle="Approvals, incidents, and control in one place."
-      roleLabel="ADMIN"
-      auth={getAuth()}
+      dashboardSubtitle={
+        isSuperAdmin
+          ? "Global governance, privileged access, and full control in one place."
+          : "Approvals, incidents, and control in one place."
+      }
+      roleLabel={currentRole}
+      auth={auth}
       sidebarItems={adminSidebar}
       kpis={adminKpis}
       quickActions={adminActions}

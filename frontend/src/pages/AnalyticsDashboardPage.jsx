@@ -92,6 +92,8 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function AnalyticsDashboardPage() {
   const auth = getAuth();
+  const currentRole = (auth?.role || "ADMIN").toUpperCase();
+  const isSuperAdmin = currentRole === "SUPER_ADMIN";
   const [activeTab, setActiveTab] = useState("overview");
   const [analyticsData, setAnalyticsData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -118,10 +120,10 @@ export default function AnalyticsDashboardPage() {
   if (loading) {
     return (
       <RoleDashboardLayout
-        sectionLabel="Admin Analytics"
+        sectionLabel={isSuperAdmin ? "Super Admin Analytics" : "Admin Analytics"}
         dashboardTitle="Analytics & Reports"
         dashboardSubtitle="Loading analytics data..."
-        roleLabel="ADMIN"
+        roleLabel={currentRole}
         auth={auth}
         sidebarItems={adminSidebar}
         kpis={[]}
@@ -149,10 +151,10 @@ export default function AnalyticsDashboardPage() {
 
   return (
     <RoleDashboardLayout
-      sectionLabel="Admin Analytics"
+      sectionLabel={isSuperAdmin ? "Super Admin Analytics" : "Admin Analytics"}
       dashboardTitle="Analytics & Reports"
       dashboardSubtitle={error ? `Error: ${error}` : "Comprehensive system analytics and performance insights."}
-      roleLabel="ADMIN"
+      roleLabel={currentRole}
       auth={auth}
       sidebarItems={adminSidebar}
       kpis={analyticsKpis}
