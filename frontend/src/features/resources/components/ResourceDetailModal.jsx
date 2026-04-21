@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { createPortal } from "react-dom";
+import { useNavigate } from "react-router-dom";
 
 function getStatusStyles(status) {
   const normalized = String(status || "").toUpperCase();
@@ -28,6 +29,7 @@ export default function ResourceDetailModal({
   onDelete,
   onChangeStatus,
 }) {
+  const navigate = useNavigate();
   const availabilityWindows = useMemo(() => getAvailabilityWindows(resource), [resource]);
 
   if (!isOpen || !resource) {
@@ -101,6 +103,18 @@ export default function ResourceDetailModal({
                 : String(resource.status || "").toUpperCase() === "ACTIVE"
                   ? "Set Out of Service"
                   : "Mark Active"}
+            </button>
+          </div>
+        ) : null}
+
+        {!isAdmin ? (
+          <div className="mt-5 border-t border-slate-200 pt-3 dark:border-slate-700">
+            <button
+              type="button"
+              onClick={() => navigate(`/dashboard/book-resource?resourceId=${encodeURIComponent(resource.id || "")}`)}
+              className="inline-flex items-center rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-700"
+            >
+              Book This Resource
             </button>
           </div>
         ) : null}

@@ -50,6 +50,15 @@ public class ResourceController {
         }
     }
 
+    @GetMapping("/{id}/booking-context")
+    public ResponseEntity<Resource> getBookingContext(@PathVariable String id) {
+        try {
+            return new ResponseEntity<>(resourceService.getResourceById(id), HttpStatus.OK);
+        } catch (NoSuchElementException exception) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
     @PutMapping("/{id}/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Resource> updateResourceStatus(

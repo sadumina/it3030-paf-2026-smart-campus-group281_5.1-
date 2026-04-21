@@ -111,3 +111,17 @@ export async function deleteResource(resourceId) {
 
   return true;
 }
+
+export async function fetchResourceBookingContext(resourceId) {
+  if (!resourceId) {
+    throw new Error("Resource id is required");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/${resourceId}/booking-context`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+
+  const data = await parseResponse(response);
+  return data && typeof data === "object" ? data : null;
+}
