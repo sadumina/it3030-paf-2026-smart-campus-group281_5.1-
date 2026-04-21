@@ -1,5 +1,7 @@
 package com.backend.backend.model;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,6 +16,7 @@ public class Resource {
     private String location;
     private String status;
     private String availability;
+    private List<String> availabilityWindows;
     private String description;
     private String imageUrl;
 
@@ -107,6 +110,14 @@ public class Resource {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<String> getAvailabilityWindows() {
+        return availabilityWindows;
+    }
+
+    public void setAvailabilityWindows(List<String> availabilityWindows) {
+        this.availabilityWindows = availabilityWindows;
     }
 
     public String getImageUrl() {

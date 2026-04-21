@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchResourceById } from "../../../services/resourceService";
+import ResourceDetailModal from "./ResourceDetailModal";
 
 function getStatusStyles(status) {
   const normalized = String(status || "").toUpperCase();
@@ -61,10 +62,8 @@ function getStatusLabel(resource) {
 }
 
 export default function ResourceCard({ resource, isAdmin = false, onEdit, onStatusToggle }) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [details, setDetails] = useState(null);
-  const [loadingDetails, setLoadingDetails] = useState(false);
-  const [detailsError, setDetailsError] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [details, setDetails] = useState(resource || null);
   const [currentStatus, setCurrentStatus] = useState(getStatusLabel(resource));
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [statusError, setStatusError] = useState("");
@@ -77,25 +76,19 @@ export default function ResourceCard({ resource, isAdmin = false, onEdit, onStat
   }, [resource]);
 
   async function handleViewDetails() {
-    if (isExpanded) {
-      setIsExpanded(false);
-      return;
-    }
-
-    setIsExpanded(true);
-    if (details || !resource.id) {
+    if (!resource.id) {
+      setIsModalOpen(true);
       return;
     }
 
     try {
-      setLoadingDetails(true);
-      setDetailsError("");
       const fetched = await fetchResourceById(resource.id);
       setDetails(fetched);
-    } catch (error) {
-      setDetailsError(error.message || "Unable to load details.");
-    } finally {
-      setLoadingDetails(false);
+      setIsModalOpen(true);
+    } catch {
+      // Keep the flow simple: show card data if details API fails.
+      setDetails(resource);
+      setIsModalOpen(true);
     }
   }
 
@@ -147,7 +140,7 @@ export default function ResourceCard({ resource, isAdmin = false, onEdit, onStat
         onClick={handleViewDetails}
         className="mt-4 inline-flex items-center rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-700"
       >
-        {isExpanded ? "Hide Details" : "View Details"}
+        View Details
       </button>
 
       {isAdmin ? (
@@ -177,24 +170,7 @@ export default function ResourceCard({ resource, isAdmin = false, onEdit, onStat
         <p className="mt-2 text-xs font-medium text-rose-600 dark:text-rose-300">{statusError}</p>
       ) : null}
 
-      {isExpanded ? (
-        <div className="mt-3 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-900">
-          {loadingDetails ? <p className="text-slate-500 dark:text-slate-400">Loading details...</p> : null}
-          {!loadingDetails && detailsError ? (
-            <p className="text-rose-600 dark:text-rose-300">{detailsError}</p>
-          ) : null}
-          {!loadingDetails && !detailsError ? (
-            <>
-              <p className="text-slate-700 dark:text-slate-300">
-                {details?.description || resource.description || "No extra details available."}
-              </p>
-              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
-                Resource ID: {details?.id || resource.id || "N/A"}
-              </p>
-            </>
-          ) : null}
-        </div>
-      ) : null}
+      <ResourceDetailModal resource={details || resource} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </article>
   );
 }

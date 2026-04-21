@@ -172,54 +172,60 @@ public class ResourceService {
         }
 
         resourceRepository.saveAll(List.of(
-                new Resource(
+                buildResource(
                         "Main Library Study Hall",
                         "Lecture Hall",
                         120,
                         "Library - Level 2",
                         "Active",
                         "Quiet shared study area with strong Wi-Fi and extended opening hours.",
-                        ""),
-                new Resource(
+                        "",
+                        List.of("Mon-Fri: 8:00 AM - 6:00 PM", "Sat: 9:00 AM - 3:00 PM")),
+                buildResource(
                         "Innovation Lab A",
                         "Lab",
                         40,
                         "Engineering Block",
                         "Active",
                         "Computer lab with high-performance workstations for project work.",
-                        ""),
-                new Resource(
+                        "",
+                        List.of("Mon-Fri: 9:00 AM - 5:00 PM")),
+                buildResource(
                         "Media Equipment Kit",
                         "Equipment",
                         10,
                         "Media Center",
                         "Active",
                         "Portable camera, microphone, and lighting kit for student content creation.",
-                        ""),
-                new Resource(
+                        "",
+                        List.of("Mon-Fri: 8:30 AM - 4:30 PM")),
+                buildResource(
                         "Seminar Room B12",
                         "Meeting Room",
                         20,
                         "Business Building",
                         "Out of Service",
                         "Presentation room with projector, whiteboard, and 20-seat capacity.",
-                        ""),
-                new Resource(
+                        "",
+                        List.of("Temporarily unavailable")),
+                buildResource(
                         "Lecture Hall C1",
                         "Lecture Hall",
                         180,
                         "Science Faculty",
                         "Active",
                         "Large lecture hall with projector, sound system, and tiered seating.",
-                        ""),
-                new Resource(
+                        "",
+                        List.of("Mon-Fri: 8:00 AM - 6:00 PM")),
+                buildResource(
                         "Robotics Lab",
                         "Lab",
                         24,
                         "Technology Wing",
                         "Out of Service",
                         "Hands-on robotics workspace with testing benches and embedded systems kits.",
-                        "")));
+                        "",
+                        List.of("Temporarily unavailable"))));
     }
 
     private void normalizeExistingResources() {
@@ -285,6 +291,41 @@ public class ResourceService {
             }
         }
 
+        if (resource.getAvailabilityWindows() == null || resource.getAvailabilityWindows().isEmpty()) {
+            resource.setAvailabilityWindows(defaultAvailabilityWindows(getResourceType(resource), normalizedStatus));
+            changed = true;
+        }
+
         return changed;
+    }
+
+    private Resource buildResource(
+            String name,
+            String type,
+            Integer capacity,
+            String location,
+            String status,
+            String description,
+            String imageUrl,
+            List<String> availabilityWindows) {
+        Resource resource = new Resource(name, type, capacity, location, status, description, imageUrl);
+        resource.setAvailabilityWindows(availabilityWindows);
+        return resource;
+    }
+
+    private List<String> defaultAvailabilityWindows(String type, String status) {
+        if ("OUT_OF_SERVICE".equals(status)) {
+            return List.of("Temporarily unavailable");
+        }
+
+        if ("LAB".equalsIgnoreCase(type)) {
+            return List.of("Mon-Fri: 9:00 AM - 5:00 PM");
+        }
+
+        if ("EQUIPMENT".equalsIgnoreCase(type)) {
+            return List.of("Mon-Fri: 8:30 AM - 4:30 PM");
+        }
+
+        return List.of("Mon-Fri: 8:00 AM - 6:00 PM");
     }
 }
