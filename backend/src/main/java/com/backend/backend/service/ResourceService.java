@@ -52,6 +52,10 @@ public class ResourceService {
         Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Resource not found"));
 
+        if (request.getCapacity() != null && request.getCapacity() > 80) {
+            throw new IllegalArgumentException("Resource capacity cannot exceed 80");
+        }
+
         resource.setName(request.getName());
         resource.setType(request.getType());
         resource.setCapacity(request.getCapacity());
@@ -91,6 +95,9 @@ public class ResourceService {
         }
         if (request.getCapacity() == null || request.getCapacity() <= 0) {
             throw new IllegalArgumentException("Resource capacity must be greater than 0");
+        }
+        if (request.getCapacity() > 80) {
+            throw new IllegalArgumentException("Resource capacity cannot exceed 80");
         }
         if (request.getLocation() == null || request.getLocation().isBlank()) {
             throw new IllegalArgumentException("Resource location is required");

@@ -136,6 +136,8 @@ export default function ResourceFormPage() {
 
     if (!form.capacity || form.capacity <= 0) {
       errors.capacity = "Capacity must be greater than 0";
+    } else if (form.capacity > 80) {
+      errors.capacity = "Capacity cannot exceed 80";
     }
 
     if (!form.location.trim()) {
@@ -257,13 +259,14 @@ export default function ResourceFormPage() {
             {/* Capacity */}
             <div>
               <label htmlFor="capacity" className="mb-1.5 block text-sm font-semibold text-slate-700">
-                Capacity *
+                Capacity * (Max: 80)
               </label>
               <input
                 id="capacity"
                 name="capacity"
                 type="number"
                 min="1"
+                max="80"
                 value={form.capacity}
                 onChange={handleFormChange}
                 placeholder="e.g., 40"
