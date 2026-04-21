@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { createPortal } from "react-dom";
 
 function getStatusStyles(status) {
   const normalized = String(status || "").toUpperCase();
@@ -23,9 +24,9 @@ export default function ResourceDetailModal({ resource, isOpen, onClose }) {
     return null;
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4">
-      <div className="w-full max-w-2xl rounded-xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-800">
+      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-800">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{resource.name}</h3>
@@ -40,7 +41,9 @@ export default function ResourceDetailModal({ resource, isOpen, onClose }) {
           <div className="rounded-lg bg-slate-50 px-3 py-2 dark:bg-slate-900">Location: {resource.location || "N/A"}</div>
           <div className="rounded-lg bg-slate-50 px-3 py-2 dark:bg-slate-900">Capacity: {resource.capacity ?? "N/A"}</div>
           <div className="rounded-lg bg-slate-50 px-3 py-2 dark:bg-slate-900">Availability: {resource.availability || "Available"}</div>
-          <div className="rounded-lg bg-slate-50 px-3 py-2 dark:bg-slate-900">Resource ID: {resource.id || "N/A"}</div>
+          <div className="break-all rounded-lg bg-slate-50 px-3 py-2 dark:bg-slate-900">
+            Resource ID: {resource.id || "N/A"}
+          </div>
         </div>
 
         <div className="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-900">
@@ -69,6 +72,7 @@ export default function ResourceDetailModal({ resource, isOpen, onClose }) {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
