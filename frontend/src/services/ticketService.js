@@ -90,7 +90,15 @@ export async function fetchTechnicians() {
   return handleResponse(res);
 }
 
-// ─── Image Upload ──────────────────────────────────────────────────────
+// ─── Image Upload / Delete ─────────────────────────────────────────────
+export async function deleteTicketImage(ticketId, filename) {
+  const res = await fetch(`${API_BASE}/${ticketId}/images/${encodeURIComponent(filename)}`, {
+    method: "DELETE",
+    headers: authHeader(),
+  });
+  return handleResponse(res);
+}
+
 export async function uploadTicketImages(ticketId, files) {
   const formData = new FormData();
   files.forEach((f) => formData.append("files", f));

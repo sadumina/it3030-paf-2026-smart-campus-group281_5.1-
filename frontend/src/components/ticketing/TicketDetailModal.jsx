@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import {
   fetchComments, addComment, editComment, deleteComment,
   assignTechnician, updateTicketStatus, fetchTechnicians,
+  deleteTicketImage,
 } from "../../services/ticketService";
 import { getAuth } from "../../services/authStorage";
 import TicketTimeline from "./TicketTimeline";
@@ -112,7 +113,18 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
     } catch (e) { setError(e.message); }
   };
 
+  const handleDeleteImage = async (url) => {
+    if (!window.confirm("Remove this image?")) return;
+    const filename = url.split("/").pop();
+    try {
+      const updated = await deleteTicketImage(ticket.id, filename);
+      setTicket(updated);
+      onUpdated?.(updated);
+    } catch (e) { setError(e.message); }
+  };
+
   const isActive = ["OPEN", "IN_PROGRESS"].includes(ticket.status);
+  const canDeleteImages = role === "ADMIN" || userId === ticket.createdByUserId;
 
   return (
     <>
@@ -251,8 +263,28 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                     <p className="tkt-section-heading">📎 Attachments</p>
                     <div className="tkt-image-gallery">
                       {ticket.imageUrls.map((url, i) => (
-                        <div key={i} className="tkt-gallery-item" onClick={() => setLightboxSrc(url)}>
-                          <img src={`http://localhost:8080${url}`} alt={`Attachment ${i + 1}`} />
+                        <div key={i} className="tkt-gallery-item" style={{ position: "relative" }}>
+                          <img
+                            src={`http://localhost:8080${url}`}
+                            alt={`Attachment ${i + 1}`}
+                            onClick={() => setLightboxSrc(url)}
+                          />
+                          {canDeleteImages && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleDeleteImage(url); }}
+                              style={{
+                                position: "absolute", top: 4, right: 4,
+                                background: "rgba(0,0,0,0.65)", color: "#fff",
+                                border: "none", borderRadius: "50%",
+                                width: 22, height: 22, fontSize: "0.7rem",
+                                cursor: "pointer", lineHeight: 1, display: "flex",
+                                alignItems: "center", justifyContent: "center",
+                              }}
+                              title="Remove image"
+                            >
+                              ✕
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>

@@ -275,6 +275,35 @@ public class TicketService {
         });
     }
 
+    // ─── Delete a Single Image from Ticket ────────────────────────────────────
+    public Optional<Ticket> deleteImage(String ticketId, String filename, User actor) {
+        Optional<Ticket> opt = ticketRepository.findById(ticketId);
+        if (opt.isEmpty()) return Optional.empty();
+
+        Ticket ticket = opt.get();
+        boolean isOwner = actor.getId().equals(ticket.getCreatedByUserId());
+        boolean isAdmin = "ADMIN".equals(actor.getRole());
+        if (!isOwner && !isAdmin) {
+            throw new SecurityException("Access denied");
+        }
+
+        String urlToRemove = "/uploads/tickets/" + filename;
+        List<String> urls = ticket.getImageUrls();
+        if (urls == null || !urls.contains(urlToRemove)) return Optional.empty();
+
+        urls.remove(urlToRemove);
+        ticket.setImageUrls(urls);
+        ticket.setUpdatedAt(Instant.now());
+
+        // Delete physical file
+        try {
+            Path filePath = Paths.get(uploadDir).resolve(filename);
+            Files.deleteIfExists(filePath);
+        } catch (IOException ignored) {}
+
+        return Optional.of(ticketRepository.save(ticket));
+    }
+
     // ─── Comments ─────────────────────────────────────────────────────────────
     public List<TicketComment> getComments(String ticketId) {
         return commentRepository.findByTicketIdOrderByCreatedAtAsc(ticketId);

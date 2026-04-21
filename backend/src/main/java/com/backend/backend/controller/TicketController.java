@@ -227,6 +227,21 @@ public class TicketController {
         }
     }
 
+    // ─── DELETE /api/tickets/{id}/images/{filename} — Remove one image ────────
+    @DeleteMapping("/{id}/images/{filename}")
+    public ResponseEntity<?> deleteImage(@PathVariable String id,
+                                         @PathVariable String filename,
+                                         Authentication auth) {
+        try {
+            User user = getUser(auth);
+            Optional<Ticket> result = ticketService.deleteImage(id, filename, user);
+            return result.map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", e.getMessage()));
+        }
+    }
+
     // ─── GET /api/tickets/{id}/comments — Get comments ───────────────────────
     @GetMapping("/{id}/comments")
     public ResponseEntity<List<TicketComment>> getComments(@PathVariable String id,
