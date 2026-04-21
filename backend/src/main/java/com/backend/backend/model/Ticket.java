@@ -45,6 +45,10 @@ public class Ticket {
     // SLA breach tracking
     private boolean slaBreachedNotified = false;
 
+    // Priority auto-escalation
+    private boolean priorityEscalated = false;
+    private String originalPriority;   // set when auto-escalation fires
+
     // SLA timestamps
     private Instant createdAt;
     private Instant updatedAt;
@@ -144,6 +148,10 @@ public class Ticket {
     public void setClosedAt(Instant closedAt) { this.closedAt = closedAt; }
     public boolean isSlaBreachedNotified() { return slaBreachedNotified; }
     public void setSlaBreachedNotified(boolean slaBreachedNotified) { this.slaBreachedNotified = slaBreachedNotified; }
+    public boolean isPriorityEscalated() { return priorityEscalated; }
+    public void setPriorityEscalated(boolean priorityEscalated) { this.priorityEscalated = priorityEscalated; }
+    public String getOriginalPriority() { return originalPriority; }
+    public void setOriginalPriority(String originalPriority) { this.originalPriority = originalPriority; }
     public List<TicketEvent> getTimeline() { return timeline; }
     public void setTimeline(List<TicketEvent> timeline) { this.timeline = timeline; }
 

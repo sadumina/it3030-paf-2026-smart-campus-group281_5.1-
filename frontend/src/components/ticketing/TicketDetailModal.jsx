@@ -216,6 +216,14 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                     <label>Category</label>
                     <span className={`tkt-badge category`}>{ticket.category}</span>
                   </div>
+                  {ticket.priorityEscalated && ticket.originalPriority && (
+                    <div className="tkt-detail-field">
+                      <label>↑ Auto-Escalated</label>
+                      <span style={{ color: "#fb923c", fontSize: "0.82rem" }}>
+                        {ticket.originalPriority} → {ticket.priority}
+                      </span>
+                    </div>
+                  )}
                   {ticket.location && (
                     <div className="tkt-detail-field">
                       <label>📍 Location</label>

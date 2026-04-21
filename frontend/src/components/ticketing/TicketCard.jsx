@@ -44,6 +44,16 @@ export default function TicketCard({ ticket, onClick, adminControls, technicians
           <span className={`tkt-badge priority-${ticket.priority}`}>
             {PRIORITY_ICON[ticket.priority]} {ticket.priority}
           </span>
+          {ticket.priorityEscalated && (
+            <span style={{
+              fontSize: "0.62rem", fontWeight: 700, letterSpacing: "0.06em",
+              color: "#fb923c", background: "rgba(251,146,60,0.12)",
+              border: "1px solid rgba(251,146,60,0.35)",
+              borderRadius: 4, padding: "1px 6px",
+            }}>
+              ↑ AUTO-ESCALATED
+            </span>
+          )}
         </div>
       </div>
 

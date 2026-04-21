@@ -38,6 +38,8 @@ public interface TicketRepository extends MongoRepository<Ticket, String> {
 
     List<Ticket> findByStatusInAndSlaBreachedNotifiedFalse(List<String> statuses);
 
+    List<Ticket> findByStatusInAndPriorityEscalatedFalse(List<String> statuses);
+
     @Query("{ '$or': [ { 'ticketId': { '$regex': ?0, '$options': 'i' } }, { 'title': { '$regex': ?0, '$options': 'i' } }, { 'description': { '$regex': ?0, '$options': 'i' } } ] }")
     List<Ticket> searchByKeyword(String keyword);
 
