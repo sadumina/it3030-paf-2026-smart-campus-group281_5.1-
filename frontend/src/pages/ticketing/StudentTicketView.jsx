@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { fetchTickets } from "../../services/ticketService";
 import { getAuth } from "../../services/authStorage";
 import TicketCard from "../../components/ticketing/TicketCard";
@@ -26,7 +26,8 @@ const CATEGORIES = ["ALL","ELECTRICAL","PLUMBING","IT","HVAC","STRUCTURAL","CLEA
 
 export default function StudentTicketView() {
   const auth = getAuth();
-  const [tickets, setTickets]         = useState([]);
+  const [allTickets, setAllTickets]   = useState([]);   // full list — drives count badges
+  const [apiTickets, setApiTickets]   = useState([]);   // server-filtered list — drives display
   const [loading, setLoading]         = useState(true);
   const [keyword, setKeyword]         = useState("");
   const [statusFilter, setStatus]     = useState("ALL");
@@ -34,51 +35,62 @@ export default function StudentTicketView() {
   const [categoryFilter, setCategory] = useState("ALL");
   const [showCreate, setShowCreate]   = useState(false);
   const [selectedTicket, setSelected] = useState(null);
+  const initialized = useRef(false);
 
-  useEffect(() => { loadTickets(); }, []);
-
+  // Initial load — fetch all once for count badges
   const loadTickets = async () => {
     setLoading(true);
-    try { setTickets(await fetchTickets()); }
-    catch { /* ignore */ }
+    try {
+      const data = await fetchTickets();
+      setAllTickets(data);
+      setApiTickets(data);
+    } catch { /* ignore */ }
     finally { setLoading(false); }
   };
 
-  // Per-status counts for tab badges
+  useEffect(() => { loadTickets(); }, []);
+
+  // Re-fetch from API whenever API-level filters change
+  useEffect(() => {
+    if (!initialized.current) { initialized.current = true; return; }
+    let active = true;
+    setLoading(true);
+    fetchTickets({ status: statusFilter, priority: priorityFilter, category: categoryFilter })
+      .then(data => { if (active) setApiTickets(data); })
+      .catch(() => {})
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [statusFilter, priorityFilter, categoryFilter]);
+
+  // Count badges always reflect the full unfiltered set
   const statusCounts = useMemo(() => ({
-    ALL:         tickets.length,
-    OPEN:        tickets.filter(t => t.status === "OPEN").length,
-    IN_PROGRESS: tickets.filter(t => t.status === "IN_PROGRESS").length,
-    RESOLVED:    tickets.filter(t => t.status === "RESOLVED").length,
-    CLOSED:      tickets.filter(t => t.status === "CLOSED").length,
-    REJECTED:    tickets.filter(t => t.status === "REJECTED").length,
-  }), [tickets]);
+    ALL:         allTickets.length,
+    OPEN:        allTickets.filter(t => t.status === "OPEN").length,
+    IN_PROGRESS: allTickets.filter(t => t.status === "IN_PROGRESS").length,
+    RESOLVED:    allTickets.filter(t => t.status === "RESOLVED").length,
+    CLOSED:      allTickets.filter(t => t.status === "CLOSED").length,
+    REJECTED:    allTickets.filter(t => t.status === "REJECTED").length,
+  }), [allTickets]);
 
-  // Per-priority counts for pill badges
   const priorityCounts = useMemo(() => ({
-    ALL:      tickets.length,
-    CRITICAL: tickets.filter(t => t.priority === "CRITICAL").length,
-    HIGH:     tickets.filter(t => t.priority === "HIGH").length,
-    MEDIUM:   tickets.filter(t => t.priority === "MEDIUM").length,
-    LOW:      tickets.filter(t => t.priority === "LOW").length,
-  }), [tickets]);
+    ALL:      allTickets.length,
+    CRITICAL: allTickets.filter(t => t.priority === "CRITICAL").length,
+    HIGH:     allTickets.filter(t => t.priority === "HIGH").length,
+    MEDIUM:   allTickets.filter(t => t.priority === "MEDIUM").length,
+    LOW:      allTickets.filter(t => t.priority === "LOW").length,
+  }), [allTickets]);
 
+  // Keyword filter applied client-side on top of the API response
   const filtered = useMemo(() => {
-    let r = [...tickets];
-    if (statusFilter   !== "ALL") r = r.filter(t => t.status   === statusFilter);
-    if (priorityFilter !== "ALL") r = r.filter(t => t.priority === priorityFilter);
-    if (categoryFilter !== "ALL") r = r.filter(t => t.category === categoryFilter);
-    if (keyword.trim()) {
-      const kw = keyword.toLowerCase();
-      r = r.filter(t =>
-        t.ticketId?.toLowerCase().includes(kw) ||
-        t.title?.toLowerCase().includes(kw) ||
-        t.description?.toLowerCase().includes(kw) ||
-        t.location?.toLowerCase().includes(kw)
-      );
-    }
-    return r;
-  }, [tickets, statusFilter, priorityFilter, categoryFilter, keyword]);
+    if (!keyword.trim()) return apiTickets;
+    const kw = keyword.toLowerCase();
+    return apiTickets.filter(t =>
+      t.ticketId?.toLowerCase().includes(kw) ||
+      t.title?.toLowerCase().includes(kw) ||
+      t.description?.toLowerCase().includes(kw) ||
+      t.location?.toLowerCase().includes(kw)
+    );
+  }, [apiTickets, keyword]);
 
   const hasActiveFilters = statusFilter !== "ALL" || priorityFilter !== "ALL" || categoryFilter !== "ALL" || keyword.trim();
 
@@ -108,7 +120,7 @@ export default function StudentTicketView() {
         {/* Stats */}
         <div className="tkt-stats-row">
           {[
-            { label: "Total",       value: tickets.length,                                              color: "#f97316" },
+            { label: "Total",       value: allTickets.length,                                            color: "#f97316" },
             { label: "Open",        value: statusCounts.OPEN,                                           color: "#3b82f6" },
             { label: "In Progress", value: statusCounts.IN_PROGRESS,                                    color: "#f97316" },
             { label: "Resolved",    value: statusCounts.RESOLVED + statusCounts.CLOSED,                 color: "#22c55e" },
@@ -190,7 +202,7 @@ export default function StudentTicketView() {
                 </button>
               )}
               <span className="tkt-result-count">
-                Showing <strong>{filtered.length}</strong> of {tickets.length} ticket{tickets.length !== 1 ? "s" : ""}
+                Showing <strong>{filtered.length}</strong> of {allTickets.length} ticket{allTickets.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
@@ -230,7 +242,8 @@ export default function StudentTicketView() {
           ticket={selectedTicket}
           onClose={() => setSelected(null)}
           onUpdated={updated => {
-            setTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
+            setAllTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
+            setApiTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
             setSelected(updated);
           }}
         />

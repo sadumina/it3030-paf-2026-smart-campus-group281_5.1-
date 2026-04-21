@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   fetchTickets, fetchStats, fetchTechnicians,
   assignTechnician, deleteTicket,
@@ -26,7 +26,8 @@ const PRIORITIES = [
 const CATEGORIES = ["ALL","ELECTRICAL","PLUMBING","IT","HVAC","STRUCTURAL","CLEANING","OTHER"];
 
 export default function AdminTicketView() {
-  const [tickets, setTickets]         = useState([]);
+  const [allTickets, setAllTickets]   = useState([]);
+  const [apiTickets, setApiTickets]   = useState([]);
   const [stats, setStats]             = useState({});
   const [technicians, setTechnicians] = useState([]);
   const [loading, setLoading]         = useState(true);
@@ -37,41 +38,54 @@ export default function AdminTicketView() {
   const [priorityFilter, setPriority] = useState("ALL");
   const [categoryFilter, setCategory] = useState("ALL");
   const [techFilter, setTechFilter]   = useState("ALL");
-
-  useEffect(() => { loadAll(); }, []);
+  const initialized = useRef(false);
 
   const loadAll = async () => {
     setLoading(true);
     try {
       const [t, s, techs] = await Promise.all([fetchTickets(), fetchStats(), fetchTechnicians()]);
-      setTickets(t); setStats(s); setTechnicians(techs);
+      setAllTickets(t); setApiTickets(t); setStats(s); setTechnicians(techs);
     } catch { /* ignore */ }
     finally { setLoading(false); }
   };
 
+  useEffect(() => { loadAll(); }, []);
+
+  // Re-fetch when API-level filters change (status / priority / category sent to server)
+  useEffect(() => {
+    if (!initialized.current) { initialized.current = true; return; }
+    let active = true;
+    setLoading(true);
+    fetchTickets({ status: statusFilter, priority: priorityFilter, category: categoryFilter })
+      .then(data => { if (active) setApiTickets(data); })
+      .catch(() => {})
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [statusFilter, priorityFilter, categoryFilter]);
+
+  // Count badges always from the unfiltered full set
   const statusCounts = useMemo(() => ({
-    ALL:         tickets.length,
-    OPEN:        tickets.filter(t => t.status === "OPEN").length,
-    IN_PROGRESS: tickets.filter(t => t.status === "IN_PROGRESS").length,
-    RESOLVED:    tickets.filter(t => t.status === "RESOLVED").length,
-    CLOSED:      tickets.filter(t => t.status === "CLOSED").length,
-    REJECTED:    tickets.filter(t => t.status === "REJECTED").length,
-  }), [tickets]);
+    ALL:         allTickets.length,
+    OPEN:        allTickets.filter(t => t.status === "OPEN").length,
+    IN_PROGRESS: allTickets.filter(t => t.status === "IN_PROGRESS").length,
+    RESOLVED:    allTickets.filter(t => t.status === "RESOLVED").length,
+    CLOSED:      allTickets.filter(t => t.status === "CLOSED").length,
+    REJECTED:    allTickets.filter(t => t.status === "REJECTED").length,
+  }), [allTickets]);
 
   const priorityCounts = useMemo(() => ({
-    ALL:      tickets.length,
-    CRITICAL: tickets.filter(t => t.priority === "CRITICAL").length,
-    HIGH:     tickets.filter(t => t.priority === "HIGH").length,
-    MEDIUM:   tickets.filter(t => t.priority === "MEDIUM").length,
-    LOW:      tickets.filter(t => t.priority === "LOW").length,
-  }), [tickets]);
+    ALL:      allTickets.length,
+    CRITICAL: allTickets.filter(t => t.priority === "CRITICAL").length,
+    HIGH:     allTickets.filter(t => t.priority === "HIGH").length,
+    MEDIUM:   allTickets.filter(t => t.priority === "MEDIUM").length,
+    LOW:      allTickets.filter(t => t.priority === "LOW").length,
+  }), [allTickets]);
 
+  // Technician filter + keyword are applied client-side on top of the API response
   const filtered = useMemo(() => {
-    let r = [...tickets];
-    if (statusFilter   !== "ALL") r = r.filter(t => t.status   === statusFilter);
-    if (priorityFilter !== "ALL") r = r.filter(t => t.priority === priorityFilter);
-    if (categoryFilter !== "ALL") r = r.filter(t => t.category === categoryFilter);
-    if (techFilter     !== "ALL") r = r.filter(t => t.assignedTechnicianId === techFilter);
+    let r = techFilter !== "ALL"
+      ? apiTickets.filter(t => t.assignedTechnicianId === techFilter)
+      : apiTickets;
     if (keyword.trim()) {
       const kw = keyword.toLowerCase();
       r = r.filter(t =>
@@ -83,7 +97,7 @@ export default function AdminTicketView() {
       );
     }
     return r;
-  }, [tickets, statusFilter, priorityFilter, categoryFilter, techFilter, keyword]);
+  }, [apiTickets, techFilter, keyword]);
 
   const hasActiveFilters = statusFilter !== "ALL" || priorityFilter !== "ALL" ||
     categoryFilter !== "ALL" || techFilter !== "ALL" || keyword.trim();
@@ -95,7 +109,8 @@ export default function AdminTicketView() {
   const handleQuickAssign = async (ticketId, techId) => {
     try {
       const updated = await assignTechnician(ticketId, techId);
-      setTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
+      const patch = prev => prev.map(t => t.id === updated.id ? updated : t);
+      setAllTickets(patch); setApiTickets(patch);
     } catch (e) { alert("Assign failed: " + e.message); }
   };
 
@@ -103,7 +118,8 @@ export default function AdminTicketView() {
     if (!window.confirm("Permanently delete this ticket?")) return;
     try {
       await deleteTicket(id);
-      setTickets(prev => prev.filter(t => t.id !== id));
+      const remove = prev => prev.filter(t => t.id !== id);
+      setAllTickets(remove); setApiTickets(remove);
       if (selectedTicket?.id === id) setSelected(null);
     } catch (e) { alert("Delete failed: " + e.message); }
   };
@@ -227,7 +243,7 @@ export default function AdminTicketView() {
                 <button className="tkt-clear-btn" onClick={clearFilters}>✕ Clear filters</button>
               )}
               <span className="tkt-result-count">
-                Showing <strong>{filtered.length}</strong> of {tickets.length} ticket{tickets.length !== 1 ? "s" : ""}
+                Showing <strong>{filtered.length}</strong> of {allTickets.length} ticket{allTickets.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
@@ -276,7 +292,8 @@ export default function AdminTicketView() {
           ticket={selectedTicket}
           onClose={() => setSelected(null)}
           onUpdated={updated => {
-            setTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
+            const patch = prev => prev.map(t => t.id === updated.id ? updated : t);
+            setAllTickets(patch); setApiTickets(patch);
             setSelected(updated);
           }}
         />

@@ -76,11 +76,15 @@ public class TicketController {
         }
     }
 
-    // ─── GET /api/tickets — Get all (role-aware) ──────────────────────────────
+    // ─── GET /api/tickets — Get all (role-aware, with optional filters) ──────
     @GetMapping
-    public ResponseEntity<List<Ticket>> getTickets(Authentication auth) {
+    public ResponseEntity<List<Ticket>> getTickets(
+            Authentication auth,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String priority,
+            @RequestParam(required = false) String category) {
         User user = getUser(auth);
-        return ResponseEntity.ok(ticketService.getTicketsForUser(user));
+        return ResponseEntity.ok(ticketService.getTicketsForUser(user, status, priority, category));
     }
 
     // ─── GET /api/tickets/stats — Admin stats ─────────────────────────────────

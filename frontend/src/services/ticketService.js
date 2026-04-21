@@ -22,8 +22,13 @@ async function handleResponse(res) {
 }
 
 // ─── Tickets ─────────────────────────────────────────────────────────
-export async function fetchTickets() {
-  const res = await fetch(API_BASE, { headers: authHeader() });
+export async function fetchTickets(params = {}) {
+  const query = new URLSearchParams();
+  if (params.status   && params.status   !== "ALL") query.set("status",   params.status);
+  if (params.priority && params.priority !== "ALL") query.set("priority", params.priority);
+  if (params.category && params.category !== "ALL") query.set("category", params.category);
+  const qs = query.toString();
+  const res = await fetch(`${API_BASE}${qs ? `?${qs}` : ""}`, { headers: authHeader() });
   return handleResponse(res);
 }
 

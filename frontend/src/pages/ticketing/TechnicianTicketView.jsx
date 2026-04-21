@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { fetchTickets } from "../../services/ticketService";
 import { getAuth } from "../../services/authStorage";
 import TicketCard from "../../components/ticketing/TicketCard";
@@ -23,54 +23,64 @@ const CATEGORIES = ["ALL","ELECTRICAL","PLUMBING","IT","HVAC","STRUCTURAL","CLEA
 
 export default function TechnicianTicketView() {
   const auth = getAuth();
-  const [tickets, setTickets]         = useState([]);
+  const [allTickets, setAllTickets]   = useState([]);
+  const [apiTickets, setApiTickets]   = useState([]);
   const [loading, setLoading]         = useState(true);
   const [keyword, setKeyword]         = useState("");
   const [statusFilter, setStatus]     = useState("ALL");
   const [priorityFilter, setPriority] = useState("ALL");
   const [categoryFilter, setCategory] = useState("ALL");
   const [selectedTicket, setSelected] = useState(null);
-
-  useEffect(() => { loadTickets(); }, []);
+  const initialized = useRef(false);
 
   const loadTickets = async () => {
     setLoading(true);
-    try { setTickets(await fetchTickets()); }
-    catch { /* ignore */ }
+    try {
+      const data = await fetchTickets();
+      setAllTickets(data);
+      setApiTickets(data);
+    } catch { /* ignore */ }
     finally { setLoading(false); }
   };
 
+  useEffect(() => { loadTickets(); }, []);
+
+  useEffect(() => {
+    if (!initialized.current) { initialized.current = true; return; }
+    let active = true;
+    setLoading(true);
+    fetchTickets({ status: statusFilter, priority: priorityFilter, category: categoryFilter })
+      .then(data => { if (active) setApiTickets(data); })
+      .catch(() => {})
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [statusFilter, priorityFilter, categoryFilter]);
+
   const statusCounts = useMemo(() => ({
-    ALL:         tickets.length,
-    OPEN:        tickets.filter(t => t.status === "OPEN").length,
-    IN_PROGRESS: tickets.filter(t => t.status === "IN_PROGRESS").length,
-    RESOLVED:    tickets.filter(t => t.status === "RESOLVED").length,
-  }), [tickets]);
+    ALL:         allTickets.length,
+    OPEN:        allTickets.filter(t => t.status === "OPEN").length,
+    IN_PROGRESS: allTickets.filter(t => t.status === "IN_PROGRESS").length,
+    RESOLVED:    allTickets.filter(t => t.status === "RESOLVED").length,
+  }), [allTickets]);
 
   const priorityCounts = useMemo(() => ({
-    ALL:      tickets.length,
-    CRITICAL: tickets.filter(t => t.priority === "CRITICAL").length,
-    HIGH:     tickets.filter(t => t.priority === "HIGH").length,
-    MEDIUM:   tickets.filter(t => t.priority === "MEDIUM").length,
-    LOW:      tickets.filter(t => t.priority === "LOW").length,
-  }), [tickets]);
+    ALL:      allTickets.length,
+    CRITICAL: allTickets.filter(t => t.priority === "CRITICAL").length,
+    HIGH:     allTickets.filter(t => t.priority === "HIGH").length,
+    MEDIUM:   allTickets.filter(t => t.priority === "MEDIUM").length,
+    LOW:      allTickets.filter(t => t.priority === "LOW").length,
+  }), [allTickets]);
 
   const filtered = useMemo(() => {
-    let r = [...tickets];
-    if (statusFilter   !== "ALL") r = r.filter(t => t.status   === statusFilter);
-    if (priorityFilter !== "ALL") r = r.filter(t => t.priority === priorityFilter);
-    if (categoryFilter !== "ALL") r = r.filter(t => t.category === categoryFilter);
-    if (keyword.trim()) {
-      const kw = keyword.toLowerCase();
-      r = r.filter(t =>
-        t.ticketId?.toLowerCase().includes(kw) ||
-        t.title?.toLowerCase().includes(kw) ||
-        t.location?.toLowerCase().includes(kw) ||
-        t.createdByName?.toLowerCase().includes(kw)
-      );
-    }
-    return r;
-  }, [tickets, statusFilter, priorityFilter, categoryFilter, keyword]);
+    if (!keyword.trim()) return apiTickets;
+    const kw = keyword.toLowerCase();
+    return apiTickets.filter(t =>
+      t.ticketId?.toLowerCase().includes(kw) ||
+      t.title?.toLowerCase().includes(kw) ||
+      t.location?.toLowerCase().includes(kw) ||
+      t.createdByName?.toLowerCase().includes(kw)
+    );
+  }, [apiTickets, keyword]);
 
   const hasActiveFilters = statusFilter !== "ALL" || priorityFilter !== "ALL" || categoryFilter !== "ALL" || keyword.trim();
   const clearFilters = () => { setStatus("ALL"); setPriority("ALL"); setCategory("ALL"); setKeyword(""); };
@@ -97,7 +107,7 @@ export default function TechnicianTicketView() {
         {/* Stats */}
         <div className="tkt-stats-row">
           {[
-            { label: "Assigned",    value: tickets.length,              color: "#f97316" },
+            { label: "Assigned",    value: allTickets.length,           color: "#f97316" },
             { label: "Open",        value: statusCounts.OPEN,           color: "#3b82f6" },
             { label: "In Progress", value: statusCounts.IN_PROGRESS,    color: "#f97316" },
             { label: "Resolved",    value: statusCounts.RESOLVED,       color: "#22c55e" },
@@ -177,7 +187,7 @@ export default function TechnicianTicketView() {
                 <button className="tkt-clear-btn" onClick={clearFilters}>✕ Clear filters</button>
               )}
               <span className="tkt-result-count">
-                Showing <strong>{filtered.length}</strong> of {tickets.length} ticket{tickets.length !== 1 ? "s" : ""}
+                Showing <strong>{filtered.length}</strong> of {allTickets.length} ticket{allTickets.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
@@ -211,7 +221,8 @@ export default function TechnicianTicketView() {
           ticket={selectedTicket}
           onClose={() => setSelected(null)}
           onUpdated={updated => {
-            setTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
+            setAllTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
+            setApiTickets(prev => prev.map(t => t.id === updated.id ? updated : t));
             setSelected(updated);
           }}
         />

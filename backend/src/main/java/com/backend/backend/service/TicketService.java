@@ -101,13 +101,22 @@ public class TicketService {
         return saved;
     }
 
-    // ─── Get Tickets (role-aware) ────────────────────────────────────────────
-    public List<Ticket> getTicketsForUser(User user) {
-        return switch (user.getRole()) {
-            case "ADMIN" -> ticketRepository.findAllByOrderByCreatedAtDesc();
+    // ─── Get Tickets (role-aware, with optional filters) ────────────────────
+    public List<Ticket> getTicketsForUser(User user, String status, String priority, String category) {
+        List<Ticket> tickets = switch (user.getRole()) {
+            case "ADMIN"      -> ticketRepository.findAllByOrderByCreatedAtDesc();
             case "TECHNICIAN" -> ticketRepository.findByAssignedTechnicianIdOrderByCreatedAtDesc(user.getId());
-            default -> ticketRepository.findByCreatedByUserIdOrderByCreatedAtDesc(user.getId());
+            default           -> ticketRepository.findByCreatedByUserIdOrderByCreatedAtDesc(user.getId());
         };
+
+        if (status   != null && !status.isBlank())
+            tickets = tickets.stream().filter(t -> status.equalsIgnoreCase(t.getStatus())).toList();
+        if (priority != null && !priority.isBlank())
+            tickets = tickets.stream().filter(t -> priority.equalsIgnoreCase(t.getPriority())).toList();
+        if (category != null && !category.isBlank())
+            tickets = tickets.stream().filter(t -> category.equalsIgnoreCase(t.getCategory())).toList();
+
+        return tickets;
     }
 
     public Optional<Ticket> getTicketById(String id) {
