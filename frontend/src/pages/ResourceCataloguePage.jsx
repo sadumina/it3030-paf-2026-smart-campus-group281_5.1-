@@ -3,7 +3,7 @@ import { getAuth } from "../services/authStorage";
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import ResourceCatalogueContent from "../features/resources/components/ResourceCatalogueContent";
 import { fetchResources } from "../services/resourceService";
-import { userActivity, userActions, userKpis, userSidebar } from "../config/userDashboardConfig";
+import { userActions, userSidebar } from "../config/userDashboardConfig";
 
 const defaultFilters = {
   type: "ALL",
@@ -82,6 +82,28 @@ export default function ResourceCataloguePage() {
     }));
   }
 
+  const activeCount = resources.filter(
+    (resource) => String(resource.status || "").toUpperCase() === "ACTIVE",
+  ).length;
+  const outOfServiceCount = resources.filter(
+    (resource) => String(resource.status || "").toUpperCase() === "OUT_OF_SERVICE",
+  ).length;
+  const totalCapacity = resources.reduce((sum, resource) => sum + (Number(resource.capacity) || 0), 0);
+
+  const resourceKpis = [
+    { label: "Resources In View", value: String(resources.length), change: "Live filtered catalogue" },
+    { label: "Active Resources", value: String(activeCount), change: "Ready for booking" },
+    { label: "Out Of Service", value: String(outOfServiceCount), change: "Under maintenance" },
+    { label: "Total Capacity", value: String(totalCapacity), change: "Current filtered scope" },
+  ];
+
+  const resourceActivity = [
+    { title: "Catalogue refresh runs every 5 seconds", meta: "Auto-sync enabled" },
+    { title: `${activeCount} resources currently active`, meta: "Status snapshot" },
+    { title: `${outOfServiceCount} resources currently unavailable`, meta: "Maintenance overview" },
+    { title: `${resources.length} results match your current filters`, meta: "Type, location, capacity, status" },
+  ];
+
   return (
     <RoleDashboardLayout
       sectionLabel="User Workspace"
@@ -90,11 +112,11 @@ export default function ResourceCataloguePage() {
       roleLabel="USER"
       auth={getAuth()}
       sidebarItems={userSidebar}
-      kpis={userKpis}
+      kpis={resourceKpis}
       quickActions={userActions}
-      activityFeed={userActivity}
+      activityFeed={resourceActivity}
       chartTitle="Resource demand snapshot"
-      chartCaption="Live-style dashboard visuals with a dedicated catalogue below."
+      chartCaption="Live catalogue metrics focused on resource availability."
       chartColor="#fb923c"
       showNotifications={false}
       extraContent={
