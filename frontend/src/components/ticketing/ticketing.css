@@ -948,6 +948,154 @@
   .tkt-modal { border-radius: 16px 16px 0 0; margin: auto 0 0; }
 }
 
+/* ─── Filter Section ─────────────────────────────────────────── */
+.tkt-filter-section {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--tkt-border);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.tkt-filter-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tkt-filter-label {
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--tkt-text-dimmed);
+  width: 58px;
+  flex-shrink: 0;
+}
+
+/* ─── Status tabs (pill style) ───────────────────────────────── */
+.tkt-status-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tkt-status-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  background: transparent;
+  border: 1px solid var(--tkt-border);
+  border-radius: 99px;
+  color: var(--tkt-text-muted);
+  font-family: inherit;
+  font-size: 0.77rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.tkt-status-tab:hover {
+  border-color: rgba(255,255,255,0.22);
+  color: var(--tkt-text);
+}
+
+.tkt-status-tab.active            { color: #fff; font-weight: 600; border-color: transparent; }
+.tkt-status-tab.active.s-all      { background: var(--tkt-orange); }
+.tkt-status-tab.active.s-open     { background: #3b82f6; }
+.tkt-status-tab.active.s-progress { background: #f97316; }
+.tkt-status-tab.active.s-resolved { background: #22c55e; }
+.tkt-status-tab.active.s-closed   { background: #6b7280; }
+.tkt-status-tab.active.s-rejected { background: #ef4444; }
+
+.tkt-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  background: rgba(255,255,255,0.14);
+  border-radius: 99px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.tkt-status-tab.active .tkt-tab-count { background: rgba(255,255,255,0.28); }
+
+/* ─── Priority pills ─────────────────────────────────────────── */
+.tkt-priority-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.tkt-priority-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 11px;
+  background: transparent;
+  border: 1px solid var(--tkt-border);
+  border-radius: 99px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: var(--tkt-text-muted);
+}
+
+.tkt-priority-pill:hover { border-color: rgba(255,255,255,0.22); color: var(--tkt-text); }
+
+.tkt-priority-pill.active.p-all      { background: rgba(249,115,22,0.15); border-color: var(--tkt-orange); color: var(--tkt-orange); }
+.tkt-priority-pill.active.p-critical { background: rgba(239,68,68,0.15);  border-color: #ef4444; color: #ef4444; }
+.tkt-priority-pill.active.p-high     { background: rgba(249,115,22,0.15); border-color: #f97316; color: #f97316; }
+.tkt-priority-pill.active.p-medium   { background: rgba(234,179,8,0.15);  border-color: #eab308; color: #eab308; }
+.tkt-priority-pill.active.p-low      { background: rgba(34,197,94,0.15);  border-color: #22c55e; color: #22c55e; }
+
+/* ─── Filter footer (result count + clear) ───────────────────── */
+.tkt-filter-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid var(--tkt-border);
+}
+
+.tkt-result-count {
+  font-size: 0.78rem;
+  color: var(--tkt-text-dimmed);
+}
+
+.tkt-result-count strong { color: var(--tkt-orange); font-weight: 600; }
+
+.tkt-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 8px;
+  color: #fca5a5;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.tkt-clear-btn:hover { background: rgba(239,68,68,0.2); }
+
 /* ─── Animations ─────────────────────────────────────────────── */
 @keyframes tkt-fade-in {
   from { opacity: 0; }
