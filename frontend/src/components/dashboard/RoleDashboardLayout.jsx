@@ -373,6 +373,30 @@ export default function RoleDashboardLayout({
               })}
             </div>
 
+            {quickActions && quickActions.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {quickActions.map((action, index) => {
+                  const ActionIcon = action.icon;
+                  const isPrimary = action.variant === "primary";
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={action.onClick}
+                      className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
+                        isPrimary
+                          ? "bg-[#a1452b] text-white shadow-lg shadow-[#a1452b]/25 hover:bg-[#873922]"
+                          : "border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700"
+                      }`}
+                    >
+                      {ActionIcon ? <ActionIcon className="h-4 w-4" /> : null}
+                      {action.label}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
             <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_280px]">
               <section className="flex flex-col rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
                 <div className="mb-4">

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Shield,
   ClipboardCheck,
@@ -7,6 +8,7 @@ import {
   Siren,
   ScrollText,
   BarChart3,
+  Plus,
 } from "lucide-react";
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
@@ -31,6 +33,7 @@ const defaultFilters = {
 };
 
 export default function AdminResourceMatrixPage() {
+  const navigate = useNavigate();
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -121,48 +124,7 @@ export default function AdminResourceMatrixPage() {
     if (!resource?.id) {
       return;
     }
-
-    const name = window.prompt("Resource name", resource.name || "");
-    if (name === null) {
-      return;
-    }
-
-    const location = window.prompt("Location", resource.location || "");
-    if (location === null) {
-      return;
-    }
-
-    const capacityInput = window.prompt("Capacity", String(resource.capacity ?? ""));
-    if (capacityInput === null) {
-      return;
-    }
-
-    const description = window.prompt("Description", resource.description || "");
-    if (description === null) {
-      return;
-    }
-
-    const capacityNumber = Number(capacityInput);
-    const payload = {
-      ...resource,
-      name: name.trim(),
-      location: location.trim(),
-      description: description.trim(),
-      capacity: Number.isNaN(capacityNumber) ? resource.capacity : capacityNumber,
-    };
-
-    setActionError("");
-    setActionLoading(true);
-    try {
-      const updated = await updateResource(resource.id, payload);
-      setResources((current) =>
-        current.map((item) => (item.id === resource.id ? { ...item, ...updated } : item)),
-      );
-    } catch (requestError) {
-      setActionError(requestError.message || "Unable to update resource.");
-    } finally {
-      setActionLoading(false);
-    }
+    navigate(`/admin/resources/${resource.id}/edit`);
   }
 
   async function handleDeleteResource(resource) {
@@ -208,7 +170,14 @@ export default function AdminResourceMatrixPage() {
         },
         { label: "Matrix Scope", value: "Campus", change: "All categories" },
       ]}
-      quickActions={[]}
+      quickActions={[
+        {
+          label: "Create Resource",
+          icon: Plus,
+          onClick: () => navigate("/admin/resources/create"),
+          variant: "primary",
+        },
+      ]}
       activityFeed={[
         { title: "Use Edit for metadata corrections", meta: "Admin-only action" },
         { title: "Use status toggle for maintenance windows", meta: "ACTIVE / OUT_OF_SERVICE" },

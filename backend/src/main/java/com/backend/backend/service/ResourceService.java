@@ -82,6 +82,38 @@ public class ResourceService {
         resourceRepository.deleteById(id);
     }
 
+    public Resource createResource(Resource request) {
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new IllegalArgumentException("Resource name is required");
+        }
+        if (request.getType() == null || request.getType().isBlank()) {
+            throw new IllegalArgumentException("Resource type is required");
+        }
+        if (request.getCapacity() == null || request.getCapacity() <= 0) {
+            throw new IllegalArgumentException("Resource capacity must be greater than 0");
+        }
+        if (request.getLocation() == null || request.getLocation().isBlank()) {
+            throw new IllegalArgumentException("Resource location is required");
+        }
+
+        Resource resource = new Resource();
+        resource.setName(request.getName());
+        resource.setType(request.getType());
+        resource.setCapacity(request.getCapacity());
+        resource.setLocation(request.getLocation());
+        resource.setDescription(request.getDescription());
+        resource.setImageUrl(request.getImageUrl());
+        resource.setAvailabilityWindows(request.getAvailabilityWindows());
+
+        String status = request.getStatus() != null && !request.getStatus().isBlank() 
+            ? normalizeStatusInput(request.getStatus()) 
+            : "ACTIVE";
+        resource.setStatus(status);
+        resource.setAvailability("ACTIVE".equals(status) ? "Available" : "Unavailable");
+
+        return resourceRepository.save(resource);
+    }
+
     private boolean matchesType(Resource resource, String type) {
         if (type == null || type.isBlank() || "ALL".equalsIgnoreCase(type)) {
             return true;

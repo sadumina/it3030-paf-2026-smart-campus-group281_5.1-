@@ -11,6 +11,7 @@ import AdminResourceMatrixPage from "../pages/AdminResourceMatrixPage";
 import AdminUsersPage from "../pages/AdminUsersPage";
 import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 import TechnicianDashboardPage from "../pages/TechnicianDashboardPage";
+import ResourceFormPage from "../pages/ResourceFormPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { fetchCurrentUser } from "../services/authService";
 import { clearAuth, getAuth, getToken, saveAuth } from "../services/authStorage";
@@ -121,6 +122,22 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["ADMIN"]}>
               <AdminResourceMatrixPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/resources/create"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ResourceFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/resources/:id/edit"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <ResourceFormPage />
             </ProtectedRoute>
           }
         />

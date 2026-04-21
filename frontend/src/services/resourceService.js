@@ -125,3 +125,14 @@ export async function fetchResourceBookingContext(resourceId) {
   const data = await parseResponse(response);
   return data && typeof data === "object" ? data : null;
 }
+
+export async function createResource(payload) {
+  const response = await fetch(API_BASE_URL, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload || {}),
+  });
+
+  const data = await parseResponse(response);
+  return data && typeof data === "object" ? data : null;
+}
