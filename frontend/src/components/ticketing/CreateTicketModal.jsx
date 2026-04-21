@@ -22,6 +22,7 @@ const CATEGORY_ICON = {
 export default function CreateTicketModal({ onClose, onCreated }) {
   const [form, setForm] = useState({
     title: "", description: "", category: "OTHER", priority: "MEDIUM",
+    location: "", contactDetails: "",
   });
   const [images, setImages] = useState([]); // File objects
   const [previews, setPreviews] = useState([]); // data URLs
@@ -63,6 +64,7 @@ export default function CreateTicketModal({ onClose, onCreated }) {
     if (!form.title.trim()) { setError("Title is required"); return; }
     if (!form.description.trim()) { setError("Description is required"); return; }
 
+    if (!form.location.trim()) { setError("Location is required"); return; }
     setLoading(true); setError("");
     try {
       const ticket = await createTicket(form);
@@ -124,6 +126,33 @@ export default function CreateTicketModal({ onClose, onCreated }) {
                 onChange={(e) => handleField("description", e.target.value)}
                 rows={4}
               />
+            </div>
+
+            {/* Location + Contact Row */}
+            <div className="tkt-form-row">
+              <div className="tkt-form-group" style={{ margin: 0 }}>
+                <label className="tkt-form-label">Location *</label>
+                <input
+                  className="tkt-form-input"
+                  placeholder="e.g. Block A, Room 204"
+                  value={form.location}
+                  onChange={(e) => handleField("location", e.target.value)}
+                  maxLength={120}
+                />
+              </div>
+              <div className="tkt-form-group" style={{ margin: 0 }}>
+                <label className="tkt-form-label">
+                  Contact Details
+                  <span style={{ color: "#71717a", fontWeight: 400, marginLeft: 6 }}>(optional)</span>
+                </label>
+                <input
+                  className="tkt-form-input"
+                  placeholder="Phone / email / extension"
+                  value={form.contactDetails}
+                  onChange={(e) => handleField("contactDetails", e.target.value)}
+                  maxLength={120}
+                />
+              </div>
             </div>
 
             {/* Category + Priority Row */}

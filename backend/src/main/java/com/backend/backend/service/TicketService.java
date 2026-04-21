@@ -65,13 +65,15 @@ public class TicketService {
 
     // ─── Create Ticket ───────────────────────────────────────────────────────
     public Ticket createTicket(String title, String description, String category,
-                               String priority, User creator) {
+                               String priority, String location, String contactDetails, User creator) {
         Ticket ticket = new Ticket();
         ticket.setTicketId(generateTicketId());
         ticket.setTitle(title);
         ticket.setDescription(description);
         ticket.setCategory(category);
         ticket.setPriority(priority == null ? "MEDIUM" : priority.toUpperCase());
+        ticket.setLocation(location);
+        ticket.setContactDetails(contactDetails);
         ticket.setStatus("OPEN");
         ticket.setCreatedByUserId(creator.getId());
         ticket.setCreatedByName(creator.getName());

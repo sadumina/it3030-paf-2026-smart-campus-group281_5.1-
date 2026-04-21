@@ -193,6 +193,18 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                     <label>Category</label>
                     <span className={`tkt-badge category`}>{ticket.category}</span>
                   </div>
+                  {ticket.location && (
+                    <div className="tkt-detail-field">
+                      <label>📍 Location</label>
+                      <span>{ticket.location}</span>
+                    </div>
+                  )}
+                  {ticket.contactDetails && (
+                    <div className="tkt-detail-field">
+                      <label>📞 Contact</label>
+                      <span>{ticket.contactDetails}</span>
+                    </div>
+                  )}
                   <div className="tkt-detail-field">
                     <label>Created By</label>
                     <span>{ticket.createdByName}</span>

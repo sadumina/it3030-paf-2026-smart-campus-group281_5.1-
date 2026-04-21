@@ -55,6 +55,8 @@ public class TicketController {
             String description = body.get("description");
             String category = body.get("category");
             String priority = body.get("priority");
+            String location = body.get("location");
+            String contactDetails = body.get("contactDetails");
 
             if (title == null || title.isBlank()) {
                 return ResponseEntity.badRequest().body(Map.of("message", "Title is required"));
@@ -62,8 +64,11 @@ public class TicketController {
             if (description == null || description.isBlank()) {
                 return ResponseEntity.badRequest().body(Map.of("message", "Description is required"));
             }
+            if (location == null || location.isBlank()) {
+                return ResponseEntity.badRequest().body(Map.of("message", "Location is required"));
+            }
 
-            Ticket ticket = ticketService.createTicket(title, description, category, priority, user);
+            Ticket ticket = ticketService.createTicket(title, description, category, priority, location, contactDetails, user);
             return ResponseEntity.status(HttpStatus.CREATED).body(ticket);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -23,6 +23,10 @@ public class Ticket {
     private String priority; // CRITICAL, HIGH, MEDIUM, LOW
     private String status;   // OPEN, IN_PROGRESS, RESOLVED, CLOSED, REJECTED
 
+    // Location & contact
+    private String location;        // e.g. "Block A, Room 204"
+    private String contactDetails;  // preferred contact (phone / email / extension)
+
     // Creator info
     private String createdByUserId;
     private String createdByName;
@@ -107,6 +111,10 @@ public class Ticket {
     public void setPriority(String priority) { this.priority = priority; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
+    public String getContactDetails() { return contactDetails; }
+    public void setContactDetails(String contactDetails) { this.contactDetails = contactDetails; }
     public String getCreatedByUserId() { return createdByUserId; }
     public void setCreatedByUserId(String createdByUserId) { this.createdByUserId = createdByUserId; }
     public String getCreatedByName() { return createdByName; }

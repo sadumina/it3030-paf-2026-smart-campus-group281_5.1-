@@ -57,6 +57,11 @@ export default function TicketCard({ ticket, onClick, adminControls, technicians
             {CATEGORY_ICON[ticket.category] || "📋"} {ticket.category}
           </span>
         )}
+        {ticket.location && (
+          <span style={{ fontSize: "0.74rem", color: "#a1a1aa" }}>
+            📍 {ticket.location}
+          </span>
+        )}
         {ticket.assignedTechnicianName && (
           <span style={{ fontSize: "0.74rem", color: "#86efac" }}>
             👤 {ticket.assignedTechnicianName}
