@@ -16,6 +16,7 @@ export default function ResourceFormPage() {
     description: "",
     status: "ACTIVE",
     availabilityWindows: [],
+    isTemporarilyUnavailable: false,
   });
 
   const [newWindow, setNewWindow] = useState({
@@ -56,6 +57,7 @@ export default function ResourceFormPage() {
               description: resource.description || "",
               status: resource.status || "ACTIVE",
               availabilityWindows: resource.availabilityWindows || [],
+              isTemporarilyUnavailable: !resource.availabilityWindows || resource.availabilityWindows.length === 0,
             });
           }
         } catch (err) {
@@ -67,6 +69,16 @@ export default function ResourceFormPage() {
       loadResource();
     }
   }, [id, isEditMode]);
+
+  // Clear windows when temporarily unavailable is checked
+  useEffect(() => {
+    if (form.isTemporarilyUnavailable && form.availabilityWindows.length > 0) {
+      setForm((prev) => ({
+        ...prev,
+        availabilityWindows: [],
+      }));
+    }
+  }, [form.isTemporarilyUnavailable]);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -106,6 +118,7 @@ export default function ResourceFormPage() {
     setForm((prev) => ({
       ...prev,
       availabilityWindows: [...prev.availabilityWindows, windowStr],
+      isTemporarilyUnavailable: false,
     }));
 
     setNewWindow({
@@ -120,6 +133,14 @@ export default function ResourceFormPage() {
     setForm((prev) => ({
       ...prev,
       availabilityWindows: prev.availabilityWindows.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleTemporarilyUnavailable = (e) => {
+    const isChecked = e.target.checked;
+    setForm((prev) => ({
+      ...prev,
+      isTemporarilyUnavailable: isChecked,
     }));
   };
 
@@ -142,6 +163,11 @@ export default function ResourceFormPage() {
 
     if (!form.location.trim()) {
       errors.location = "Location is required";
+    }
+
+    // Validate availability windows
+    if (!form.isTemporarilyUnavailable && form.availabilityWindows.length === 0) {
+      errors.availability = "Please either add availability windows or mark as temporarily unavailable";
     }
 
     return errors;
@@ -169,7 +195,7 @@ export default function ResourceFormPage() {
         location: form.location.trim(),
         description: form.description.trim(),
         status: form.status,
-        availabilityWindows: form.availabilityWindows,
+        availabilityWindows: form.isTemporarilyUnavailable ? [] : form.availabilityWindows,
       };
 
       if (isEditMode) {
@@ -335,71 +361,102 @@ export default function ResourceFormPage() {
             {/* Availability Windows */}
             <div>
               <label className="mb-1.5 block text-sm font-semibold text-slate-700">Availability Windows</label>
+              {fieldErrors.availability && <p className="text-xs text-red-600 mb-2">{fieldErrors.availability}</p>}
 
-              {/* Add Window Form */}
-              <div className="bg-slate-50 p-4 rounded-2xl mb-4 space-y-3">
-                <div>
-                  <label htmlFor="day" className="block text-xs font-medium text-slate-700 mb-1">
-                    Day
-                  </label>
-                  <select
-                    id="day"
-                    name="day"
-                    value={newWindow.day}
-                    onChange={handleNewWindowChange}
-                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-[#a1452b] focus:ring-2 focus:ring-[#a1452b]/15"
-                  >
-                    <option value="">Select day</option>
-                    {DAYS.map((day) => (
-                      <option key={day} value={day}>
-                        {day}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
+              {/* Temporarily Unavailable Checkbox */}
+              <div className="bg-amber-50 p-4 rounded-lg border border-amber-200 mb-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.isTemporarilyUnavailable}
+                    onChange={handleTemporarilyUnavailable}
+                    className="w-4 h-4 rounded border-slate-300 text-[#a1452b] focus:ring-2 focus:ring-[#a1452b]"
+                  />
                   <div>
-                    <label htmlFor="startTime" className="block text-xs font-medium text-slate-700 mb-1">
-                      Start Time
-                    </label>
-                    <input
-                      id="startTime"
-                      name="startTime"
-                      type="time"
-                      value={newWindow.startTime}
-                      onChange={handleNewWindowChange}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-[#a1452b] focus:ring-2 focus:ring-[#a1452b]/15"
-                    />
+                    <p className="text-sm font-medium text-amber-900">Mark as Temporarily Unavailable</p>
+                    <p className="text-xs text-amber-700 mt-0.5">Check this to indicate the resource has no specific availability windows</p>
                   </div>
-
-                  <div>
-                    <label htmlFor="endTime" className="block text-xs font-medium text-slate-700 mb-1">
-                      End Time
-                    </label>
-                    <input
-                      id="endTime"
-                      name="endTime"
-                      type="time"
-                      value={newWindow.endTime}
-                      onChange={handleNewWindowChange}
-                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-[#a1452b] focus:ring-2 focus:ring-[#a1452b]/15"
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={addAvailabilityWindow}
-                  className="w-full rounded-lg bg-[#a1452b] text-white font-medium py-2 text-sm transition hover:bg-[#873922] disabled:opacity-70"
-                >
-                  Add Window
-                </button>
+                </label>
               </div>
+
+              {/* Add Window Form - Disabled when temporarily unavailable */}
+              {!form.isTemporarilyUnavailable && (
+                <div className="bg-slate-50 p-4 rounded-2xl mb-4 space-y-3">
+                  <div>
+                    <label htmlFor="day" className="block text-xs font-medium text-slate-700 mb-1">
+                      Day
+                    </label>
+                    <select
+                      id="day"
+                      name="day"
+                      value={newWindow.day}
+                      onChange={handleNewWindowChange}
+                      className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-[#a1452b] focus:ring-2 focus:ring-[#a1452b]/15"
+                    >
+                      <option value="">Select day</option>
+                      {DAYS.map((day) => (
+                        <option key={day} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label htmlFor="startTime" className="block text-xs font-medium text-slate-700 mb-1">
+                        Start Time
+                      </label>
+                      <input
+                        id="startTime"
+                        name="startTime"
+                        type="time"
+                        value={newWindow.startTime}
+                        onChange={handleNewWindowChange}
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-[#a1452b] focus:ring-2 focus:ring-[#a1452b]/15"
+                      />
+                    </div>
+
+                    <div>
+                      <label htmlFor="endTime" className="block text-xs font-medium text-slate-700 mb-1">
+                        End Time
+                      </label>
+                      <input
+                        id="endTime"
+                        name="endTime"
+                        type="time"
+                        value={newWindow.endTime}
+                        onChange={handleNewWindowChange}
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-[#a1452b] focus:ring-2 focus:ring-[#a1452b]/15"
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={addAvailabilityWindow}
+                    className="w-full rounded-lg bg-[#a1452b] text-white font-medium py-2 text-sm transition hover:bg-[#873922] disabled:opacity-70"
+                  >
+                    Add Window
+                  </button>
+                </div>
+              )}
 
               {/* Display Windows */}
               {form.availabilityWindows.length > 0 && (
-                <div className="space-y-2">
+                <div className="space-y-2 mb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-xs font-medium text-slate-600">{form.availabilityWindows.length} window(s) configured</p>
+                    {!form.isTemporarilyUnavailable && (
+                      <button
+                        type="button"
+                        onClick={() => setForm((prev) => ({ ...prev, availabilityWindows: [] }))}
+                        className="text-xs font-medium text-red-600 hover:text-red-700 transition"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
                   {form.availabilityWindows.map((window, index) => (
                     <div key={index} className="flex items-center justify-between bg-emerald-50 p-3 rounded-lg border border-emerald-200">
                       <span className="text-sm text-slate-700">{window}</span>
@@ -412,6 +469,13 @@ export default function ResourceFormPage() {
                       </button>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {form.isTemporarilyUnavailable && (
+                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200 text-center">
+                  <p className="text-xs font-medium text-blue-900">Resource marked as temporarily unavailable</p>
+                  <p className="text-xs text-blue-700 mt-1">No specific availability windows defined</p>
                 </div>
               )}
             </div>

@@ -63,7 +63,8 @@ public class ResourceService {
         resource.setDescription(request.getDescription());
         resource.setImageUrl(request.getImageUrl());
 
-        if (request.getAvailabilityWindows() != null && !request.getAvailabilityWindows().isEmpty()) {
+        // Update availability windows (even if empty list is provided)
+        if (request.getAvailabilityWindows() != null) {
             resource.setAvailabilityWindows(request.getAvailabilityWindows());
         }
 
