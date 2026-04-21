@@ -183,6 +183,17 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                 {/* SLA Timer */}
                 {isActive && (
                   <div style={{ marginBottom: 14 }}>
+                    {ticket.slaBreachedNotified && (
+                      <div style={{
+                        padding: "6px 12px", marginBottom: 8,
+                        background: "rgba(239,68,68,0.12)",
+                        border: "1px solid rgba(239,68,68,0.35)",
+                        borderRadius: 8, color: "#fca5a5",
+                        fontSize: "0.78rem", fontWeight: 600,
+                      }}>
+                        ⚠ SLA BREACHED — Admin and ticket owner have been notified
+                      </div>
+                    )}
                     <SlaTimer createdAt={ticket.createdAt} priority={ticket.priority} resolvedAt={ticket.resolvedAt} />
                   </div>
                 )}

@@ -42,6 +42,9 @@ public class Ticket {
     private String resolutionNote;
     private String rejectionReason;
 
+    // SLA breach tracking
+    private boolean slaBreachedNotified = false;
+
     // SLA timestamps
     private Instant createdAt;
     private Instant updatedAt;
@@ -139,6 +142,8 @@ public class Ticket {
     public void setResolvedAt(Instant resolvedAt) { this.resolvedAt = resolvedAt; }
     public Instant getClosedAt() { return closedAt; }
     public void setClosedAt(Instant closedAt) { this.closedAt = closedAt; }
+    public boolean isSlaBreachedNotified() { return slaBreachedNotified; }
+    public void setSlaBreachedNotified(boolean slaBreachedNotified) { this.slaBreachedNotified = slaBreachedNotified; }
     public List<TicketEvent> getTimeline() { return timeline; }
     public void setTimeline(List<TicketEvent> timeline) { this.timeline = timeline; }
 

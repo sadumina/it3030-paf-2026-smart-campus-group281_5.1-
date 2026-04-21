@@ -69,9 +69,26 @@ export default function TicketCard({ ticket, onClick, adminControls, technicians
         )}
       </div>
 
+      {/* SLA breached banner */}
+      {isActive && ticket.slaBreachedNotified && (
+        <div style={{
+          marginTop: 10,
+          padding: "4px 10px",
+          background: "rgba(239,68,68,0.12)",
+          border: "1px solid rgba(239,68,68,0.35)",
+          borderRadius: 6,
+          color: "#fca5a5",
+          fontSize: "0.72rem",
+          fontWeight: 600,
+          letterSpacing: "0.05em",
+        }}>
+          ⚠ SLA BREACHED — Response overdue
+        </div>
+      )}
+
       {/* SLA Timer — only for active tickets */}
       {isActive && (
-        <div style={{ marginTop: 12 }}>
+        <div style={{ marginTop: 8 }}>
           <SlaTimer
             createdAt={ticket.createdAt}
             priority={ticket.priority}

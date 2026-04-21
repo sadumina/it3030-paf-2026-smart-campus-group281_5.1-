@@ -36,6 +36,8 @@ public interface TicketRepository extends MongoRepository<Ticket, String> {
 
     long countByCreatedByUserId(String userId);
 
+    List<Ticket> findByStatusInAndSlaBreachedNotifiedFalse(List<String> statuses);
+
     @Query("{ '$or': [ { 'ticketId': { '$regex': ?0, '$options': 'i' } }, { 'title': { '$regex': ?0, '$options': 'i' } }, { 'description': { '$regex': ?0, '$options': 'i' } } ] }")
     List<Ticket> searchByKeyword(String keyword);
 
