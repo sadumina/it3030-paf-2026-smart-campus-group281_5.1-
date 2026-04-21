@@ -47,6 +47,41 @@ public class ResourceService {
         return resourceRepository.save(resource);
     }
 
+    public Resource updateResource(String id, Resource request) {
+        ensureSampleResources();
+        Resource resource = resourceRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Resource not found"));
+
+        resource.setName(request.getName());
+        resource.setType(request.getType());
+        resource.setCapacity(request.getCapacity());
+        resource.setLocation(request.getLocation());
+        resource.setDescription(request.getDescription());
+        resource.setImageUrl(request.getImageUrl());
+
+        if (request.getAvailabilityWindows() != null && !request.getAvailabilityWindows().isEmpty()) {
+            resource.setAvailabilityWindows(request.getAvailabilityWindows());
+        }
+
+        String requestStatus = request.getStatus();
+        if (requestStatus != null && !requestStatus.isBlank()) {
+            String normalizedStatus = normalizeStatusInput(requestStatus);
+            resource.setStatus(normalizedStatus);
+            resource.setAvailability("ACTIVE".equals(normalizedStatus) ? "Available" : "Unavailable");
+        }
+
+        normalizeResourceFields(resource);
+        return resourceRepository.save(resource);
+    }
+
+    public void deleteResource(String id) {
+        ensureSampleResources();
+        if (!resourceRepository.existsById(id)) {
+            throw new NoSuchElementException("Resource not found");
+        }
+        resourceRepository.deleteById(id);
+    }
+
     private boolean matchesType(Resource resource, String type) {
         if (type == null || type.isBlank() || "ALL".equalsIgnoreCase(type)) {
             return true;

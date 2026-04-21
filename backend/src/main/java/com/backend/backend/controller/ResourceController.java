@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -60,6 +61,31 @@ public class ResourceController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Resource> updateResource(
+            @PathVariable String id,
+            @RequestBody Resource request) {
+        try {
+            return new ResponseEntity<>(resourceService.updateResource(id, request), HttpStatus.OK);
+        } catch (NoSuchElementException exception) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteResource(@PathVariable String id) {
+        try {
+            resourceService.deleteResource(id);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException exception) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

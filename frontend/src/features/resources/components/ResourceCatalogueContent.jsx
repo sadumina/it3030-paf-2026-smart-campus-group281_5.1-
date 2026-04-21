@@ -10,6 +10,9 @@ export default function ResourceCatalogueContent({
   isAdmin = false,
   onEditResource,
   onStatusToggle,
+  onDeleteResource,
+  actionLoading = false,
+  actionError = "",
 }) {
   return (
     <section className="space-y-4">
@@ -49,6 +52,9 @@ export default function ResourceCatalogueContent({
               isAdmin={isAdmin}
               onEdit={onEditResource}
               onStatusToggle={onStatusToggle}
+              onDelete={onDeleteResource}
+              actionLoading={actionLoading}
+              actionError={actionError}
             />
           ))}
         </div>

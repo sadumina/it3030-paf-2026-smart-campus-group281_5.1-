@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { fetchResourceById } from "../../../services/resourceService";
 import ResourceDetailModal from "./ResourceDetailModal";
 
@@ -61,19 +61,21 @@ function getStatusLabel(resource) {
   return "ACTIVE";
 }
 
-export default function ResourceCard({ resource, isAdmin = false, onEdit, onStatusToggle }) {
+export default function ResourceCard({
+  resource,
+  isAdmin = false,
+  onEdit,
+  onStatusToggle,
+  onDelete,
+  actionLoading = false,
+  actionError = "",
+}) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [details, setDetails] = useState(resource || null);
-  const [currentStatus, setCurrentStatus] = useState(getStatusLabel(resource));
-  const [statusUpdating, setStatusUpdating] = useState(false);
-  const [statusError, setStatusError] = useState("");
+  const [details, setDetails] = useState(null);
 
   const typeLabel = getTypeLabel(resource);
   const capacityLabel = resource.capacity ?? "-";
-
-  useEffect(() => {
-    setCurrentStatus(getStatusLabel(resource));
-  }, [resource]);
+  const currentStatus = getStatusLabel(resource);
 
   async function handleViewDetails() {
     if (!resource.id) {
@@ -89,22 +91,6 @@ export default function ResourceCard({ resource, isAdmin = false, onEdit, onStat
       // Keep the flow simple: show card data if details API fails.
       setDetails(resource);
       setIsModalOpen(true);
-    }
-  }
-
-  async function handleStatusToggle() {
-    const nextStatus = currentStatus === "ACTIVE" ? "OUT_OF_SERVICE" : "ACTIVE";
-    setStatusError("");
-    setStatusUpdating(true);
-    try {
-      if (onStatusToggle) {
-        await onStatusToggle(resource, nextStatus);
-      }
-      setCurrentStatus(nextStatus);
-    } catch (error) {
-      setStatusError(error.message || "Unable to update status.");
-    } finally {
-      setStatusUpdating(false);
     }
   }
 
@@ -143,34 +129,17 @@ export default function ResourceCard({ resource, isAdmin = false, onEdit, onStat
         View Details
       </button>
 
-      {isAdmin ? (
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3 dark:border-slate-700">
-          <button
-            type="button"
-            onClick={() => onEdit?.(resource)}
-            className="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
-          >
-            Edit
-          </button>
-          <button
-            type="button"
-            onClick={handleStatusToggle}
-            disabled={statusUpdating}
-            className="inline-flex items-center rounded-lg border border-orange-300 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100 dark:border-orange-700 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/50"
-          >
-            {statusUpdating
-              ? "Updating..."
-              : currentStatus === "ACTIVE"
-                ? "Set Out of Service"
-                : "Mark Active"}
-          </button>
-        </div>
-      ) : null}
-      {statusError ? (
-        <p className="mt-2 text-xs font-medium text-rose-600 dark:text-rose-300">{statusError}</p>
-      ) : null}
-
-      <ResourceDetailModal resource={details || resource} isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ResourceDetailModal
+        resource={details || resource}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        isAdmin={isAdmin}
+        actionLoading={actionLoading}
+        actionError={actionError}
+        onEdit={onEdit}
+        onDelete={onDelete}
+        onChangeStatus={onStatusToggle}
+      />
     </article>
   );
 }

@@ -17,7 +17,17 @@ function getAvailabilityWindows(resource) {
   return ["Mon-Fri: 8:00 AM - 6:00 PM"];
 }
 
-export default function ResourceDetailModal({ resource, isOpen, onClose }) {
+export default function ResourceDetailModal({
+  resource,
+  isOpen,
+  onClose,
+  isAdmin = false,
+  actionLoading = false,
+  actionError = "",
+  onEdit,
+  onDelete,
+  onChangeStatus,
+}) {
   const availabilityWindows = useMemo(() => getAvailabilityWindows(resource), [resource]);
 
   if (!isOpen || !resource) {
@@ -62,7 +72,44 @@ export default function ResourceDetailModal({ resource, isOpen, onClose }) {
           </p>
         </div>
 
-        <div className="mt-5 flex justify-end">
+        {isAdmin ? (
+          <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3 dark:border-slate-700">
+            <button
+              type="button"
+              onClick={() => onEdit?.(resource)}
+              disabled={actionLoading}
+              className="inline-flex items-center rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+            >
+              Edit
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete?.(resource)}
+              disabled={actionLoading}
+              className="inline-flex items-center rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-rose-700 dark:bg-rose-900/30 dark:text-rose-300 dark:hover:bg-rose-900/50"
+            >
+              Delete
+            </button>
+            <button
+              type="button"
+              onClick={() => onChangeStatus?.(resource)}
+              disabled={actionLoading}
+              className="inline-flex items-center rounded-lg border border-orange-300 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-orange-700 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/50"
+            >
+              {actionLoading
+                ? "Updating..."
+                : String(resource.status || "").toUpperCase() === "ACTIVE"
+                  ? "Set Out of Service"
+                  : "Mark Active"}
+            </button>
+          </div>
+        ) : null}
+
+        {actionError ? (
+          <p className="mt-2 text-xs font-medium text-rose-600 dark:text-rose-300">{actionError}</p>
+        ) : null}
+
+        <div className="mt-4 flex justify-end">
           <button
             type="button"
             onClick={onClose}

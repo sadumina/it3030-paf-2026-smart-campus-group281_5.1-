@@ -11,7 +11,7 @@ import {
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
 import ResourceCatalogueContent from "../features/resources/components/ResourceCatalogueContent";
-import { fetchResources, updateResourceStatus } from "../services/resourceService";
+import { deleteResource, fetchResources, updateResource, updateResourceStatus } from "../services/resourceService";
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
@@ -35,6 +35,8 @@ export default function AdminResourceMatrixPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filters, setFilters] = useState(defaultFilters);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState("");
 
   async function loadResources(activeGuard = () => true, silent = false) {
     try {
@@ -100,10 +102,88 @@ export default function AdminResourceMatrixPage() {
   }
 
   async function handleStatusToggle(resource, nextStatus) {
-    const updated = await updateResourceStatus(resource?.id, nextStatus);
-    setResources((current) =>
-      current.map((item) => (item.id === resource.id ? { ...item, ...updated } : item)),
-    );
+    setActionError("");
+    setActionLoading(true);
+    try {
+      const next = nextStatus || (String(resource?.status || "").toUpperCase() === "ACTIVE" ? "OUT_OF_SERVICE" : "ACTIVE");
+      const updated = await updateResourceStatus(resource?.id, next);
+      setResources((current) =>
+        current.map((item) => (item.id === resource.id ? { ...item, ...updated } : item)),
+      );
+    } catch (requestError) {
+      setActionError(requestError.message || "Unable to update resource status.");
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  async function handleEditResource(resource) {
+    if (!resource?.id) {
+      return;
+    }
+
+    const name = window.prompt("Resource name", resource.name || "");
+    if (name === null) {
+      return;
+    }
+
+    const location = window.prompt("Location", resource.location || "");
+    if (location === null) {
+      return;
+    }
+
+    const capacityInput = window.prompt("Capacity", String(resource.capacity ?? ""));
+    if (capacityInput === null) {
+      return;
+    }
+
+    const description = window.prompt("Description", resource.description || "");
+    if (description === null) {
+      return;
+    }
+
+    const capacityNumber = Number(capacityInput);
+    const payload = {
+      ...resource,
+      name: name.trim(),
+      location: location.trim(),
+      description: description.trim(),
+      capacity: Number.isNaN(capacityNumber) ? resource.capacity : capacityNumber,
+    };
+
+    setActionError("");
+    setActionLoading(true);
+    try {
+      const updated = await updateResource(resource.id, payload);
+      setResources((current) =>
+        current.map((item) => (item.id === resource.id ? { ...item, ...updated } : item)),
+      );
+    } catch (requestError) {
+      setActionError(requestError.message || "Unable to update resource.");
+    } finally {
+      setActionLoading(false);
+    }
+  }
+
+  async function handleDeleteResource(resource) {
+    if (!resource?.id) {
+      return;
+    }
+    const confirmed = window.confirm(`Delete "${resource.name}"?`);
+    if (!confirmed) {
+      return;
+    }
+
+    setActionError("");
+    setActionLoading(true);
+    try {
+      await deleteResource(resource.id);
+      setResources((current) => current.filter((item) => item.id !== resource.id));
+    } catch (requestError) {
+      setActionError(requestError.message || "Unable to delete resource.");
+    } finally {
+      setActionLoading(false);
+    }
   }
 
   return (
@@ -145,7 +225,11 @@ export default function AdminResourceMatrixPage() {
           loading={loading}
           error={error}
           isAdmin
+          onEditResource={handleEditResource}
           onStatusToggle={handleStatusToggle}
+          onDeleteResource={handleDeleteResource}
+          actionLoading={actionLoading}
+          actionError={actionError}
         />
       }
     />

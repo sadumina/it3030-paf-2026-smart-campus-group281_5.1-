@@ -78,3 +78,36 @@ export async function updateResourceStatus(resourceId, status) {
   const data = await parseResponse(response);
   return data && typeof data === "object" ? data : null;
 }
+
+export async function updateResource(resourceId, payload) {
+  if (!resourceId) {
+    throw new Error("Resource id is required");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/${resourceId}`, {
+    method: "PUT",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload || {}),
+  });
+
+  const data = await parseResponse(response);
+  return data && typeof data === "object" ? data : null;
+}
+
+export async function deleteResource(resourceId) {
+  if (!resourceId) {
+    throw new Error("Resource id is required");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/${resourceId}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => null);
+    throw new Error(data?.message || "Unable to delete resource");
+  }
+
+  return true;
+}
