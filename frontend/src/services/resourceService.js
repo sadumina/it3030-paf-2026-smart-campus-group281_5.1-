@@ -79,6 +79,26 @@ export async function updateResourceStatus(resourceId, status) {
   return data && typeof data === "object" ? data : null;
 }
 
+export async function changeResourceStatus(resourceId, status, reason = "") {
+  if (!resourceId) {
+    throw new Error("Resource id is required");
+  }
+
+  const body = { status };
+  if (reason && reason.trim()) {
+    body.reason = reason.trim();
+  }
+
+  const response = await fetch(`${API_BASE_URL}/${resourceId}/status`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(body),
+  });
+
+  const data = await parseResponse(response);
+  return data && typeof data === "object" ? data : null;
+}
+
 export async function updateResource(resourceId, payload) {
   if (!resourceId) {
     throw new Error("Resource id is required");

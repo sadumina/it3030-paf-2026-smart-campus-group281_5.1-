@@ -2,6 +2,7 @@ package com.backend.backend.dto;
 
 public class ResourceStatusUpdateRequest {
     private String status;
+    private String reason;
 
     public String getStatus() {
         return status;
@@ -9,5 +10,13 @@ public class ResourceStatusUpdateRequest {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 }

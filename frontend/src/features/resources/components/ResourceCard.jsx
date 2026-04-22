@@ -65,7 +65,7 @@ export default function ResourceCard({
   resource,
   isAdmin = false,
   onEdit,
-  onStatusToggle,
+  onStatusChange,
   onDelete,
   actionLoading = false,
   actionError = "",
@@ -138,7 +138,7 @@ export default function ResourceCard({
         actionError={actionError}
         onEdit={onEdit}
         onDelete={onDelete}
-        onChangeStatus={onStatusToggle}
+        onStatusChange={onStatusChange}
       />
     </article>
   );

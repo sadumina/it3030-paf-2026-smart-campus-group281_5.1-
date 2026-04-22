@@ -13,7 +13,8 @@ import {
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
 import ResourceCatalogueContent from "../features/resources/components/ResourceCatalogueContent";
-import { deleteResource, fetchResources, updateResource, updateResourceStatus } from "../services/resourceService";
+import StatusChangeModal from "../features/resources/components/StatusChangeModal";
+import { deleteResource, fetchResources } from "../services/resourceService";
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
@@ -40,6 +41,7 @@ export default function AdminResourceMatrixPage() {
   const [filters, setFilters] = useState(defaultFilters);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [statusChangeTarget, setStatusChangeTarget] = useState(null);
 
   async function loadResources(activeGuard = () => true, silent = false) {
     try {
@@ -104,20 +106,17 @@ export default function AdminResourceMatrixPage() {
     }));
   }
 
-  async function handleStatusToggle(resource, nextStatus) {
-    setActionError("");
-    setActionLoading(true);
-    try {
-      const next = nextStatus || (String(resource?.status || "").toUpperCase() === "ACTIVE" ? "OUT_OF_SERVICE" : "ACTIVE");
-      const updated = await updateResourceStatus(resource?.id, next);
-      setResources((current) =>
-        current.map((item) => (item.id === resource.id ? { ...item, ...updated } : item)),
-      );
-    } catch (requestError) {
-      setActionError(requestError.message || "Unable to update resource status.");
-    } finally {
-      setActionLoading(false);
-    }
+
+  function handleOpenStatusChange(resource) {
+    if (!resource?.id) return;
+    setStatusChangeTarget(resource);
+  }
+
+  function handleStatusChangeSuccess(updated) {
+    setResources((current) =>
+      current.map((item) => (item.id === updated.id ? { ...item, ...updated } : item)),
+    );
+    setStatusChangeTarget(null);
   }
 
   async function handleEditResource(resource) {
@@ -187,19 +186,27 @@ export default function AdminResourceMatrixPage() {
       chartCaption="Overview context for matrix operations."
       chartColor="#ea580c"
       extraContent={
-        <ResourceCatalogueContent
-          resources={resources}
-          filters={filters}
-          onFilterChange={handleFilterChange}
-          loading={loading}
-          error={error}
-          isAdmin
-          onEditResource={handleEditResource}
-          onStatusToggle={handleStatusToggle}
-          onDeleteResource={handleDeleteResource}
-          actionLoading={actionLoading}
-          actionError={actionError}
-        />
+        <>
+          <ResourceCatalogueContent
+            resources={resources}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            loading={loading}
+            error={error}
+            isAdmin
+            onEditResource={handleEditResource}
+            onStatusChange={handleOpenStatusChange}
+            onDeleteResource={handleDeleteResource}
+            actionLoading={actionLoading}
+            actionError={actionError}
+          />
+          <StatusChangeModal
+            resource={statusChangeTarget}
+            isOpen={statusChangeTarget !== null}
+            onClose={() => setStatusChangeTarget(null)}
+            onSuccess={handleStatusChangeSuccess}
+          />
+        </>
       }
     />
   );

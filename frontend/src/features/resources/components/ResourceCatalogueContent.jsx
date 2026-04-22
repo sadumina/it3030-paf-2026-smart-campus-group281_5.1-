@@ -9,7 +9,7 @@ export default function ResourceCatalogueContent({
   error,
   isAdmin = false,
   onEditResource,
-  onStatusToggle,
+  onStatusChange,
   onDeleteResource,
   actionLoading = false,
   actionError = "",
@@ -51,7 +51,7 @@ export default function ResourceCatalogueContent({
               resource={resource}
               isAdmin={isAdmin}
               onEdit={onEditResource}
-              onStatusToggle={onStatusToggle}
+              onStatusChange={onStatusChange}
               onDelete={onDeleteResource}
               actionLoading={actionLoading}
               actionError={actionError}

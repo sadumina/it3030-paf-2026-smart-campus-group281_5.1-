@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Run Backend (Spring Boot)",
+      "request": "launch",
+      "mainClass": "com.backend.backend.BackendApplication",
+      "projectName": "backend",
+      "cwd": "${workspaceFolder}/backend",
+      "vmArgs": "",
+      "env": {}
+    }
+  ]
+}

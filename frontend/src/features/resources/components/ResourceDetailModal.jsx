@@ -27,7 +27,7 @@ export default function ResourceDetailModal({
   actionError = "",
   onEdit,
   onDelete,
-  onChangeStatus,
+  onStatusChange,
 }) {
   const navigate = useNavigate();
   const availabilityWindows = useMemo(() => getAvailabilityWindows(resource), [resource]);
@@ -86,23 +86,19 @@ export default function ResourceDetailModal({
             </button>
             <button
               type="button"
+              onClick={() => onStatusChange?.(resource)}
+              disabled={actionLoading}
+              className="inline-flex items-center rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-amber-700 dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50"
+            >
+              Change Status
+            </button>
+            <button
+              type="button"
               onClick={() => onDelete?.(resource)}
               disabled={actionLoading}
               className="inline-flex items-center rounded-lg border border-rose-300 bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-rose-700 dark:bg-rose-900/30 dark:text-rose-300 dark:hover:bg-rose-900/50"
             >
               Delete
-            </button>
-            <button
-              type="button"
-              onClick={() => onChangeStatus?.(resource)}
-              disabled={actionLoading}
-              className="inline-flex items-center rounded-lg border border-orange-300 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-700 transition hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-orange-700 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/50"
-            >
-              {actionLoading
-                ? "Updating..."
-                : String(resource.status || "").toUpperCase() === "ACTIVE"
-                  ? "Set Out of Service"
-                  : "Mark Active"}
             </button>
           </div>
         ) : null}
