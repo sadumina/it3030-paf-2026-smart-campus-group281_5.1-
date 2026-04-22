@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { fetchResourceById } from "../../../services/resourceService";
 import ResourceDetailModal from "./ResourceDetailModal";
 
@@ -70,6 +71,7 @@ export default function ResourceCard({
   actionLoading = false,
   actionError = "",
 }) {
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [details, setDetails] = useState(null);
 
@@ -121,13 +123,26 @@ export default function ResourceCard({
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={handleViewDetails}
-        className="mt-4 inline-flex items-center rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-700"
-      >
-        View Details
-      </button>
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={handleViewDetails}
+          className="inline-flex items-center rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700"
+        >
+          View Details
+        </button>
+
+        {!isAdmin && (
+          <button
+            type="button"
+            onClick={() => navigate(`/dashboard/book-resource?resourceId=${encodeURIComponent(resource.id || "")}`)}
+            disabled={currentStatus !== "ACTIVE"}
+            className="inline-flex items-center rounded-lg bg-orange-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Book This Resource
+          </button>
+        )}
+      </div>
 
       <ResourceDetailModal
         resource={details || resource}

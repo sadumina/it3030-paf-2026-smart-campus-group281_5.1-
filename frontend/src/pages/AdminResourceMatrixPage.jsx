@@ -18,7 +18,7 @@ import { deleteResource, fetchResources } from "../services/resourceService";
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Approvals", badge: "18", icon: ClipboardCheck },
+  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/approvals" },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "Resource Matrix", icon: LayoutGrid, path: "/admin/resources" },
   { label: "User Management", icon: Users, path: "/admin/users" },

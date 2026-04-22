@@ -8,6 +8,7 @@ import ResourceCataloguePage from "../pages/ResourceCataloguePage";
 import ResourceBookingRedirectPage from "../pages/ResourceBookingRedirectPage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
 import AdminResourceMatrixPage from "../pages/AdminResourceMatrixPage";
+import AdminApprovalsPage from "../pages/AdminApprovalsPage";
 import AdminUsersPage from "../pages/AdminUsersPage";
 import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 import TechnicianDashboardPage from "../pages/TechnicianDashboardPage";
@@ -146,6 +147,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["TECHNICIAN"]}>
               <TechnicianDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/approvals"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AdminApprovalsPage />
             </ProtectedRoute>
           }
         />
