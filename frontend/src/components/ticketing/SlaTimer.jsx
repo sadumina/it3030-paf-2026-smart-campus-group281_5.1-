@@ -71,11 +71,11 @@ export default function SlaTimer({ createdAt, priority, resolvedAt, compact = fa
         <span style={{ fontSize: "0.75rem" }}>{isOverdue ? "⚠ SLA BREACHED" : formatDuration(remaining)}</span>
       </div>
       {/* Progress bar */}
-      <div style={{ height: 4, borderRadius: 4, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+      <div style={{ height: 4, borderRadius: 4, background: "rgba(255,255,255,0.25)", overflow: "hidden" }}>
         <div style={{
           height: "100%",
           width: `${pct}%`,
-          background: isOverdue ? "#ef4444" : pct > 75 ? "#eab308" : "#22c55e",
+          background: isOverdue ? "#fca5a5" : pct > 75 ? "#fde047" : "#86efac",
           borderRadius: 4,
           transition: "width 1s linear",
         }} />

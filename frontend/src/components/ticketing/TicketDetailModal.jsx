@@ -171,9 +171,9 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
           <div className="tkt-modal-body" style={{ maxHeight: "62vh", overflowY: "auto" }}>
             {error && (
               <div style={{
-                background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)",
+                background: "rgba(220,38,38,0.07)", border: "1.5px solid rgba(220,38,38,0.22)",
                 borderRadius: 10, padding: "10px 14px", marginBottom: 14,
-                color: "#fca5a5", fontSize: "0.82rem"
+                color: "#b91c1c", fontSize: "0.82rem", fontWeight: 500,
               }}>⚠ {error}</div>
             )}
 
@@ -185,11 +185,11 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                   <div style={{ marginBottom: 14 }}>
                     {ticket.slaBreachedNotified && (
                       <div style={{
-                        padding: "6px 12px", marginBottom: 8,
-                        background: "rgba(239,68,68,0.12)",
-                        border: "1px solid rgba(239,68,68,0.35)",
-                        borderRadius: 8, color: "#fca5a5",
-                        fontSize: "0.78rem", fontWeight: 600,
+                        padding: "7px 14px", marginBottom: 8,
+                        background: "rgba(220,38,38,0.07)",
+                        border: "1.5px solid rgba(220,38,38,0.25)",
+                        borderRadius: 10, color: "#b91c1c",
+                        fontSize: "0.78rem", fontWeight: 700,
                       }}>
                         ⚠ SLA BREACHED — Admin and ticket owner have been notified
                       </div>
@@ -202,9 +202,9 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                 <div className="tkt-form-group">
                   <label className="tkt-form-label">Description</label>
                   <div style={{
-                    background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
-                    borderRadius: 10, padding: "12px 14px", fontSize: "0.88rem",
-                    color: "#d4d4d8", lineHeight: 1.6,
+                    background: "var(--tkt-bg)", border: "1.5px solid var(--tkt-border)",
+                    borderRadius: 11, padding: "12px 15px", fontSize: "0.88rem",
+                    color: "var(--tkt-text-muted)", lineHeight: 1.6,
                   }}>
                     {ticket.description}
                   </div>
@@ -312,7 +312,7 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
 
                 {/* ─── ADMIN ACTIONS ─── */}
                 {role === "ADMIN" && (
-                  <div style={{ marginTop: 22, borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 18 }}>
+                  <div style={{ marginTop: 22, borderTop: "1.5px solid var(--tkt-border)", paddingTop: 18 }}>
                     <p className="tkt-section-heading">⚙ Admin Controls</p>
 
                     {/* Assign technician */}
@@ -371,7 +371,7 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
 
                 {/* ─── TECHNICIAN ACTIONS ─── */}
                 {role === "TECHNICIAN" && ticket.assignedTechnicianId === userId && (
-                  <div style={{ marginTop: 22, borderTop: "1px solid rgba(255,255,255,0.07)", paddingTop: 18 }}>
+                  <div style={{ marginTop: 22, borderTop: "1.5px solid var(--tkt-border)", paddingTop: 18 }}>
                     <p className="tkt-section-heading">🔧 Technician Actions</p>
                     <div className="tkt-form-group">
                       <label className="tkt-form-label">Resolution Note *</label>
