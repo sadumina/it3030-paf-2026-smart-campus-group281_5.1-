@@ -109,9 +109,16 @@ export default function ResourceCard({
             {resource.name}
           </h3>
         </div>
-        <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusStyles(currentStatus)}`}>
-          {currentStatus}
-        </span>
+        <div className="flex flex-col items-end gap-1 text-right">
+          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${getStatusStyles(currentStatus)}`}>
+            {currentStatus}
+          </span>
+          {resource.statusReason && currentStatus === "OUT_OF_SERVICE" && (
+            <span className="text-[10px] italic text-rose-500 max-w-[130px] leading-tight line-clamp-2" title={resource.statusReason}>
+              {resource.statusReason}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="mt-4 grid gap-2 text-sm text-slate-700 dark:text-slate-300 sm:grid-cols-2">

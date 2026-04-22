@@ -78,7 +78,7 @@ public class ResourceController {
             @PathVariable String id,
             @RequestBody ResourceStatusUpdateRequest request) {
         try {
-            return new ResponseEntity<>(resourceService.updateResourceStatus(id, request.getStatus()), HttpStatus.OK);
+            return new ResponseEntity<>(resourceService.updateResourceStatus(id, request.getStatus(), request.getReason()), HttpStatus.OK);
         } catch (NoSuchElementException exception) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (IllegalArgumentException exception) {
@@ -92,7 +92,7 @@ public class ResourceController {
             @PathVariable String id,
             @RequestBody ResourceStatusUpdateRequest request) {
         try {
-            Resource resource = resourceService.updateResourceStatus(id, request.getStatus());
+            Resource resource = resourceService.updateResourceStatus(id, request.getStatus(), request.getReason());
             return new ResponseEntity<>(resource, HttpStatus.OK);
         } catch (NoSuchElementException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found");

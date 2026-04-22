@@ -44,9 +44,16 @@ export default function ResourceDetailModal({
             <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100">{resource.name}</h3>
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{resource.type || "Resource"}</p>
           </div>
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusStyles(resource.status)}`}>
-            {String(resource.status || "ACTIVE").toUpperCase()}
-          </span>
+          <div className="flex flex-col items-end gap-1 text-right">
+            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusStyles(resource.status)}`}>
+              {String(resource.status || "ACTIVE").toUpperCase()}
+            </span>
+            {resource.statusReason && String(resource.status || "ACTIVE").toUpperCase() === "OUT_OF_SERVICE" && (
+              <span className="text-xs italic text-rose-500 max-w-[250px] leading-tight">
+                {resource.statusReason}
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="mt-4 grid gap-2 text-sm text-slate-700 dark:text-slate-300 sm:grid-cols-2">

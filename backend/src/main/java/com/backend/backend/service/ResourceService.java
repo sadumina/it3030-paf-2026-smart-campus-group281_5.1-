@@ -37,13 +37,14 @@ public class ResourceService {
                 .orElseThrow(() -> new NoSuchElementException("Resource not found"));
     }
 
-    public Resource updateResourceStatus(String id, String status) {
+    public Resource updateResourceStatus(String id, String status, String reason) {
         ensureSampleResources();
         String normalizedStatus = normalizeStatusInput(status);
         Resource resource = resourceRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Resource not found"));
         resource.setStatus(normalizedStatus);
         resource.setAvailability("ACTIVE".equals(normalizedStatus) ? "Available" : "Unavailable");
+        resource.setStatusReason(reason);
         return resourceRepository.save(resource);
     }
 

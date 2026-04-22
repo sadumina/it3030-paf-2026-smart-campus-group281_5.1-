@@ -19,6 +19,7 @@ public class Resource {
     private List<String> availabilityWindows;
     private String description;
     private String imageUrl;
+    private String statusReason;
 
     public Resource() {
     }
@@ -126,5 +127,13 @@ public class Resource {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getStatusReason() {
+        return statusReason;
+    }
+
+    public void setStatusReason(String statusReason) {
+        this.statusReason = statusReason;
     }
 }
