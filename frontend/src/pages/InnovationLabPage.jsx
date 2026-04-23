@@ -23,7 +23,7 @@ const adminSidebar = [
   { label: "User Management", icon: Users, path: "/admin/users" },
   { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
   { label: "Incidents", badge: "6", icon: Siren },
-  { label: "Audit Trail", icon: ScrollText },
+  { label: "Audit Trail", icon: ScrollText, path: "/tickets", badge: "Tickets" },
 ];
 
 const LAST_LOGIN_RISK_DAYS = 14;
