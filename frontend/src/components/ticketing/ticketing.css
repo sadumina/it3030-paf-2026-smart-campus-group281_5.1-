@@ -111,6 +111,13 @@
   padding: 28px 18px 72px;
 }
 
+.tkt-embedded {
+  min-height: auto;
+  background: transparent;
+  color: var(--tkt-text);
+  padding: 0;
+}
+
 .tkt-container {
   max-width: 1200px;
   margin: 0 auto;

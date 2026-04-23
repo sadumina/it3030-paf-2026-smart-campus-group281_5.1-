@@ -25,7 +25,7 @@ const PRIORITIES = [
 
 const CATEGORIES = ["ALL","ELECTRICAL","PLUMBING","IT","HVAC","STRUCTURAL","CLEANING","OTHER"];
 
-export default function AdminTicketView() {
+export default function AdminTicketView({ embedded = false }) {
   const [allTickets, setAllTickets]   = useState([]);
   const [apiTickets, setApiTickets]   = useState([]);
   const [stats, setStats]             = useState({});
@@ -136,7 +136,7 @@ export default function AdminTicketView() {
   ];
 
   return (
-    <div className="tkt-page tkt-root">
+    <div className={`tkt-root ${embedded ? "tkt-embedded" : "tkt-page"}`}>
       <div className="tkt-container">
 
         {/* Header */}

@@ -24,7 +24,7 @@ const PRIORITIES = [
 
 const CATEGORIES = ["ALL","ELECTRICAL","PLUMBING","IT","HVAC","STRUCTURAL","CLEANING","OTHER"];
 
-export default function StudentTicketView() {
+export default function StudentTicketView({ embedded = false }) {
   const auth = getAuth();
   const [allTickets, setAllTickets]   = useState([]);   // full list — drives count badges
   const [apiTickets, setApiTickets]   = useState([]);   // server-filtered list — drives display
@@ -118,7 +118,7 @@ export default function StudentTicketView() {
   };
 
   return (
-    <div className="tkt-page tkt-root">
+    <div className={`tkt-root ${embedded ? "tkt-embedded" : "tkt-page"}`}>
       <div className="tkt-container">
 
         {/* Header */}
