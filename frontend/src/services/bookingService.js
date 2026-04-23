@@ -62,19 +62,19 @@ export async function fetchAllBookings() {
 export const getAllBookings = fetchAllBookings;
 
 /** ADMIN: update a booking's status */
-export async function updateBookingStatus(bookingId, status) {
+export async function updateBookingStatus(bookingId, status, reason = "") {
   const response = await fetch(`${API_BASE_URL}/${bookingId}/status`, {
     method: "PATCH",
     headers: getAuthHeaders(),
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status, reason }),
   });
   return parseResponse(response);
 }
 
 export function approveBooking(bookingId) {
-  return updateBookingStatus(bookingId, "CONFIRMED");
+  return updateBookingStatus(bookingId, "APPROVED");
 }
 
-export function rejectBooking(bookingId) {
-  return updateBookingStatus(bookingId, "REJECTED");
+export function rejectBooking(bookingId, reason) {
+  return updateBookingStatus(bookingId, "REJECTED", reason);
 }

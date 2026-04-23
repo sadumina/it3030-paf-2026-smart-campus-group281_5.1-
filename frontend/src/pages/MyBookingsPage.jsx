@@ -9,15 +9,20 @@ import { cancelBooking, fetchMyBookings } from "../services/bookingService";
 
 const STATUS_STYLES = {
   PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+  APPROVED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
   CONFIRMED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
   REJECTED: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
   CANCELLED: "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
 };
 
+function normalizeBookingStatus(status) {
+  return status === "CONFIRMED" ? "APPROVED" : status || "PENDING";
+}
+
 function sortBookings(a, b) {
-  const statusRank = { PENDING: 0, CONFIRMED: 1, REJECTED: 2, CANCELLED: 3 };
-  const rankA = statusRank[a.status] ?? 4;
-  const rankB = statusRank[b.status] ?? 4;
+  const statusRank = { PENDING: 0, APPROVED: 1, REJECTED: 2, CANCELLED: 3 };
+  const rankA = statusRank[normalizeBookingStatus(a.status)] ?? 4;
+  const rankB = statusRank[normalizeBookingStatus(b.status)] ?? 4;
 
   if (rankA !== rankB) {
     return rankA - rankB;
@@ -69,11 +74,11 @@ export default function MyBookingsPage() {
 
   const stats = useMemo(() => {
     const total = bookings.length;
-    const pending = bookings.filter((booking) => booking.status === "PENDING").length;
-    const confirmed = bookings.filter((booking) => booking.status === "CONFIRMED").length;
-    const rejected = bookings.filter((booking) => booking.status === "REJECTED").length;
+    const pending = bookings.filter((booking) => normalizeBookingStatus(booking.status) === "PENDING").length;
+    const approved = bookings.filter((booking) => normalizeBookingStatus(booking.status) === "APPROVED").length;
+    const rejected = bookings.filter((booking) => normalizeBookingStatus(booking.status) === "REJECTED").length;
 
-    return { total, pending, confirmed, rejected };
+    return { total, pending, approved, rejected };
   }, [bookings]);
 
   const sortedBookings = useMemo(() => [...bookings].sort(sortBookings), [bookings]);
@@ -89,13 +94,13 @@ export default function MyBookingsPage() {
       kpis={[
         { label: "Total Bookings", value: String(stats.total), change: "All requests" },
         { label: "Pending", value: String(stats.pending), change: "Awaiting approval" },
-        { label: "Confirmed", value: String(stats.confirmed), change: "Ready to use" },
+        { label: "Approved", value: String(stats.approved), change: "Ready to use" },
         { label: "Rejected", value: String(stats.rejected), change: "Needs another slot" },
       ]}
       quickActions={userActions}
       activityFeed={sortedBookings.slice(0, 4).map((booking) => ({
         title: booking.resourceName || "Resource booking",
-        meta: `${booking.date || "No date"} - ${booking.status || "PENDING"}`,
+        meta: `${booking.date || "No date"} - ${normalizeBookingStatus(booking.status)}`,
       }))}
       chartTitle="Booking activity"
       chartCaption="Current status of your booking requests."
@@ -149,7 +154,10 @@ export default function MyBookingsPage() {
 
           {!loading && !error && sortedBookings.length > 0 ? (
             <div className="grid gap-4 lg:grid-cols-2">
-              {sortedBookings.map((booking) => (
+              {sortedBookings.map((booking) => {
+                const displayStatus = normalizeBookingStatus(booking.status);
+
+                return (
                 <article
                   key={booking.id}
                   className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
@@ -163,8 +171,8 @@ export default function MyBookingsPage() {
                         {booking.date || "No date selected"}
                       </h3>
                     </div>
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[booking.status] || STATUS_STYLES.PENDING}`}>
-                      {booking.status || "PENDING"}
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[displayStatus] || STATUS_STYLES.PENDING}`}>
+                      {displayStatus}
                     </span>
                   </div>
 
@@ -177,6 +185,11 @@ export default function MyBookingsPage() {
                       <p className="mt-1 text-slate-500 dark:text-slate-400">
                         {booking.startTime || "--"} - {booking.endTime || "--"}
                       </p>
+                      {booking.expectedAttendees ? (
+                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                          {booking.expectedAttendees} attendee{booking.expectedAttendees === 1 ? "" : "s"}
+                        </p>
+                      ) : null}
                     </div>
                     <div className="rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-900/50">
                       <p className="font-medium text-slate-700 dark:text-slate-200">Booking ID</p>
@@ -189,9 +202,14 @@ export default function MyBookingsPage() {
                       {booking.purpose}
                     </p>
                   ) : null}
+                  {booking.rejectionReason ? (
+                    <p className="mt-3 rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm font-medium text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300">
+                      Reason: {booking.rejectionReason}
+                    </p>
+                  ) : null}
 
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-                    {booking.status === "CONFIRMED" ? (
+                    {displayStatus === "APPROVED" ? (
                       <span className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-300">
                         <CheckCircle2 className="h-4 w-4" />
                         Approved
@@ -200,7 +218,7 @@ export default function MyBookingsPage() {
                       <span className="text-sm text-slate-500 dark:text-slate-400">Status updates appear here automatically.</span>
                     )}
 
-                    {booking.status === "PENDING" ? (
+                    {["PENDING", "APPROVED"].includes(displayStatus) ? (
                       <button
                         type="button"
                         onClick={() => handleCancel(booking.id)}
@@ -213,7 +231,8 @@ export default function MyBookingsPage() {
                     ) : null}
                   </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
           ) : null}
         </section>

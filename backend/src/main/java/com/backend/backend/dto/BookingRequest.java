@@ -9,6 +9,7 @@ public class BookingRequest {
     private LocalTime startTime;
     private LocalTime endTime;
     private String purpose;
+    private Integer expectedAttendees;
 
     public String getResourceId() { return resourceId; }
     public void setResourceId(String resourceId) { this.resourceId = resourceId; }
@@ -24,4 +25,7 @@ public class BookingRequest {
 
     public String getPurpose() { return purpose; }
     public void setPurpose(String purpose) { this.purpose = purpose; }
+
+    public Integer getExpectedAttendees() { return expectedAttendees; }
+    public void setExpectedAttendees(Integer expectedAttendees) { this.expectedAttendees = expectedAttendees; }
 }

@@ -52,6 +52,14 @@ public class BookingService {
         if (!request.getEndTime().isAfter(request.getStartTime())) {
             throw new IllegalArgumentException("End time must be after start time");
         }
+        if (request.getExpectedAttendees() != null && request.getExpectedAttendees() < 1) {
+            throw new IllegalArgumentException("Expected attendees must be at least 1");
+        }
+        if (request.getExpectedAttendees() != null
+                && resource.getCapacity() != null
+                && request.getExpectedAttendees() > resource.getCapacity()) {
+            throw new IllegalArgumentException("Expected attendees cannot exceed resource capacity");
+        }
 
         // Validate no overlaps
         checkOverlap(resource.getId(), request.getDate(), request.getStartTime(), request.getEndTime());
@@ -69,6 +77,7 @@ public class BookingService {
         booking.setStartTime(request.getStartTime());
         booking.setEndTime(request.getEndTime());
         booking.setPurpose(request.getPurpose());
+        booking.setExpectedAttendees(request.getExpectedAttendees());
         booking.setStatus("PENDING");
 
         return bookingRepository.save(booking);
@@ -78,7 +87,7 @@ public class BookingService {
         List<Booking> existingBookings = bookingRepository.findByResourceIdAndDateAndStatusIn(
                 resourceId,
                 date,
-                List.of("PENDING", "CONFIRMED"));
+                List.of("PENDING", "APPROVED", "CONFIRMED"));
 
         for (Booking b : existingBookings) {
             if (start.isBefore(b.getEndTime()) && b.getStartTime().isBefore(end)) {
@@ -111,16 +120,23 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    public Booking updateBookingStatus(String bookingId, String status) {
+    public Booking updateBookingStatus(String bookingId, String status, String reason) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NoSuchElementException("Booking not found"));
 
         String normalized = status != null ? status.trim().toUpperCase() : "";
-        if (!List.of("PENDING", "CONFIRMED", "REJECTED", "CANCELLED").contains(normalized)) {
+        if ("CONFIRMED".equals(normalized)) {
+            normalized = "APPROVED";
+        }
+        if (!List.of("PENDING", "APPROVED", "REJECTED", "CANCELLED").contains(normalized)) {
             throw new IllegalArgumentException("Invalid booking status: " + status);
+        }
+        if ("REJECTED".equals(normalized) && (reason == null || reason.trim().isEmpty())) {
+            throw new IllegalArgumentException("Rejection reason is required");
         }
 
         booking.setStatus(normalized);
+        booking.setRejectionReason("REJECTED".equals(normalized) ? reason.trim() : null);
         return bookingRepository.save(booking);
     }
 }

@@ -8,12 +8,18 @@ import { createBooking, fetchMyBookings, cancelBooking } from "../services/booki
 
 const STATUS_STYLES = {
   PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+  APPROVED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
   CONFIRMED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+  REJECTED: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
   CANCELLED: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
 };
 
 function getTodayDateString() {
   return new Date().toISOString().split("T")[0];
+}
+
+function normalizeBookingStatus(status) {
+  return status === "CONFIRMED" ? "APPROVED" : status || "PENDING";
 }
 
 export default function ResourceBookingRedirectPage() {
@@ -30,6 +36,7 @@ export default function ResourceBookingRedirectPage() {
   const [startTime, setStartTime] = useState("09:00");
   const [endTime, setEndTime] = useState("10:00");
   const [purpose, setPurpose] = useState("");
+  const [expectedAttendees, setExpectedAttendees] = useState("1");
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(null);
@@ -85,6 +92,14 @@ export default function ResourceBookingRedirectPage() {
     if (!date) { setSubmitError("Please select a date."); return; }
     if (!startTime || !endTime) { setSubmitError("Please set start and end times."); return; }
     if (endTime <= startTime) { setSubmitError("End time must be after start time."); return; }
+    if (expectedAttendees && Number(expectedAttendees) < 1) {
+      setSubmitError("Expected attendees must be at least 1.");
+      return;
+    }
+    if (resource?.capacity && Number(expectedAttendees) > Number(resource.capacity)) {
+      setSubmitError(`Expected attendees cannot exceed this resource capacity (${resource.capacity}).`);
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -94,6 +109,7 @@ export default function ResourceBookingRedirectPage() {
         startTime,
         endTime,
         purpose: purpose.trim(),
+        expectedAttendees: expectedAttendees ? Number(expectedAttendees) : null,
       });
       setSubmitSuccess(result);
       setPurpose("");
@@ -136,8 +152,8 @@ export default function ResourceBookingRedirectPage() {
           change: "Awaiting confirmation",
         },
         {
-          label: "Confirmed",
-          value: String(myBookings.filter((b) => b.status === "CONFIRMED").length),
+          label: "Approved",
+          value: String(myBookings.filter((b) => normalizeBookingStatus(b.status) === "APPROVED").length),
           change: "Approved",
         },
         {
@@ -296,6 +312,25 @@ export default function ResourceBookingRedirectPage() {
                     </div>
                   </div>
 
+                  <div className="space-y-1.5">
+                    <label
+                      htmlFor="booking-attendees"
+                      className="block text-sm font-medium text-slate-700 dark:text-slate-200"
+                    >
+                      Expected Attendees
+                    </label>
+                    <input
+                      id="booking-attendees"
+                      type="number"
+                      min="1"
+                      max={resource?.capacity || undefined}
+                      value={expectedAttendees}
+                      onChange={(e) => setExpectedAttendees(e.target.value.replace(/[^\d]/g, ""))}
+                      disabled={submitting}
+                      className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200 disabled:opacity-60 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+                    />
+                  </div>
+
                   {/* Purpose */}
                   <div className="space-y-1.5">
                     <label
@@ -339,7 +374,7 @@ export default function ResourceBookingRedirectPage() {
                           Submitting…
                         </>
                       ) : (
-                        "Confirm Booking"
+                        "Submit Booking Request"
                       )}
                     </button>
                     <button
@@ -389,14 +424,24 @@ export default function ResourceBookingRedirectPage() {
                           {booking.purpose}
                         </p>
                       )}
+                      {booking.expectedAttendees && (
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                          Expected attendees: {booking.expectedAttendees}
+                        </p>
+                      )}
+                      {booking.rejectionReason && (
+                        <p className="text-xs font-medium text-rose-600 dark:text-rose-300">
+                          Reason: {booking.rejectionReason}
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLES[booking.status] || "bg-slate-100 text-slate-600"}`}
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLES[normalizeBookingStatus(booking.status)] || "bg-slate-100 text-slate-600"}`}
                       >
-                        {booking.status}
+                        {normalizeBookingStatus(booking.status)}
                       </span>
-                      {booking.status === "PENDING" && (
+                      {["PENDING", "APPROVED"].includes(normalizeBookingStatus(booking.status)) && (
                         <button
                           type="button"
                           onClick={() => handleCancel(booking.id)}

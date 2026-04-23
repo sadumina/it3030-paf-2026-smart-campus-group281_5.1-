@@ -24,7 +24,9 @@ public class Booking {
     private LocalTime endTime;
 
     private String purpose;
-    private String status; // PENDING | CONFIRMED | REJECTED | CANCELLED
+    private Integer expectedAttendees;
+    private String rejectionReason;
+    private String status; // PENDING | APPROVED | REJECTED | CANCELLED
 
     public Booking() {}
 
@@ -59,6 +61,12 @@ public class Booking {
 
     public String getPurpose() { return purpose; }
     public void setPurpose(String purpose) { this.purpose = purpose; }
+
+    public Integer getExpectedAttendees() { return expectedAttendees; }
+    public void setExpectedAttendees(Integer expectedAttendees) { this.expectedAttendees = expectedAttendees; }
+
+    public String getRejectionReason() { return rejectionReason; }
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }

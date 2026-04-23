@@ -85,7 +85,7 @@ public class BookingController {
             @PathVariable String id,
             @RequestBody BookingStatusUpdateRequest request) {
         try {
-            Booking booking = bookingService.updateBookingStatus(id, request.getStatus());
+            Booking booking = bookingService.updateBookingStatus(id, request.getStatus(), request.getReason());
             return ResponseEntity.ok(booking);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
