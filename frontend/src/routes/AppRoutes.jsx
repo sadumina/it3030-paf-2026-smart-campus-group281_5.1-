@@ -4,11 +4,16 @@ import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
+import ResourceCataloguePage from "../pages/ResourceCataloguePage";
+import ResourceBookingRedirectPage from "../pages/ResourceBookingRedirectPage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
+import AdminResourceMatrixPage from "../pages/AdminResourceMatrixPage";
+import AdminApprovalsPage from "../pages/AdminApprovalsPage";
 import AdminUsersPage from "../pages/AdminUsersPage";
 import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 import TechnicianDashboardPage from "../pages/TechnicianDashboardPage";
 import InnovationLabPage from "../pages/InnovationLabPage";
+import ResourceFormPage from "../pages/ResourceFormPage";
 import TicketingPage from "../pages/ticketing/TicketingPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { fetchCurrentUser } from "../services/authService";
@@ -92,6 +97,22 @@ export default function AppRoutes() {
           }
         />
         <Route
+          path="/dashboard/resources"
+          element={
+            <ProtectedRoute allowedRoles={["USER"]}>
+              <ResourceCataloguePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/book-resource"
+          element={
+            <ProtectedRoute allowedRoles={["USER"]}>
+              <ResourceBookingRedirectPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/tickets"
           element={
             <ProtectedRoute>
@@ -104,6 +125,38 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
               <AdminDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/resources"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+              <AdminResourceMatrixPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/resources/create"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+              <ResourceFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/resources/:id/edit"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+              <ResourceFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/approvals"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+              <AdminApprovalsPage />
             </ProtectedRoute>
           }
         />

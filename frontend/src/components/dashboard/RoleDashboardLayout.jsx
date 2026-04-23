@@ -147,6 +147,7 @@ export default function RoleDashboardLayout({
   chartColor,
   extraContent,
   showInsightsPanel = true,
+  showNotifications = true,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -308,13 +309,15 @@ export default function RoleDashboardLayout({
                   <Search className="h-3.5 w-3.5" />
                   Search
                 </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
-                >
-                  <BellDot className="h-3.5 w-3.5" />
-                  Alerts
-                </button>
+                {showNotifications ? (
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                  >
+                    <BellDot className="h-3.5 w-3.5" />
+                    Alerts
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   onClick={handleExportPDF}
@@ -380,6 +383,32 @@ export default function RoleDashboardLayout({
               })}
             </div>
 
+            {quickActions?.some((action) => action.label || action.onClick) ? (
+              <div className="flex flex-wrap gap-2">
+                {quickActions
+                  .filter((action) => action.label || action.onClick)
+                  .map((action, index) => {
+                    const ActionIcon = action.icon;
+                    const isPrimary = action.variant === "primary";
+                    return (
+                      <button
+                        key={action.label || index}
+                        type="button"
+                        onClick={action.onClick}
+                        className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
+                          isPrimary
+                            ? "bg-[#a1452b] text-white shadow-lg shadow-[#a1452b]/25 hover:bg-[#873922]"
+                            : "border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700"
+                        }`}
+                      >
+                        {ActionIcon ? <ActionIcon className="h-4 w-4" /> : null}
+                        {action.label || action.title}
+                      </button>
+                    );
+                  })}
+              </div>
+            ) : null}
+
             {showInsightsPanel ? (
               <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_280px]">
                 <section className="flex flex-col rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
@@ -420,7 +449,7 @@ export default function RoleDashboardLayout({
                     </div>
                   </section>
 
-                  <NotificationPanel />
+                  {showNotifications ? <NotificationPanel /> : null}
                 </div>
               </div>
             ) : null}

@@ -13,9 +13,9 @@ import {
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Approvals", badge: "18", icon: ClipboardCheck },
+  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/approvals" },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
-  { label: "Resource Matrix", icon: LayoutGrid },
+  { label: "Resource Matrix", icon: LayoutGrid, path: "/admin/resources" },
   { label: "User Management", icon: Users, path: "/admin/users" },
   { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
   { label: "Incidents", badge: "6", icon: Siren },
