@@ -10,10 +10,10 @@ import {
 } from "lucide-react";
 
 const userSidebar = [
-  { label: "Overview", icon: LayoutDashboard },
+  { label: "Overview", icon: LayoutDashboard, path: "/dashboard" },
   { label: "My Bookings", badge: "7", icon: CalendarDays },
   { label: "New Reservation", icon: PlusCircle },
-  { label: "Incident Reports", icon: TriangleAlert },
+  { label: "Incident Reports", icon: TriangleAlert, path: "/tickets" },
   { label: "Availability", icon: CalendarClock },
   { label: "Support", icon: LifeBuoy },
 ];
@@ -33,10 +33,10 @@ const userActions = [
 ];
 
 const userActivity = [
-  { title: "Lab C12 reservation approved", meta: "5 minutes ago · scheduling" },
-  { title: "Incident #REP-087 assigned", meta: "13 minutes ago · building services" },
-  { title: "Classroom B03 availability updated", meta: "22 minutes ago · resource system" },
-  { title: "Reminder sent for tomorrow booking", meta: "31 minutes ago · smart notifications" },
+  { title: "Lab C12 reservation approved", meta: "5 minutes ago - scheduling" },
+  { title: "Incident #REP-087 assigned", meta: "13 minutes ago - building services" },
+  { title: "Classroom B03 availability updated", meta: "22 minutes ago - resource system" },
+  { title: "Reminder sent for tomorrow booking", meta: "31 minutes ago - smart notifications" },
 ];
 
 export default function DashboardPage() {

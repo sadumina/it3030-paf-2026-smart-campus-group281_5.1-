@@ -9,6 +9,7 @@ import AdminUsersPage from "../pages/AdminUsersPage";
 import AnalyticsDashboardPage from "../pages/AnalyticsDashboardPage";
 import TechnicianDashboardPage from "../pages/TechnicianDashboardPage";
 import InnovationLabPage from "../pages/InnovationLabPage";
+import TicketingPage from "../pages/ticketing/TicketingPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { fetchCurrentUser } from "../services/authService";
 import { clearAuth, getAuth, getToken, saveAuth } from "../services/authStorage";
@@ -87,6 +88,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["USER"]}>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/tickets"
+          element={
+            <ProtectedRoute>
+              <TicketingPage />
             </ProtectedRoute>
           }
         />
