@@ -30,3 +30,14 @@ export const rejectBooking = (id, reason) =>
   });
 export const cancelBooking = (id) =>
   axios.put(`${API_URL}/${id}/cancel`, null, authConfig());
+
+// Student soft-deletes a PENDING booking (permanently removed after 7 days)
+export const deleteBooking = (id, userId) =>
+  axios.delete(`${API_URL}/${id}`, {
+    params: { userId },
+    ...authConfig(),
+  });
+
+// Admin: fetch all soft-deleted bookings
+export const getDeletedBookings = () =>
+  axios.get(`${API_URL}/deleted`, authConfig());

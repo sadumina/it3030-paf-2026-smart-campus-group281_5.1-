@@ -11,6 +11,10 @@ import {
   BarChart3,
   Search,
   ChartBar,
+  Trash2,
+  ChevronDown,
+  ChevronRight,
+  Clock,
 } from "lucide-react";
 
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
@@ -27,6 +31,7 @@ import {
   cancelBooking,
   getAllBookings,
   rejectBooking,
+  getDeletedBookings,
 } from "../services/bookingService";
 
 const adminSidebar = [
@@ -51,6 +56,7 @@ const statusStyles = {
   APPROVED: "bg-emerald-100 text-emerald-700 border-emerald-200",
   REJECTED: "bg-rose-100 text-rose-700 border-rose-200",
   CANCELLED: "bg-slate-100 text-slate-700 border-slate-200",
+  DELETED: "bg-rose-50 text-rose-600 border-rose-200",
 };
 
 function formatDateTime(value) {
@@ -90,6 +96,11 @@ export default function AdminBookingsPage() {
   const [reasonById, setReasonById] = useState({});
   const [busyId, setBusyId] = useState(null);
 
+  // Deleted bookings state
+  const [deletedBookings, setDeletedBookings] = useState([]);
+  const [deletedLoading, setDeletedLoading] = useState(false);
+  const [showDeleted, setShowDeleted] = useState(false);
+
   // Confirmation Modal State
   const [confirmModal, setConfirmModal] = useState({
     isOpen: false,
@@ -115,8 +126,21 @@ export default function AdminBookingsPage() {
     }
   };
 
+  const loadDeletedBookings = async () => {
+    setDeletedLoading(true);
+    try {
+      const response = await getDeletedBookings();
+      setDeletedBookings(response.data || []);
+    } catch (_) {
+      setDeletedBookings([]);
+    } finally {
+      setDeletedLoading(false);
+    }
+  };
+
   useEffect(() => {
     loadBookings();
+    loadDeletedBookings();
   }, []);
 
   const filteredBookings = useMemo(() => {
@@ -576,6 +600,138 @@ export default function AdminBookingsPage() {
                 })}
               </div>
             )}
+
+            {/* ── Deleted Bookings Section ── */}
+            <section className="mt-6 rounded-xl border border-rose-200/70 dark:border-rose-700/40 bg-rose-50/40 dark:bg-rose-900/10 shadow-sm">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowDeleted((prev) => !prev);
+                  if (!showDeleted) loadDeletedBookings();
+                }}
+                className="flex w-full items-center justify-between px-5 py-3.5 text-left"
+              >
+                <div className="flex items-center gap-2">
+                  <Trash2 className="h-4 w-4 text-rose-500 dark:text-rose-400" />
+                  <span className="text-sm font-semibold text-rose-700 dark:text-rose-300">
+                    Deleted Bookings
+                  </span>
+                  {deletedBookings.length > 0 && (
+                    <span className="rounded-full bg-rose-200 dark:bg-rose-800 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:text-rose-200">
+                      {deletedBookings.length}
+                    </span>
+                  )}
+                </div>
+                {showDeleted ? (
+                  <ChevronDown className="h-4 w-4 text-rose-400" />
+                ) : (
+                  <ChevronRight className="h-4 w-4 text-rose-400" />
+                )}
+              </button>
+
+              {showDeleted && (
+                <div className="border-t border-rose-200/70 dark:border-rose-700/40 px-5 pb-5 pt-4">
+                  <p className="mb-3 text-xs text-rose-600 dark:text-rose-400">
+                    These bookings were soft-deleted by students and will be
+                    permanently purged{" "}
+                    <span className="font-semibold">7 days</span> after deletion.
+                  </p>
+
+                  {deletedLoading ? (
+                    <div className="space-y-2 animate-pulse">
+                      <div className="h-14 rounded-lg bg-rose-100 dark:bg-rose-900/30" />
+                      <div className="h-14 rounded-lg bg-rose-100 dark:bg-rose-900/30" />
+                    </div>
+                  ) : deletedBookings.length === 0 ? (
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      No deleted bookings found.
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {deletedBookings.map((b) => {
+                        const deletedAt = b.deletedAt ? new Date(b.deletedAt) : null;
+                        const purgeDate = deletedAt
+                          ? new Date(deletedAt.getTime() + 7 * 24 * 60 * 60 * 1000)
+                          : null;
+                        const daysLeft = purgeDate
+                          ? Math.max(
+                              0,
+                              Math.ceil(
+                                (purgeDate - Date.now()) / (1000 * 60 * 60 * 24),
+                              ),
+                            )
+                          : null;
+
+                        return (
+                          <div
+                            key={b.id}
+                            className="rounded-xl border border-rose-200/60 dark:border-rose-700/40 bg-white dark:bg-slate-800 p-4 shadow-sm"
+                          >
+                            <div className="flex flex-wrap items-start justify-between gap-2">
+                              <div>
+                                <p className="text-[10px] uppercase tracking-widest text-slate-400 dark:text-slate-500">
+                                  BOOKING ID
+                                </p>
+                                <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                                  {String(b.id).slice(0, -4)}
+                                  <span className="text-rose-500">{String(b.id).slice(-4)}</span>
+                                </p>
+                              </div>
+                              <span className={`inline-flex rounded-full border px-3 py-0.5 text-xs font-semibold ${statusStyles.DELETED}`}>
+                                DELETED
+                              </span>
+                            </div>
+
+                            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 text-xs">
+                              <div>
+                                <p className="text-slate-400 dark:text-slate-500 font-medium">RESOURCE</p>
+                                <p className="mt-0.5 font-semibold text-slate-700 dark:text-slate-200">{b.resourceId}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400 dark:text-slate-500 font-medium">USER</p>
+                                <p className="mt-0.5 font-semibold text-slate-700 dark:text-slate-200">{b.userId}</p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400 dark:text-slate-500 font-medium">DELETED AT</p>
+                                <p className="mt-0.5 font-semibold text-slate-700 dark:text-slate-200">
+                                  {deletedAt
+                                    ? deletedAt.toLocaleString("en-GB", {
+                                        day: "2-digit",
+                                        month: "short",
+                                        year: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      })
+                                    : "-"}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-slate-400 dark:text-slate-500 font-medium">PURGE IN</p>
+                                <p className={`mt-0.5 font-bold flex items-center gap-1 ${
+                                  daysLeft !== null && daysLeft <= 1
+                                    ? "text-rose-600 dark:text-rose-400"
+                                    : "text-amber-600 dark:text-amber-400"
+                                }`}>
+                                  <Clock className="h-3 w-3" />
+                                  {daysLeft !== null ? `${daysLeft}d` : "-"}
+                                </p>
+                              </div>
+                            </div>
+
+                            {b.purpose && (
+                              <div className="mt-2 rounded-lg bg-slate-50 dark:bg-slate-700/60 border border-slate-100 dark:border-slate-600 p-2">
+                                <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">PURPOSE</p>
+                                <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">{b.purpose}</p>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
           </section>
         }
       />

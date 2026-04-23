@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.backend.backend.dto.BookingRequestDTO;
@@ -58,12 +59,15 @@ public class BookingService {
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
     }
 
-    // NEW - User sees only their own bookings
+    // User sees only their own bookings (excluding DELETED ones)
     public List<Booking> getMyBookings(String userId) {
-        return bookingRepository.findByUserId(userId);
+        return bookingRepository.findByUserId(userId)
+                .stream()
+                .filter(b -> b.getStatus() != BookingStatus.DELETED)
+                .toList();
     }
 
-    // WORKFLOW: Approve (only PENDING → APPROVED)
+    // WORKFLOW: Approve (only PENDING -> APPROVED)
     public Booking approveBooking(String id, String adminId) {
         Booking booking = getBookingById(id);
         if (booking.getStatus() != BookingStatus.PENDING) {
@@ -74,7 +78,7 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    // WORKFLOW: Reject (only PENDING → REJECTED)
+    // WORKFLOW: Reject (only PENDING -> REJECTED)
     public Booking rejectBooking(String id, String reason) {
         Booking booking = getBookingById(id);
         if (booking.getStatus() != BookingStatus.PENDING) {
@@ -85,7 +89,7 @@ public class BookingService {
         return bookingRepository.save(booking);
     }
 
-    // WORKFLOW: Cancel (only APPROVED → CANCELLED)
+    // WORKFLOW: Cancel (only APPROVED -> CANCELLED)
     public Booking cancelBooking(String id) {
         Booking booking = getBookingById(id);
         if (booking.getStatus() != BookingStatus.APPROVED) {
@@ -93,5 +97,35 @@ public class BookingService {
         }
         booking.setStatus(BookingStatus.CANCELLED);
         return bookingRepository.save(booking);
+    }
+
+    // WORKFLOW: Student soft-deletes (only PENDING -> DELETED)
+    public Booking softDeleteBooking(String id, String userId) {
+        Booking booking = getBookingById(id);
+        if (booking.getStatus() != BookingStatus.PENDING) {
+            throw new RuntimeException("Only PENDING bookings can be deleted");
+        }
+        if (!booking.getUserId().equals(userId)) {
+            throw new RuntimeException("You can only delete your own bookings");
+        }
+        booking.setStatus(BookingStatus.DELETED);
+        booking.setDeletedAt(LocalDateTime.now());
+        return bookingRepository.save(booking);
+    }
+
+    // Admin: get all soft-deleted bookings sorted newest first
+    public List<Booking> getDeletedBookings() {
+        return bookingRepository.findByStatusOrderByDeletedAtDesc(BookingStatus.DELETED);
+    }
+
+    // Scheduled: permanently remove DELETED bookings older than 7 days (runs at midnight daily)
+    @Scheduled(cron = "0 0 0 * * *")
+    public void purgeOldDeletedBookings() {
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(7);
+        List<Booking> toDelete =
+                bookingRepository.findByStatusAndDeletedAtBefore(BookingStatus.DELETED, cutoff);
+        if (!toDelete.isEmpty()) {
+            bookingRepository.deleteAll(toDelete);
+        }
     }
 }

@@ -26,6 +26,9 @@ public class Booking {
     private String rejectionReason;
     private String approvedBy;
 
+    // Soft-delete support: set when student deletes a PENDING booking
+    private LocalDateTime deletedAt;
+
     @CreatedDate
     private LocalDateTime createdAt;
 }

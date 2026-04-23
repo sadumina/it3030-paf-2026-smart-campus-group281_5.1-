@@ -1,5 +1,5 @@
 package com.backend.backend.model;
 
 public enum BookingStatus {
-    PENDING, APPROVED, REJECTED, CANCELLED
+    PENDING, APPROVED, REJECTED, CANCELLED, CONFIRMED, DELETED
 }

@@ -27,9 +27,9 @@ public class BookingController {
     public List<Booking> getAllBookings() {
         return bookingService.getAllBookings();
     }
-    
+
     @GetMapping("/my")
-    public List<Booking> getMyBookings(@RequestParam String userId) {   // temporary
+    public List<Booking> getMyBookings(@RequestParam String userId) {
         return bookingService.getMyBookings(userId);
     }
 
@@ -53,4 +53,15 @@ public class BookingController {
         return bookingService.cancelBooking(id);
     }
 
+    // Student soft-deletes a PENDING booking; userId ensures ownership check
+    @DeleteMapping("/{id}")
+    public Booking softDeleteBooking(@PathVariable String id, @RequestParam String userId) {
+        return bookingService.softDeleteBooking(id, userId);
+    }
+
+    // Admin: list all soft-deleted bookings
+    @GetMapping("/deleted")
+    public List<Booking> getDeletedBookings() {
+        return bookingService.getDeletedBookings();
+    }
 }

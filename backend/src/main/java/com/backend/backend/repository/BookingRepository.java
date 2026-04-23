@@ -22,4 +22,10 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
     List<Booking> findByUserId(String userId);
 
     List<Booking> findByStatus(BookingStatus status);
+
+    // Find all soft-deleted bookings (for admin dashboard)
+    List<Booking> findByStatusOrderByDeletedAtDesc(BookingStatus status);
+
+    // Find DELETED bookings whose deletedAt is before a given cutoff (for 7-day purge)
+    List<Booking> findByStatusAndDeletedAtBefore(BookingStatus status, LocalDateTime cutoff);
 }
