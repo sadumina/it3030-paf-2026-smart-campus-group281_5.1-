@@ -181,16 +181,23 @@ public class TicketController {
         }
     }
 
-    // ─── DELETE /api/tickets/{id} — Delete (Admin) ────────────────────────────
+    // ─── DELETE /api/tickets/{id} — Delete (Admin or creator) ─────────────────
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTicket(@PathVariable String id, Authentication auth) {
         User user = getUser(auth);
-        if (!"ADMIN".equals(user.getRole())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Admin only"));
+        Optional<Ticket> existing = ticketService.getTicketById(id);
+        if (existing.isEmpty()) {
+            return ResponseEntity.notFound().build();
         }
-        boolean deleted = ticketService.deleteTicket(id);
-        return deleted ? ResponseEntity.noContent().build()
-                : ResponseEntity.notFound().build();
+        Ticket ticket = existing.get();
+        boolean isAdmin = "ADMIN".equals(user.getRole());
+        boolean isCreator = user.getId().equals(ticket.getCreatedByUserId());
+        if (!isAdmin && !isCreator) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access denied"));
+        }
+
+        boolean deleted = ticketService.deleteTicket(id, user);
+        return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }
 
     // ─── POST /api/tickets/{id}/upload — Upload images ────────────────────────

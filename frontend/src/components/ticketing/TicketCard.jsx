@@ -23,7 +23,16 @@ function formatDate(iso) {
   });
 }
 
-export default function TicketCard({ ticket, onClick, adminControls, technicians, onAssign }) {
+export default function TicketCard({
+  ticket,
+  onClick,
+  adminControls,
+  technicians,
+  onAssign,
+  showDelete,
+  deleting,
+  onDelete,
+}) {
   const isActive = ["OPEN", "IN_PROGRESS"].includes(ticket.status);
 
   return (
@@ -100,6 +109,18 @@ export default function TicketCard({ ticket, onClick, adminControls, technicians
           By {ticket.createdByName}
         </span>
       </div>
+
+      {showDelete && (
+        <div className="tkt-card-actions" onClick={(e) => e.stopPropagation()}>
+          <button
+            className="tkt-card-delete-btn"
+            onClick={() => onDelete?.(ticket)}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting..." : "Delete Ticket"}
+          </button>
+        </div>
+      )}
 
       {/* Admin: Quick assign inline */}
       {adminControls && technicians?.length > 0 && ticket.status === "OPEN" && (

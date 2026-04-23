@@ -19,10 +19,10 @@ body {
   font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: radial-gradient(circle at 20% 10%, rgba(249,115,22,0.12), transparent 45%),
-    radial-gradient(circle at 80% 0%, rgba(14,165,233,0.12), transparent 45%),
-    #fdfcf8;
-  color: #0f172a;
+  background: radial-gradient(circle at 20% 10%, rgba(249,115,22,0.08), transparent 45%),
+    radial-gradient(circle at 80% 0%, rgba(249,115,22,0.05), transparent 45%),
+    #0f0f11;
+  color: #f4f4f5;
   line-height: 1.6;
 }
 
@@ -52,7 +52,7 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #18181b;
 }
 
 ::-webkit-scrollbar-thumb {

@@ -41,9 +41,9 @@ public class TicketService {
     private String serverPort;
 
     public TicketService(TicketRepository ticketRepository,
-                         TicketCommentRepository commentRepository,
-                         NotificationService notificationService,
-                         UserRepository userRepository) {
+            TicketCommentRepository commentRepository,
+            NotificationService notificationService,
+            UserRepository userRepository) {
         this.ticketRepository = ticketRepository;
         this.commentRepository = commentRepository;
         this.notificationService = notificationService;
@@ -65,7 +65,7 @@ public class TicketService {
 
     // ─── Create Ticket ───────────────────────────────────────────────────────
     public Ticket createTicket(String title, String description, String category,
-                               String priority, String location, String contactDetails, User creator) {
+            String priority, String location, String contactDetails, User creator) {
         Ticket ticket = new Ticket();
         ticket.setTicketId(generateTicketId());
         ticket.setTitle(title);
@@ -104,12 +104,12 @@ public class TicketService {
     // ─── Get Tickets (role-aware, with optional filters) ────────────────────
     public List<Ticket> getTicketsForUser(User user, String status, String priority, String category) {
         List<Ticket> tickets = switch (user.getRole()) {
-            case "ADMIN"      -> ticketRepository.findAllByOrderByCreatedAtDesc();
+            case "ADMIN" -> ticketRepository.findAllByOrderByCreatedAtDesc();
             case "TECHNICIAN" -> ticketRepository.findByAssignedTechnicianIdOrderByCreatedAtDesc(user.getId());
-            default           -> ticketRepository.findByCreatedByUserIdOrderByCreatedAtDesc(user.getId());
+            default -> ticketRepository.findByCreatedByUserIdOrderByCreatedAtDesc(user.getId());
         };
 
-        if (status   != null && !status.isBlank())
+        if (status != null && !status.isBlank())
             tickets = tickets.stream().filter(t -> status.equalsIgnoreCase(t.getStatus())).toList();
         if (priority != null && !priority.isBlank())
             tickets = tickets.stream().filter(t -> priority.equalsIgnoreCase(t.getPriority())).toList();
@@ -128,7 +128,8 @@ public class TicketService {
     // ─── Assign Technician (Admin only) ──────────────────────────────────────
     public Optional<Ticket> assignTechnician(String ticketId, String technicianId, User admin) {
         Optional<Ticket> opt = ticketRepository.findById(ticketId);
-        if (opt.isEmpty()) return Optional.empty();
+        if (opt.isEmpty())
+            return Optional.empty();
 
         Optional<User> techOpt = userRepository.findById(technicianId);
         if (techOpt.isEmpty() || !"TECHNICIAN".equals(techOpt.get().getRole())) {
@@ -142,7 +143,8 @@ public class TicketService {
         ticket.setAssignedTechnicianName(tech.getName());
         if ("OPEN".equals(ticket.getStatus())) {
             ticket.setStatus("IN_PROGRESS");
-            if (ticket.getFirstResponseAt() == null) ticket.setFirstResponseAt(Instant.now());
+            if (ticket.getFirstResponseAt() == null)
+                ticket.setFirstResponseAt(Instant.now());
         }
         ticket.setUpdatedAt(Instant.now());
 
@@ -172,10 +174,11 @@ public class TicketService {
 
     // ─── Update Status ────────────────────────────────────────────────────────
     public Optional<Ticket> updateStatus(String ticketId, String newStatus,
-                                         String resolutionNote, String rejectionReason,
-                                         User actor) {
+            String resolutionNote, String rejectionReason,
+            User actor) {
         Optional<Ticket> opt = ticketRepository.findById(ticketId);
-        if (opt.isEmpty()) return Optional.empty();
+        if (opt.isEmpty())
+            return Optional.empty();
 
         Ticket ticket = opt.get();
         String currentStatus = ticket.getStatus();
@@ -238,7 +241,8 @@ public class TicketService {
             default -> false;
         };
         if (!valid) {
-            throw new IllegalStateException("Invalid status transition: " + current + " → " + next + " for role " + role);
+            throw new IllegalStateException(
+                    "Invalid status transition: " + current + " → " + next + " for role " + role);
         }
     }
 
@@ -265,9 +269,11 @@ public class TicketService {
     public Optional<Ticket> addImageUrls(String ticketId, List<String> urls) {
         return ticketRepository.findById(ticketId).map(ticket -> {
             List<String> existing = ticket.getImageUrls();
-            if (existing == null) existing = new ArrayList<>();
+            if (existing == null)
+                existing = new ArrayList<>();
             for (String url : urls) {
-                if (existing.size() < 3) existing.add(url);
+                if (existing.size() < 3)
+                    existing.add(url);
             }
             ticket.setImageUrls(existing);
             ticket.setUpdatedAt(Instant.now());
@@ -278,7 +284,8 @@ public class TicketService {
     // ─── Delete a Single Image from Ticket ────────────────────────────────────
     public Optional<Ticket> deleteImage(String ticketId, String filename, User actor) {
         Optional<Ticket> opt = ticketRepository.findById(ticketId);
-        if (opt.isEmpty()) return Optional.empty();
+        if (opt.isEmpty())
+            return Optional.empty();
 
         Ticket ticket = opt.get();
         boolean isOwner = actor.getId().equals(ticket.getCreatedByUserId());
@@ -289,7 +296,8 @@ public class TicketService {
 
         String urlToRemove = "/uploads/tickets/" + filename;
         List<String> urls = ticket.getImageUrls();
-        if (urls == null || !urls.contains(urlToRemove)) return Optional.empty();
+        if (urls == null || !urls.contains(urlToRemove))
+            return Optional.empty();
 
         urls.remove(urlToRemove);
         ticket.setImageUrls(urls);
@@ -299,7 +307,8 @@ public class TicketService {
         try {
             Path filePath = Paths.get(uploadDir).resolve(filename);
             Files.deleteIfExists(filePath);
-        } catch (IOException ignored) {}
+        } catch (IOException ignored) {
+        }
 
         return Optional.of(ticketRepository.save(ticket));
     }
@@ -311,7 +320,8 @@ public class TicketService {
 
     public TicketComment addComment(String ticketId, String content, User author) {
         Optional<Ticket> ticketOpt = ticketRepository.findById(ticketId);
-        if (ticketOpt.isEmpty()) throw new IllegalArgumentException("Ticket not found");
+        if (ticketOpt.isEmpty())
+            throw new IllegalArgumentException("Ticket not found");
 
         Ticket ticket = ticketOpt.get();
         TicketComment comment = new TicketComment(
@@ -362,14 +372,24 @@ public class TicketService {
         } else {
             opt = commentRepository.findByIdAndAuthorId(commentId, actor.getId());
         }
-        if (opt.isEmpty()) return false;
+        if (opt.isEmpty())
+            return false;
         commentRepository.deleteById(commentId);
         return true;
     }
 
-    // ─── Delete Ticket (Admin only) ───────────────────────────────────────────
-    public boolean deleteTicket(String ticketId) {
-        if (!ticketRepository.existsById(ticketId)) return false;
+    // ─── Delete Ticket (Admin or Ticket Creator) ──────────────────────────────
+    public boolean deleteTicket(String ticketId, User actor) {
+        Optional<Ticket> ticketOpt = ticketRepository.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            return false;
+        }
+        Ticket ticket = ticketOpt.get();
+        boolean isAdmin = "ADMIN".equals(actor.getRole());
+        boolean isCreator = actor.getId().equals(ticket.getCreatedByUserId());
+        if (!isAdmin && !isCreator) {
+            return false;
+        }
         commentRepository.deleteAllByTicketId(ticketId);
         ticketRepository.deleteById(ticketId);
         return true;

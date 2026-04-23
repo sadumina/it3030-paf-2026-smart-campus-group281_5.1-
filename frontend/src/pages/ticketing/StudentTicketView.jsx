@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import { fetchTickets } from "../../services/ticketService";
+import { deleteTicket, fetchTickets } from "../../services/ticketService";
 import { getAuth } from "../../services/authStorage";
 import TicketCard from "../../components/ticketing/TicketCard";
 import CreateTicketModal from "../../components/ticketing/CreateTicketModal";
@@ -35,6 +35,7 @@ export default function StudentTicketView() {
   const [categoryFilter, setCategory] = useState("ALL");
   const [showCreate, setShowCreate]   = useState(false);
   const [selectedTicket, setSelected] = useState(null);
+  const [deletingTicketId, setDeletingTicketId] = useState(null);
   const initialized = useRef(false);
 
   // Initial load — fetch all once for count badges
@@ -96,6 +97,24 @@ export default function StudentTicketView() {
 
   const clearFilters = () => {
     setStatus("ALL"); setPriority("ALL"); setCategory("ALL"); setKeyword("");
+  };
+
+  const handleDeleteTicket = async (ticket) => {
+    const confirmed = window.confirm(`Delete ticket ${ticket.ticketId}? This action cannot be undone.`);
+    if (!confirmed) return;
+    setDeletingTicketId(ticket.id);
+    try {
+      await deleteTicket(ticket.id);
+      setAllTickets((prev) => prev.filter((t) => t.id !== ticket.id));
+      setApiTickets((prev) => prev.filter((t) => t.id !== ticket.id));
+      if (selectedTicket?.id === ticket.id) {
+        setSelected(null);
+      }
+    } catch (err) {
+      window.alert(err?.message || "Failed to delete ticket");
+    } finally {
+      setDeletingTicketId(null);
+    }
   };
 
   return (
@@ -225,7 +244,14 @@ export default function StudentTicketView() {
         ) : (
           <div className="tkt-cards-grid">
             {filtered.map(t => (
-              <TicketCard key={t.id} ticket={t} onClick={() => setSelected(t)} />
+              <TicketCard
+                key={t.id}
+                ticket={t}
+                onClick={() => setSelected(t)}
+                showDelete
+                deleting={deletingTicketId === t.id}
+                onDelete={handleDeleteTicket}
+              />
             ))}
           </div>
         )}
