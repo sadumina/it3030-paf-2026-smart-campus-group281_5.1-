@@ -33,6 +33,7 @@ public class ResourceController {
     }
 
     @GetMapping
+    @PreAuthorize("permitAll()")
     public ResponseEntity<List<Resource>> getAllResources(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Integer minCapacity,
@@ -55,6 +56,7 @@ public class ResourceController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Resource> getResourceById(@PathVariable String id) {
         try {
             return new ResponseEntity<>(resourceService.getResourceById(id), HttpStatus.OK);
@@ -64,6 +66,7 @@ public class ResourceController {
     }
 
     @GetMapping("/{id}/booking-context")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Resource> getBookingContext(@PathVariable String id) {
         try {
             return new ResponseEntity<>(resourceService.getResourceById(id), HttpStatus.OK);

@@ -2,6 +2,7 @@ package com.backend.backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -38,9 +39,17 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/health", "/api/users/db-test").permitAll()
                         .requestMatchers("/uploads/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/resources").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/resources/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/resources").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/resources/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/resources/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/resources/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/resources/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                         .requestMatchers("/api/users/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                         .requestMatchers("/api/tickets/**").authenticated()
                         .anyRequest().authenticated())

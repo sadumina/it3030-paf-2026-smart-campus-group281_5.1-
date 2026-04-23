@@ -37,7 +37,8 @@ export default function ResourceFormPage() {
 
   // Check admin role
   useEffect(() => {
-    if (getRole() !== "ADMIN") {
+    const role = (getRole() || "").toUpperCase();
+    if (role !== "ADMIN" && role !== "SUPER_ADMIN") {
       navigate("/");
     }
   }, [navigate]);

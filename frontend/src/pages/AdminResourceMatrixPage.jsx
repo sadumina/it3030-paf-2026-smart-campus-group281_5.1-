@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   Shield,
   ClipboardCheck,
@@ -14,6 +13,7 @@ import {
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
 import ResourceCatalogueContent from "../features/resources/components/ResourceCatalogueContent";
+import ResourceFormModal from "../features/resources/components/ResourceFormModal";
 import StatusChangeModal from "../features/resources/components/StatusChangeModal";
 import { deleteResource, fetchResources } from "../services/resourceService";
 
@@ -36,7 +36,6 @@ const defaultFilters = {
 };
 
 export default function AdminResourceMatrixPage() {
-  const navigate = useNavigate();
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -44,20 +43,22 @@ export default function AdminResourceMatrixPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState("");
   const [statusChangeTarget, setStatusChangeTarget] = useState(null);
+  const [formTarget, setFormTarget] = useState(null);
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
-  async function loadResources(activeGuard = () => true, silent = false) {
+  async function loadResources(activeGuard = () => true, silent = false, filterSnapshot = filters) {
     try {
       if (!silent) {
         setLoading(true);
       }
       setError("");
       const normalizedCapacity =
-        filters.minCapacity === "" || Number.isNaN(Number(filters.minCapacity))
+        filterSnapshot.minCapacity === "" || Number.isNaN(Number(filterSnapshot.minCapacity))
           ? ""
-          : Number(filters.minCapacity);
+          : Number(filterSnapshot.minCapacity);
 
       const data = await fetchResources({
-        ...filters,
+        ...filterSnapshot,
         minCapacity: normalizedCapacity,
       });
 
@@ -125,7 +126,32 @@ export default function AdminResourceMatrixPage() {
     if (!resource?.id) {
       return;
     }
-    navigate(`/admin/resources/${resource.id}/edit`);
+    setFormTarget(resource);
+    setIsFormOpen(true);
+  }
+
+  function handleCreateResource() {
+    setFormTarget(null);
+    setIsFormOpen(true);
+  }
+
+  async function handleResourceSaved(saved, { isEditMode } = {}) {
+    setActionError("");
+
+    if (isEditMode && saved?.id) {
+      setResources((current) =>
+        current.map((resource) => (resource.id === saved.id ? { ...resource, ...saved } : resource)),
+      );
+      return;
+    }
+
+    setFilters(defaultFilters);
+    try {
+      const data = await fetchResources(defaultFilters);
+      setResources(data);
+    } catch (requestError) {
+      setActionError(requestError.message || "Resource saved, but the list could not refresh.");
+    }
   }
 
   async function handleDeleteResource(resource) {
@@ -175,7 +201,7 @@ export default function AdminResourceMatrixPage() {
         {
           label: "Create Resource",
           icon: Plus,
-          onClick: () => navigate("/admin/resources/create"),
+          onClick: handleCreateResource,
           variant: "primary",
         },
       ]}
@@ -189,6 +215,24 @@ export default function AdminResourceMatrixPage() {
       chartColor="#ea580c"
       extraContent={
         <>
+          <section className="rounded-lg border border-orange-200 bg-orange-50 p-4 shadow-sm dark:border-orange-900/40 dark:bg-orange-950/20">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Resource Matrix Controls</h2>
+                <p className="mt-1 text-xs text-slate-700 dark:text-slate-300">
+                  Create a new resource here, then manage status, edits, and bookings from the cards below.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleCreateResource}
+                className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-orange-600/20 transition hover:bg-orange-700"
+              >
+                <Plus className="h-4 w-4" />
+                Create Resource
+              </button>
+            </div>
+          </section>
           <ResourceCatalogueContent
             resources={resources}
             filters={filters}
@@ -207,6 +251,15 @@ export default function AdminResourceMatrixPage() {
             isOpen={statusChangeTarget !== null}
             onClose={() => setStatusChangeTarget(null)}
             onSuccess={handleStatusChangeSuccess}
+          />
+          <ResourceFormModal
+            isOpen={isFormOpen}
+            resource={formTarget}
+            onClose={() => {
+              setIsFormOpen(false);
+              setFormTarget(null);
+            }}
+            onSaved={handleResourceSaved}
           />
         </>
       }

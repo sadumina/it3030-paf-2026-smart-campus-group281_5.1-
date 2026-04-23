@@ -20,6 +20,10 @@ function getAuthHeaders() {
   };
 }
 
+function getReadHeaders() {
+  return {};
+}
+
 export async function fetchResources(filters = {}) {
   const params = new URLSearchParams();
 
@@ -43,7 +47,7 @@ export async function fetchResources(filters = {}) {
 
   const response = await fetch(requestUrl, {
     method: "GET",
-    headers: getAuthHeaders(),
+    headers: getReadHeaders(),
   });
 
   const data = await parseResponse(response);
@@ -57,7 +61,7 @@ export async function fetchResourceById(resourceId) {
 
   const response = await fetch(`${API_BASE_URL}/${resourceId}`, {
     method: "GET",
-    headers: getAuthHeaders(),
+    headers: getReadHeaders(),
   });
 
   const data = await parseResponse(response);
@@ -139,7 +143,7 @@ export async function fetchResourceBookingContext(resourceId) {
 
   const response = await fetch(`${API_BASE_URL}/${resourceId}/booking-context`, {
     method: "GET",
-    headers: getAuthHeaders(),
+    headers: getReadHeaders(),
   });
 
   const data = await parseResponse(response);
