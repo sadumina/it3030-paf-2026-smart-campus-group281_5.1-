@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * Firebase Authentication Service
@@ -36,17 +38,28 @@ public class FirebaseAuthenticationService {
      * Initialize Firebase with service account credentials
      */
     private void initializeFirebase(String credentialsPath) throws IOException {
-        if (FirebaseApp.getApps().isEmpty()) {
-            FileInputStream serviceAccount = new FileInputStream(credentialsPath);
-            
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                .setCredentials(ServiceAccountCredentials.fromStream(serviceAccount))
-                .build();
-            
-            FirebaseApp.initializeApp(options);
-            logger.info("Firebase initialized successfully");
+        if (credentialsPath == null || credentialsPath.isBlank()) {
+            logger.warn("Firebase credentials path is not configured. Firebase authentication will remain disabled.");
+            return;
         }
-        
+
+        Path credentialsFile = Path.of(credentialsPath).toAbsolutePath().normalize();
+        if (!Files.exists(credentialsFile)) {
+            logger.warn("Firebase credentials file not found at {}. Firebase authentication will remain disabled.", credentialsFile);
+            return;
+        }
+
+        if (FirebaseApp.getApps().isEmpty()) {
+            try (FileInputStream serviceAccount = new FileInputStream(credentialsFile.toFile())) {
+                FirebaseOptions options = new FirebaseOptions.Builder()
+                    .setCredentials(ServiceAccountCredentials.fromStream(serviceAccount))
+                    .build();
+
+                FirebaseApp.initializeApp(options);
+                logger.info("Firebase initialized successfully using {}", credentialsFile);
+            }
+        }
+
         this.firebaseAuth = FirebaseAuth.getInstance();
     }
 
@@ -57,6 +70,11 @@ public class FirebaseAuthenticationService {
      * @return FirebaseToken if valid, null otherwise
      */
     public FirebaseToken verifyIdToken(String idToken) {
+        if (!isInitialized()) {
+            logger.warn("Firebase token verification requested before Firebase was initialized.");
+            return null;
+        }
+
         try {
             FirebaseToken decodedToken = firebaseAuth.verifyIdToken(idToken);
             logger.info("Token verified for user: {}", decodedToken.getEmail());
@@ -75,6 +93,9 @@ public class FirebaseAuthenticationService {
      * @throws FirebaseAuthException if user not found
      */
     public com.google.firebase.auth.UserRecord getUser(String uid) throws FirebaseAuthException {
+        if (!isInitialized()) {
+            throw new IllegalStateException("Firebase authentication is not initialized");
+        }
         return firebaseAuth.getUser(uid);
     }
 
@@ -88,6 +109,11 @@ public class FirebaseAuthenticationService {
      * @return Custom JWT token
      */
     public String createCustomToken(String firebaseUid, String email, String role) {
+        if (!isInitialized()) {
+            logger.warn("Custom Firebase token requested before Firebase was initialized.");
+            return null;
+        }
+
         try {
             // Create claims to include in custom token
             java.util.Map<String, Object> claims = new java.util.HashMap<>();

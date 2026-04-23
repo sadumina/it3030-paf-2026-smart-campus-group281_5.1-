@@ -84,6 +84,12 @@ public class FirebaseAuthController {
 
     @PostMapping("/firebase-login")
     public ResponseEntity<AuthResponse> firebaseLogin(@RequestBody FirebaseLoginRequest request) {
+        if (!firebaseAuthService.isInitialized()) {
+            return new ResponseEntity<>(
+                    new AuthResponse(false, "Firebase authentication is not configured on the server", null, null, null, null, null),
+                    HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
         if (request.getIdToken() == null || request.getIdToken().isBlank()) {
             return new ResponseEntity<>(
                     new AuthResponse(false, "Firebase ID token is required", null, null, null, null, null),
@@ -134,6 +140,12 @@ public class FirebaseAuthController {
 
     @PostMapping("/firebase-google")
     public ResponseEntity<AuthResponse> firebaseGoogleLogin(@RequestBody Map<String, String> request) {
+        if (!firebaseAuthService.isInitialized()) {
+            return new ResponseEntity<>(
+                    new AuthResponse(false, "Firebase authentication is not configured on the server", null, null, null, null, null),
+                    HttpStatus.SERVICE_UNAVAILABLE);
+        }
+
         String idToken = request.get("idToken");
         if (idToken == null || idToken.isBlank()) {
             return new ResponseEntity<>(
