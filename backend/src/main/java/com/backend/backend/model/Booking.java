@@ -24,7 +24,7 @@ public class Booking {
     private LocalTime endTime;
 
     private String purpose;
-    private String status; // PENDING | CONFIRMED | CANCELLED
+    private String status; // PENDING | CONFIRMED | REJECTED | CANCELLED
 
     public Booking() {}
 

@@ -11,8 +11,8 @@ import {
 export const userSidebar = [
   { label: "Overview", icon: LayoutDashboard, path: "/dashboard" },
   { label: "Resource Catalogue", icon: LibraryBig, path: "/dashboard/resources" },
-  { label: "My Bookings", badge: "7", icon: CalendarDays },
-  { label: "New Reservation", icon: PlusCircle },
+  { label: "My Bookings", badge: "Live", icon: CalendarDays, path: "/dashboard/bookings" },
+  { label: "New Reservation", icon: PlusCircle, path: "/dashboard/resources" },
   { label: "Incident Reports", icon: TriangleAlert, path: "/tickets" },
   { label: "Availability", icon: CalendarClock },
   { label: "Support", icon: LifeBuoy },

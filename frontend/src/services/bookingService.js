@@ -38,6 +38,8 @@ export async function fetchMyBookings() {
   return Array.isArray(data) ? data : [];
 }
 
+export const getMyBookings = fetchMyBookings;
+
 /** USER: cancel a booking */
 export async function cancelBooking(bookingId) {
   const response = await fetch(`${API_BASE_URL}/${bookingId}/cancel`, {
@@ -57,6 +59,8 @@ export async function fetchAllBookings() {
   return Array.isArray(data) ? data : [];
 }
 
+export const getAllBookings = fetchAllBookings;
+
 /** ADMIN: update a booking's status */
 export async function updateBookingStatus(bookingId, status) {
   const response = await fetch(`${API_BASE_URL}/${bookingId}/status`, {
@@ -65,4 +69,12 @@ export async function updateBookingStatus(bookingId, status) {
     body: JSON.stringify({ status }),
   });
   return parseResponse(response);
+}
+
+export function approveBooking(bookingId) {
+  return updateBookingStatus(bookingId, "CONFIRMED");
+}
+
+export function rejectBooking(bookingId) {
+  return updateBookingStatus(bookingId, "REJECTED");
 }

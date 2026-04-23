@@ -75,7 +75,10 @@ public class BookingService {
     }
 
     private void checkOverlap(String resourceId, java.time.LocalDate date, java.time.LocalTime start, java.time.LocalTime end) {
-        List<Booking> existingBookings = bookingRepository.findByResourceIdAndDateAndStatusNot(resourceId, date, "CANCELLED");
+        List<Booking> existingBookings = bookingRepository.findByResourceIdAndDateAndStatusIn(
+                resourceId,
+                date,
+                List.of("PENDING", "CONFIRMED"));
 
         for (Booking b : existingBookings) {
             if (start.isBefore(b.getEndTime()) && b.getStartTime().isBefore(end)) {
@@ -113,7 +116,7 @@ public class BookingService {
                 .orElseThrow(() -> new NoSuchElementException("Booking not found"));
 
         String normalized = status != null ? status.trim().toUpperCase() : "";
-        if (!List.of("PENDING", "CONFIRMED", "CANCELLED").contains(normalized)) {
+        if (!List.of("PENDING", "CONFIRMED", "REJECTED", "CANCELLED").contains(normalized)) {
             throw new IllegalArgumentException("Invalid booking status: " + status);
         }
 

@@ -4,6 +4,7 @@ import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
 import DashboardPage from "../pages/DashboardPage";
+import MyBookingsPage from "../pages/MyBookingsPage";
 import ResourceCataloguePage from "../pages/ResourceCataloguePage";
 import ResourceBookingRedirectPage from "../pages/ResourceBookingRedirectPage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
@@ -93,6 +94,14 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["USER"]}>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/bookings"
+          element={
+            <ProtectedRoute allowedRoles={["USER"]}>
+              <MyBookingsPage />
             </ProtectedRoute>
           }
         />

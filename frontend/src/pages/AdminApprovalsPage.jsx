@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Shield,
   ClipboardCheck,
@@ -10,6 +10,7 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  Search,
 } from "lucide-react";
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
@@ -28,14 +29,19 @@ const adminSidebar = [
 const STATUS_STYLES = {
   PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
   CONFIRMED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-  CANCELLED: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
+  REJECTED: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
+  CANCELLED: "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
 };
+
+const STATUS_FILTERS = ["ALL", "PENDING", "CONFIRMED", "REJECTED", "CANCELLED"];
 
 export default function AdminApprovalsPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState(null);
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [searchQuery, setSearchQuery] = useState("");
 
   async function loadBookings() {
     try {
@@ -69,6 +75,34 @@ export default function AdminApprovalsPage() {
 
   const pendingCount = bookings.filter((b) => b.status === "PENDING").length;
   const confirmedCount = bookings.filter((b) => b.status === "CONFIRMED").length;
+  const rejectedCount = bookings.filter((b) => b.status === "REJECTED").length;
+
+  const filteredBookings = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    return [...bookings]
+      .filter((booking) => statusFilter === "ALL" || booking.status === statusFilter)
+      .filter((booking) => {
+        if (!query) {
+          return true;
+        }
+
+        return [
+          booking.id,
+          booking.resourceName,
+          booking.userName,
+          booking.userEmail,
+          booking.date,
+          booking.status,
+        ]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query));
+      })
+      .sort((a, b) => {
+        if (a.status === "PENDING" && b.status !== "PENDING") return -1;
+        if (a.status !== "PENDING" && b.status === "PENDING") return 1;
+        return String(b.date || "").localeCompare(String(a.date || ""));
+      });
+  }, [bookings, searchQuery, statusFilter]);
 
   return (
     <RoleDashboardLayout
@@ -80,8 +114,8 @@ export default function AdminApprovalsPage() {
       sidebarItems={adminSidebar}
       kpis={[
         { label: "Pending Requests", value: String(pendingCount), change: "Awaiting review" },
-        { label: "Approved Today", value: String(confirmedCount), change: "Operationalized" },
-        { label: "System Uptime", value: "99.9%", change: "Stable" },
+        { label: "Approved", value: String(confirmedCount), change: "Ready to use" },
+        { label: "Rejected", value: String(rejectedCount), change: "Declined requests" },
         { label: "Matrix Sync", value: "Live", change: "Auto-refresh" },
       ]}
       quickActions={[]}
@@ -106,11 +140,40 @@ export default function AdminApprovalsPage() {
               </button>
             </div>
 
+            <div className="mb-5 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex flex-wrap gap-2">
+                {STATUS_FILTERS.map((status) => (
+                  <button
+                    key={status}
+                    type="button"
+                    onClick={() => setStatusFilter(status)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                      statusFilter === status
+                        ? "border-orange-600 bg-orange-600 text-white"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-700"
+                    }`}
+                  >
+                    {status === "ALL" ? "All" : status}
+                  </button>
+                ))}
+              </div>
+              <div className="relative w-full lg:max-w-sm">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search bookings"
+                  className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-orange-900/30"
+                />
+              </div>
+            </div>
+
             {loading ? (
               <p className="text-sm text-slate-500 dark:text-slate-400">Loading booking queue...</p>
             ) : error ? (
               <p className="text-sm text-rose-600 dark:text-rose-300">{error}</p>
-            ) : bookings.length === 0 ? (
+            ) : filteredBookings.length === 0 ? (
               <p className="text-sm text-slate-500 dark:text-slate-400">No booking records found.</p>
             ) : (
               <div className="overflow-x-auto">
@@ -124,7 +187,7 @@ export default function AdminApprovalsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
-                    {bookings.sort((a, b) => (a.status === 'PENDING' ? -1 : 1)).map((booking) => (
+                    {filteredBookings.map((booking) => (
                       <tr key={booking.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-900/50 transition-colors">
                         <td className="py-4 pr-4">
                           <p className="font-semibold text-slate-900 dark:text-slate-100">{booking.resourceName}</p>
@@ -163,7 +226,7 @@ export default function AdminApprovalsPage() {
                                 )}
                               </button>
                               <button
-                                onClick={() => handleStatusUpdate(booking.id, "CANCELLED")}
+                                onClick={() => handleStatusUpdate(booking.id, "REJECTED")}
                                 disabled={actionLoading === booking.id}
                                 className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-900/30 transition-colors"
                                 title="Reject"
