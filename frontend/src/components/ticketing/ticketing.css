@@ -117,6 +117,36 @@
   animation: tkt-fade-up 0.4s ease both;
 }
 
+.tkt-content-scroll {
+  margin-top: 8px;
+  max-height: clamp(360px, 62vh, 76vh);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+  scrollbar-gutter: stable;
+}
+
+.tkt-content-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+
+.tkt-content-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+}
+
+.tkt-content-scroll::-webkit-scrollbar-thumb {
+  background: rgba(249, 115, 22, 0.38);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.tkt-content-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(249, 115, 22, 0.6);
+  background-clip: content-box;
+}
+
 /* ─── Page Header ────────────────────────────────────────────── */
 .tkt-header {
   display: flex;
@@ -614,7 +644,13 @@
 .tkt-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-auto-rows: 1fr;
   gap: 18px;
+}
+
+.tkt-card-shell {
+  position: relative;
+  height: 100%;
 }
 
 /* ─── Ticket Card ────────────────────────────────────────────── */
@@ -630,6 +666,9 @@
   box-shadow: 0 8px 24px rgba(249, 115, 22, 0.25);
   animation: tkt-fade-up 0.35s ease both;
   color: #ffffff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Staggered entrance for cards */
@@ -727,7 +766,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 12px;
+  margin-top: auto;
+  padding-top: 12px;
   font-size: 0.74rem;
   color: rgba(255, 255, 255, 0.8);
 }
@@ -900,15 +940,17 @@
 .tkt-assign-select {
   padding: 4px 8px;
   border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  border: 1px solid rgba(17, 24, 39, 0.3);
+  background: rgba(255, 255, 255, 0.95);
+  color: #111827;
   font-size: 0.75rem;
   outline: none;
+  font-weight: 600;
 }
 
 .tkt-assign-select option {
-  color: #1c1917;
+  color: #111827;
+  background: #ffffff;
 }
 
 .tkt-assign-label {
@@ -1638,6 +1680,11 @@
 
 /* ─── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 640px) {
+  .tkt-content-scroll {
+    max-height: clamp(320px, 58vh, 70vh);
+    padding-right: 2px;
+  }
+
   .tkt-cards-grid {
     grid-template-columns: 1fr;
   }

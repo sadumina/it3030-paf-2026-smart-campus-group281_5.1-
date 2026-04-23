@@ -249,42 +249,44 @@ export default function AdminTicketView() {
           </div>
         </div>
 
-        {/* Cards */}
-        {loading ? (
-          <div className="tkt-spinner" />
-        ) : filtered.length === 0 ? (
-          <div className="tkt-empty">
-            <div className="tkt-empty-icon">📋</div>
-            <h3>No tickets found</h3>
-            <p>{hasActiveFilters ? "Try adjusting or clearing your filters" : "No tickets have been submitted yet."}</p>
-            {hasActiveFilters && (
-              <button className="tkt-btn-secondary" style={{ marginTop: 14 }} onClick={clearFilters}>
-                Clear Filters
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="tkt-cards-grid">
-            {filtered.map(t => (
-              <div key={t.id} style={{ position: "relative" }}>
-                <TicketCard
-                  ticket={t}
-                  onClick={() => setSelected(t)}
-                  adminControls
-                  technicians={technicians}
-                  onAssign={handleQuickAssign}
-                />
-                <button
-                  className="tkt-btn-danger"
-                  style={{ position: "absolute", top: 10, right: 10, padding: "4px 10px", fontSize: "0.7rem", zIndex: 2 }}
-                  onClick={e => { e.stopPropagation(); handleDelete(t.id); }}
-                >
-                  🗑
+        <div className="tkt-content-scroll">
+          {/* Cards */}
+          {loading ? (
+            <div className="tkt-spinner" />
+          ) : filtered.length === 0 ? (
+            <div className="tkt-empty">
+              <div className="tkt-empty-icon">📋</div>
+              <h3>No tickets found</h3>
+              <p>{hasActiveFilters ? "Try adjusting or clearing your filters" : "No tickets have been submitted yet."}</p>
+              {hasActiveFilters && (
+                <button className="tkt-btn-secondary" style={{ marginTop: 14 }} onClick={clearFilters}>
+                  Clear Filters
                 </button>
-              </div>
-            ))}
-          </div>
-        )}
+              )}
+            </div>
+          ) : (
+            <div className="tkt-cards-grid">
+              {filtered.map(t => (
+                <div key={t.id} className="tkt-card-shell">
+                  <TicketCard
+                    ticket={t}
+                    onClick={() => setSelected(t)}
+                    adminControls
+                    technicians={technicians}
+                    onAssign={handleQuickAssign}
+                  />
+                  <button
+                    className="tkt-btn-danger"
+                    style={{ position: "absolute", top: 10, right: 10, padding: "4px 10px", fontSize: "0.7rem", zIndex: 2 }}
+                    onClick={e => { e.stopPropagation(); handleDelete(t.id); }}
+                  >
+                    🗑
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {selectedTicket && (

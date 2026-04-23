@@ -227,34 +227,36 @@ export default function StudentTicketView() {
           </div>
         </div>
 
-        {/* Cards */}
-        {loading ? (
-          <div className="tkt-spinner" />
-        ) : filtered.length === 0 ? (
-          <div className="tkt-empty">
-            <div className="tkt-empty-icon">🎫</div>
-            <h3>{hasActiveFilters ? "No matching tickets" : "No tickets yet"}</h3>
-            <p>{hasActiveFilters ? "Try adjusting or clearing your filters" : "Create your first incident ticket to get started"}</p>
-            {hasActiveFilters && (
-              <button className="tkt-btn-secondary" style={{ marginTop: 14 }} onClick={clearFilters}>
-                Clear Filters
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="tkt-cards-grid">
-            {filtered.map(t => (
-              <TicketCard
-                key={t.id}
-                ticket={t}
-                onClick={() => setSelected(t)}
-                showDelete
-                deleting={deletingTicketId === t.id}
-                onDelete={handleDeleteTicket}
-              />
-            ))}
-          </div>
-        )}
+        <div className="tkt-content-scroll">
+          {/* Cards */}
+          {loading ? (
+            <div className="tkt-spinner" />
+          ) : filtered.length === 0 ? (
+            <div className="tkt-empty">
+              <div className="tkt-empty-icon">🎫</div>
+              <h3>{hasActiveFilters ? "No matching tickets" : "No tickets yet"}</h3>
+              <p>{hasActiveFilters ? "Try adjusting or clearing your filters" : "Create your first incident ticket to get started"}</p>
+              {hasActiveFilters && (
+                <button className="tkt-btn-secondary" style={{ marginTop: 14 }} onClick={clearFilters}>
+                  Clear Filters
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="tkt-cards-grid">
+              {filtered.map(t => (
+                <TicketCard
+                  key={t.id}
+                  ticket={t}
+                  onClick={() => setSelected(t)}
+                  showDelete
+                  deleting={deletingTicketId === t.id}
+                  onDelete={handleDeleteTicket}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {showCreate && (
