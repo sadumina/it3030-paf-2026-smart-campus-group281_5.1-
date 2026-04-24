@@ -1,6 +1,7 @@
 import { getToken } from "./authStorage";
+import { API_BASE_URL } from "./apiConfig";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/bookings`;
+const BOOKINGS_BASE_URL = `${API_BASE_URL}/bookings`;
 
 async function parseResponse(response) {
   const data = await response.json().catch(() => null);
@@ -20,7 +21,7 @@ function getAuthHeaders() {
 
 /** USER: submit a new booking */
 export async function createBooking(payload) {
-  const response = await fetch(API_BASE_URL, {
+  const response = await fetch(BOOKINGS_BASE_URL, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),
@@ -30,7 +31,7 @@ export async function createBooking(payload) {
 
 /** USER: list own bookings */
 export async function fetchMyBookings() {
-  const response = await fetch(`${API_BASE_URL}/my`, {
+  const response = await fetch(`${BOOKINGS_BASE_URL}/my`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -42,7 +43,7 @@ export const getMyBookings = fetchMyBookings;
 
 /** USER: cancel a booking */
 export async function cancelBooking(bookingId) {
-  const response = await fetch(`${API_BASE_URL}/${bookingId}/cancel`, {
+  const response = await fetch(`${BOOKINGS_BASE_URL}/${bookingId}/cancel`, {
     method: "PATCH",
     headers: getAuthHeaders(),
   });
@@ -51,7 +52,7 @@ export async function cancelBooking(bookingId) {
 
 /** ADMIN: list all bookings */
 export async function fetchAllBookings() {
-  const response = await fetch(API_BASE_URL, {
+  const response = await fetch(BOOKINGS_BASE_URL, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -63,7 +64,7 @@ export const getAllBookings = fetchAllBookings;
 
 /** ADMIN: update a booking's status */
 export async function updateBookingStatus(bookingId, status, reason = "") {
-  const response = await fetch(`${API_BASE_URL}/${bookingId}/status`, {
+  const response = await fetch(`${BOOKINGS_BASE_URL}/${bookingId}/status`, {
     method: "PATCH",
     headers: getAuthHeaders(),
     body: JSON.stringify({ status, reason }),
