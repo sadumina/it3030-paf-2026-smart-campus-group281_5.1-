@@ -1,6 +1,7 @@
 import { getToken } from "./authStorage";
+import { API_BASE_URL } from "./apiConfig";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/notifications`;
+const NOTIFICATIONS_BASE_URL = `${API_BASE_URL}/notifications`;
 
 async function parseResponse(response) {
   const data = await response.json().catch(() => ({}));
@@ -22,21 +23,21 @@ function authHeaders() {
 }
 
 export async function fetchMyNotifications() {
-  const response = await fetch(`${API_BASE_URL}/my`, {
+  const response = await fetch(`${NOTIFICATIONS_BASE_URL}/my`, {
     headers: authHeaders(),
   });
   return parseResponse(response);
 }
 
 export async function fetchUnreadCount() {
-  const response = await fetch(`${API_BASE_URL}/my/unread-count`, {
+  const response = await fetch(`${NOTIFICATIONS_BASE_URL}/my/unread-count`, {
     headers: authHeaders(),
   });
   return parseResponse(response);
 }
 
 export async function markNotificationAsRead(notificationId) {
-  const response = await fetch(`${API_BASE_URL}/${notificationId}/read`, {
+  const response = await fetch(`${NOTIFICATIONS_BASE_URL}/${notificationId}/read`, {
     method: "PATCH",
     headers: authHeaders(),
   });
@@ -44,7 +45,7 @@ export async function markNotificationAsRead(notificationId) {
 }
 
 export async function markAllNotificationsAsRead() {
-  const response = await fetch(`${API_BASE_URL}/read-all`, {
+  const response = await fetch(`${NOTIFICATIONS_BASE_URL}/read-all`, {
     method: "PATCH",
     headers: authHeaders(),
   });
@@ -52,7 +53,7 @@ export async function markAllNotificationsAsRead() {
 }
 
 export async function createSeedNotification(payload) {
-  const response = await fetch(`${API_BASE_URL}/seed`, {
+  const response = await fetch(`${NOTIFICATIONS_BASE_URL}/seed`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(payload),
