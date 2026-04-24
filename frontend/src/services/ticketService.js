@@ -1,4 +1,6 @@
-const API_BASE = "http://localhost:8080/api/tickets";
+import { API_BASE_URL } from "./apiConfig";
+
+const API_BASE = `${API_BASE_URL}/tickets`;
 
 function authHeader() {
   const raw = localStorage.getItem("campusAuth");

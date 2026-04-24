@@ -30,7 +30,24 @@ import { notifyAlert } from "../../services/notificationHelper";
 import { userProfileService } from "../../services/userProfileService";
 import { clearAuth } from "../../services/authStorage";
 
-function ProfessionalChart({ points = [], color = "#ea580c" }) {
+function ProfessionalChartTooltip({ active, payload }) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-lg border border-slate-200 bg-white p-2 shadow-lg">
+        <p className="text-xs font-semibold text-slate-900">{payload[0].payload.time}</p>
+        {payload.map((entry, index) => (
+          <p key={index} className="text-xs font-medium" style={{ color: entry.color }}>
+            {entry.name}: {entry.value}
+          </p>
+        ))}
+      </div>
+    );
+  }
+
+  return null;
+}
+
+function ProfessionalChart({ points = [] }) {
   const safePoints = points.length > 1 ? points : [28, 32, 30, 38, 36, 44, 42, 48, 50, 54, 52, 58, 60, 64];
   
   // Generate chart data with comparison metric
@@ -39,22 +56,6 @@ function ProfessionalChart({ points = [], color = "#ea580c" }) {
     "Primary Metric": value,
     "Secondary Metric": Math.max(10, value - 15 + (Math.sin(index * 0.5) * 6)),
   }));
-
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="rounded-lg border border-slate-200 bg-white p-2 shadow-lg">
-          <p className="text-xs font-semibold text-slate-900">{payload[0].payload.time}</p>
-          {payload.map((entry, index) => (
-            <p key={index} className="text-xs font-medium" style={{ color: entry.color }}>
-              {entry.name}: {entry.value}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <ResponsiveContainer width="100%" height={400}>
@@ -84,7 +85,7 @@ function ProfessionalChart({ points = [], color = "#ea580c" }) {
           style={{ fontSize: "11px" }}
           tick={{ fill: "#6b7280" }}
         />
-        <Tooltip content={<CustomTooltip />} />
+        <Tooltip content={<ProfessionalChartTooltip />} />
         <Legend
           wrapperStyle={{ fontSize: "12px", paddingTop: "20px" }}
           iconType="circle"
@@ -229,7 +230,7 @@ export default function RoleDashboardLayout({
 
               return (
               <button
-                key={item.label}
+                key={item.path || `${item.label}-${item.badge || "item"}`}
                 type="button"
                 onClick={() => {
                   if (item.path) {
@@ -371,7 +372,7 @@ export default function RoleDashboardLayout({
                 const color = neonColors[index % 4];
                 return (
                   <article
-                    key={kpi.label}
+                    key={`${kpi.label}-${index}`}
                     className={`rounded-lg border-2 ${color.border} bg-gradient-to-br ${color.bg} p-4 ${color.shadow} transition duration-300 hover:scale-105 cursor-pointer backdrop-blur-sm`}
                   >
                     <p className={`text-xs font-semibold ${color.label} uppercase tracking-wider opacity-90`}>{kpi.label}</p>
@@ -439,8 +440,11 @@ export default function RoleDashboardLayout({
                   <section className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
                     <h2 className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">Live Activity</h2>
                     <div className="space-y-2">
-                      {activityFeed.slice(0, 4).map((item) => (
-                        <article key={item.title} className="rounded-md border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 p-2">
+                      {activityFeed.slice(0, 4).map((item, index) => (
+                        <article
+                          key={`${item.title}-${item.meta || "activity"}-${index}`}
+                          className="rounded-md border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 p-2"
+                        >
                           <p className="text-xs font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
                           <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{item.meta}</p>
                         </article>

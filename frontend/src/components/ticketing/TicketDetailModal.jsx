@@ -5,6 +5,7 @@ import {
   deleteTicketImage,
 } from "../../services/ticketService";
 import { getAuth } from "../../services/authStorage";
+import { BACKEND_URL } from "../../services/apiConfig";
 import TicketTimeline from "./TicketTimeline";
 import ImagePreviewModal from "./ImagePreviewModal";
 import SlaTimer from "./SlaTimer";
@@ -38,18 +39,18 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
   const [error, setError] = useState("");
 
   useEffect(() => {
+    const loadComments = async () => {
+      try {
+        const data = await fetchComments(ticket.id);
+        setComments(data);
+      } catch { /* ignore */ }
+    };
+
     loadComments();
     if (role === "ADMIN") {
       fetchTechnicians().then(setTechnicians).catch(() => {});
     }
-  }, [ticket.id]);
-
-  const loadComments = async () => {
-    try {
-      const data = await fetchComments(ticket.id);
-      setComments(data);
-    } catch { /* ignore */ }
-  };
+  }, [role, ticket.id]);
 
   // ─── Actions ──────────────────────────────────────────────────────
   const handleAssign = async () => {
@@ -91,7 +92,8 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
     try {
       await addComment(ticket.id, newComment);
       setNewComment("");
-      loadComments();
+      const data = await fetchComments(ticket.id);
+      setComments(data);
     } catch (e) { setError(e.message); }
     finally { setLoading(false); }
   };
@@ -101,7 +103,8 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
     try {
       await editComment(ticket.id, cid, editContent);
       setEditingCid(null);
-      loadComments();
+      const data = await fetchComments(ticket.id);
+      setComments(data);
     } catch (e) { setError(e.message); }
   };
 
@@ -109,7 +112,8 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
     if (!window.confirm("Delete this comment?")) return;
     try {
       await deleteComment(ticket.id, cid);
-      loadComments();
+      const data = await fetchComments(ticket.id);
+      setComments(data);
     } catch (e) { setError(e.message); }
   };
 
@@ -284,7 +288,7 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                       {ticket.imageUrls.map((url, i) => (
                         <div key={i} className="tkt-gallery-item" style={{ position: "relative" }}>
                           <img
-                            src={`http://localhost:8080${url}`}
+                            src={`${BACKEND_URL}${url}`}
                             alt={`Attachment ${i + 1}`}
                             onClick={() => setLightboxSrc(url)}
                           />
