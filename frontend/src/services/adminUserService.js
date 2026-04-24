@@ -1,7 +1,8 @@
 import { getToken } from "./authStorage";
+import { API_BASE_URL } from "./apiConfig";
 
-const USERS_BASE_URL = "http://localhost:8080/api/users";
-const AUTH_BASE_URL = "http://localhost:8080/api/auth";
+const USERS_BASE_URL = `${API_BASE_URL}/users`;
+const AUTH_BASE_URL = `${API_BASE_URL}/auth`;
 
 function authHeaders() {
   return {
