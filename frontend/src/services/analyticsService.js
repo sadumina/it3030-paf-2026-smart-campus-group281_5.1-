@@ -1,10 +1,11 @@
 import { getToken } from "./authStorage";
+import { API_BASE_URL } from "./apiConfig";
 
-const API_BASE_URL = "http://localhost:8080/api/users";
+const USERS_BASE_URL = `${API_BASE_URL}/users`;
 
 export const fetchAnalyticsSummary = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/analytics/summary`, {
+    const response = await fetch(`${USERS_BASE_URL}/analytics/summary`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
