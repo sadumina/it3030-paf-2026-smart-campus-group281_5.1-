@@ -99,7 +99,7 @@ export default function RegisterPage() {
                 transition={{ duration: 0.38, delay: 0.08 }}
               >
                 <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">New Student Access</p>
-                <h1 className="font-['Outfit'] text-4xl font-extrabold text-slate-950">Join Smart Campus</h1>
+                <h1 className="font-['Outfit'] text-4xl font-extrabold text-slate-950">Join CleverCampus</h1>
                 <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-slate-500">
                   Create your student profile and start using bookings, support tickets, alerts, and dashboards.
                 </p>
@@ -186,3 +186,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+
