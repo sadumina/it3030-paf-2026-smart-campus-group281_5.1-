@@ -5,7 +5,9 @@ const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8
 async function parseResponse(response) {
   const data = await response.json().catch(() => null);
   if (!response.ok) {
-    throw new Error(typeof data === "string" ? data : data?.message || "Request failed");
+    throw new Error(
+      typeof data === "string" ? data : data?.message || "Request failed",
+    );
   }
   return data;
 }
@@ -60,6 +62,22 @@ export async function fetchAllBookings() {
 }
 
 export const getAllBookings = fetchAllBookings;
+
+/** ADMIN: list soft-deleted bookings (optional endpoint) */
+export async function getDeletedBookings() {
+  const response = await fetch(`${API_BASE_URL}/deleted`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+
+  // Keep UI stable if backend doesn't expose deleted bookings yet.
+  if (response.status === 404) {
+    return [];
+  }
+
+  const data = await parseResponse(response);
+  return Array.isArray(data) ? data : [];
+}
 
 /** ADMIN: update a booking's status */
 export async function updateBookingStatus(bookingId, status, reason = "") {

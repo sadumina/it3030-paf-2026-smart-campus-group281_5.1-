@@ -22,6 +22,8 @@ import ProtectedRoute from "../components/ProtectedRoute";
 import { fetchCurrentUser } from "../services/authService";
 import { clearAuth, getAuth, getToken, saveAuth } from "../services/authStorage";
 import { getDashboardPathForRole } from "../services/roleDashboard";
+import AdminBookingsPage from "../pages/AdminBookingsPage";
+import AdminBookingAnalytics from "../pages/BookingAnalyticspage"
 
 function SessionSync() {
   const location = useLocation();
@@ -259,6 +261,28 @@ function AnimatedRoutes() {
             <PageFrame>
               <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
                 <InnovationLabPage />
+              </ProtectedRoute>
+            </PageFrame>
+          }
+        />
+        {/* 
+        /admin/booking-analytics */}
+        <Route
+          path="/admin/booking-analytics"
+          element={
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+                <AdminBookingAnalytics />
+              </ProtectedRoute>
+            </PageFrame>
+          }
+        />
+        <Route
+          path="/admin/bookings"
+          element={
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+                <AdminBookingsPage />
               </ProtectedRoute>
             </PageFrame>
           }
