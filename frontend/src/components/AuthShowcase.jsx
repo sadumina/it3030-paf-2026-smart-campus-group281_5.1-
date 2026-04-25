@@ -11,7 +11,7 @@ export default function AuthShowcase({ variant = "login" }) {
     : "bg-[radial-gradient(circle_at_18%_18%,rgba(255,176,109,0.18),transparent_32%),radial-gradient(circle_at_86%_80%,rgba(249,115,22,0.16),transparent_34%)]";
   const accentColor = isRegister ? "text-slate-950" : "text-orange-500";
   const badgeColor = isRegister ? "text-slate-900" : "text-orange-600";
-  const badgeText = isRegister ? "Student Onboarding" : "Smart Campus";
+  const badgeText = isRegister ? "Student Onboarding" : "CleverCampus";
 
   return (
     <motion.section
@@ -50,7 +50,7 @@ export default function AuthShowcase({ variant = "login" }) {
             <p className="text-sm font-extrabold text-slate-900">{isRegister ? "New Account" : "Campus Ticket"}</p>
             <p className="text-xs text-slate-500">{isRegister ? "Student" : "12 Tasks"}</p>
             <div className="mt-3 flex items-center gap-3">
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-orange-100 text-xs font-bold text-orange-600">
+              <span className="grid h-9 w-9 place-items-center rounded-full bg-orange-100 text-xs font-bold text-orange-600">
                 84%
               </span>
               <span className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-700">
