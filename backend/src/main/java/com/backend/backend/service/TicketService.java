@@ -86,9 +86,9 @@ public class TicketService {
 
         Ticket saved = ticketRepository.save(ticket);
 
-        // Notify all admins
+        // Notify all admins and super admins
         List<User> admins = userRepository.findAll().stream()
-                .filter(u -> "ADMIN".equals(u.getRole()))
+                .filter(u -> isAdminLike(u.getRole()))
                 .toList();
         for (User admin : admins) {
             notificationService.createNotification(
@@ -101,10 +101,14 @@ public class TicketService {
         return saved;
     }
 
+    private boolean isAdminLike(String role) {
+        return "ADMIN".equals(role) || "SUPER_ADMIN".equals(role);
+    }
+
     // ─── Get Tickets (role-aware, with optional filters) ────────────────────
     public List<Ticket> getTicketsForUser(User user, String status, String priority, String category) {
         List<Ticket> tickets = switch (user.getRole()) {
-            case "ADMIN" -> ticketRepository.findAllByOrderByCreatedAtDesc();
+            case "ADMIN", "SUPER_ADMIN" -> ticketRepository.findAllByOrderByCreatedAtDesc();
             case "TECHNICIAN" -> ticketRepository.findByAssignedTechnicianIdOrderByCreatedAtDesc(user.getId());
             default -> ticketRepository.findByCreatedByUserIdOrderByCreatedAtDesc(user.getId());
         };
@@ -232,12 +236,13 @@ public class TicketService {
     }
 
     private void validateTransition(String current, String next, String role) {
+        boolean isAdmin = isAdminLike(role);
         boolean valid = switch (current) {
             case "OPEN" -> List.of("IN_PROGRESS", "REJECTED").contains(next) &&
-                    ("ADMIN".equals(role) || ("IN_PROGRESS".equals(next) && "TECHNICIAN".equals(role)));
+                    (isAdmin || ("IN_PROGRESS".equals(next) && "TECHNICIAN".equals(role)));
             case "IN_PROGRESS" -> (List.of("RESOLVED").contains(next) && "TECHNICIAN".equals(role)) ||
-                    (List.of("REJECTED", "CLOSED").contains(next) && "ADMIN".equals(role));
-            case "RESOLVED" -> "CLOSED".equals(next) && "ADMIN".equals(role);
+                    (List.of("REJECTED", "CLOSED").contains(next) && isAdmin);
+            case "RESOLVED" -> "CLOSED".equals(next) && isAdmin;
             default -> false;
         };
         if (!valid) {
@@ -289,7 +294,7 @@ public class TicketService {
 
         Ticket ticket = opt.get();
         boolean isOwner = actor.getId().equals(ticket.getCreatedByUserId());
-        boolean isAdmin = "ADMIN".equals(actor.getRole());
+        boolean isAdmin = isAdminLike(actor.getRole());
         if (!isOwner && !isAdmin) {
             throw new SecurityException("Access denied");
         }
@@ -367,7 +372,7 @@ public class TicketService {
 
     public boolean deleteComment(String commentId, User actor) {
         Optional<TicketComment> opt;
-        if ("ADMIN".equals(actor.getRole())) {
+        if (isAdminLike(actor.getRole())) {
             opt = commentRepository.findById(commentId);
         } else {
             opt = commentRepository.findByIdAndAuthorId(commentId, actor.getId());
@@ -385,7 +390,7 @@ public class TicketService {
             return false;
         }
         Ticket ticket = ticketOpt.get();
-        boolean isAdmin = "ADMIN".equals(actor.getRole());
+        boolean isAdmin = isAdminLike(actor.getRole());
         boolean isCreator = actor.getId().equals(ticket.getCreatedByUserId());
         if (!isAdmin && !isCreator) {
             return false;
@@ -418,7 +423,7 @@ public class TicketService {
 
     // ─── Search / Filter ─────────────────────────────────────────────────────
     public List<Ticket> searchTickets(String keyword, User user) {
-        if ("ADMIN".equals(user.getRole())) {
+        if (isAdminLike(user.getRole())) {
             return ticketRepository.searchByKeyword(keyword);
         } else if ("TECHNICIAN".equals(user.getRole())) {
             return ticketRepository.searchByKeyword(keyword).stream()

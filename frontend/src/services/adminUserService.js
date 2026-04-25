@@ -1,7 +1,7 @@
 import { getToken } from "./authStorage";
 
-const USERS_BASE_URL = "http://localhost:8080/api/users";
-const AUTH_BASE_URL = "http://localhost:8080/api/auth";
+const USERS_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/users`;
+const AUTH_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/auth`;
 
 function authHeaders() {
   return {

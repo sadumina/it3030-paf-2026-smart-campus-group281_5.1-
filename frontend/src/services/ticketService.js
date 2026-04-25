@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:8080/api/tickets";
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/tickets`;
 
 function authHeader() {
   const raw = localStorage.getItem("campusAuth");

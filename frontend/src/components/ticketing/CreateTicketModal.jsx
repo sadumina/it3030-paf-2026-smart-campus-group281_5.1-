@@ -1,5 +1,7 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { createTicket, uploadTicketImages } from "../../services/ticketService";
+import { fetchResources } from "../../services/resourceService";
+import ImagePreviewModal from "./ImagePreviewModal";
 
 const CATEGORIES = ["ELECTRICAL", "PLUMBING", "IT", "HVAC", "STRUCTURAL", "CLEANING", "OTHER"];
 
@@ -24,12 +26,18 @@ export default function CreateTicketModal({ onClose, onCreated }) {
     title: "", description: "", category: "OTHER", priority: "MEDIUM",
     location: "", contactDetails: "",
   });
-  const [images, setImages] = useState([]); // File objects
-  const [previews, setPreviews] = useState([]); // data URLs
+  const [images, setImages] = useState([]);
+  const [previews, setPreviews] = useState([]);
   const [dragging, setDragging] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [resources, setResources] = useState([]);
+  const [lightboxSrc, setLightboxSrc] = useState(null);
   const fileInput = useRef();
+
+  useEffect(() => {
+    fetchResources().then(setResources).catch(() => {});
+  }, []);
 
   const handleField = (key, val) => {
     const update = { ...form, [key]: val };
@@ -81,6 +89,7 @@ export default function CreateTicketModal({ onClose, onCreated }) {
   };
 
   return (
+    <>
     <div className="tkt-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="tkt-modal">
         {/* Header */}
@@ -132,13 +141,18 @@ export default function CreateTicketModal({ onClose, onCreated }) {
             <div className="tkt-form-row">
               <div className="tkt-form-group" style={{ margin: 0 }}>
                 <label className="tkt-form-label">Location *</label>
-                <input
-                  className="tkt-form-input"
-                  placeholder="e.g. Block A, Room 204"
+                <select
+                  className="tkt-form-select"
                   value={form.location}
                   onChange={(e) => handleField("location", e.target.value)}
-                  maxLength={120}
-                />
+                >
+                  <option value="">— Select a location —</option>
+                  {resources.map((r) => (
+                    <option key={r.id} value={r.location ? `${r.name} — ${r.location}` : r.name}>
+                      {r.name}{r.location ? ` — ${r.location}` : ""}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="tkt-form-group" style={{ margin: 0 }}>
                 <label className="tkt-form-label">
@@ -229,12 +243,19 @@ export default function CreateTicketModal({ onClose, onCreated }) {
               {previews.length > 0 && (
                 <div className="tkt-image-previews">
                   {previews.map((src, idx) => (
-                    <div key={idx} className="tkt-image-thumb">
+                    <div
+                      key={idx}
+                      className="tkt-image-thumb"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setLightboxSrc(src)}
+                      title="Click to view full image"
+                    >
                       <img src={src} alt={`Preview ${idx + 1}`} />
+                      <div className="tkt-gallery-zoom-hint">🔍</div>
                       <button
                         type="button"
                         className="tkt-image-thumb-remove"
-                        onClick={() => removeImage(idx)}
+                        onClick={(e) => { e.stopPropagation(); removeImage(idx); }}
                       >
                         ×
                       </button>
@@ -264,5 +285,7 @@ export default function CreateTicketModal({ onClose, onCreated }) {
         </form>
       </div>
     </div>
+    {lightboxSrc && <ImagePreviewModal src={lightboxSrc} onClose={() => setLightboxSrc(null)} />}
+    </>
   );
 }

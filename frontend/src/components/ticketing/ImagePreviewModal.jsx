@@ -20,7 +20,10 @@ export default function ImagePreviewModal({ src, onClose }) {
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
-      <img src={`http://localhost:8080${src}`} alt="Full preview" />
+      <img
+        src={src.startsWith("data:") || src.startsWith("http") ? src : `${import.meta.env.VITE_BACKEND_URL}${src}`}
+        alt="Full preview"
+      />
     </div>
   );
 }

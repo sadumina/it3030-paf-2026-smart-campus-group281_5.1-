@@ -24,7 +24,7 @@ import com.backend.backend.service.ResourceService;
 
 @RestController
 @RequestMapping("/api/resources")
-@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5176" })
+@CrossOrigin(originPatterns = { "http://localhost:*", "http://127.0.0.1:*" })
 public class ResourceController {
     private final ResourceService resourceService;
 

@@ -21,7 +21,7 @@ const PRIORITIES = [
 
 const CATEGORIES = ["ALL","ELECTRICAL","PLUMBING","IT","HVAC","STRUCTURAL","CLEANING","OTHER"];
 
-export default function TechnicianTicketView() {
+export default function TechnicianTicketView({ embedded = false }) {
   const auth = getAuth();
   const [allTickets, setAllTickets]   = useState([]);
   const [apiTickets, setApiTickets]   = useState([]);
@@ -86,7 +86,7 @@ export default function TechnicianTicketView() {
   const clearFilters = () => { setStatus("ALL"); setPriority("ALL"); setCategory("ALL"); setKeyword(""); };
 
   return (
-    <div className="tkt-page tkt-root">
+    <div className={`tkt-root ${embedded ? "tkt-embedded" : "tkt-page"}`}>
       <div className="tkt-container">
 
         {/* Header */}

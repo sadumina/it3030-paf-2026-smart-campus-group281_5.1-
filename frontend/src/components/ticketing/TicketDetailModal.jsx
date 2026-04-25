@@ -279,15 +279,21 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                 {/* Images */}
                 {ticket.imageUrls?.length > 0 && (
                   <div style={{ marginTop: 14 }}>
-                    <p className="tkt-section-heading">📎 Attachments</p>
+                    <p className="tkt-section-heading">📎 Attachments ({ticket.imageUrls.length})</p>
                     <div className="tkt-image-gallery">
                       {ticket.imageUrls.map((url, i) => (
-                        <div key={i} className="tkt-gallery-item" style={{ position: "relative" }}>
+                        <div
+                          key={i}
+                          className="tkt-gallery-item"
+                          style={{ position: "relative", cursor: "pointer" }}
+                          onClick={() => setLightboxSrc(url)}
+                          title="Click to view full image"
+                        >
                           <img
-                            src={`http://localhost:8080${url}`}
+                            src={`${import.meta.env.VITE_BACKEND_URL}${url}`}
                             alt={`Attachment ${i + 1}`}
-                            onClick={() => setLightboxSrc(url)}
                           />
+                          <div className="tkt-gallery-zoom-hint">🔍</div>
                           {canDeleteImages && (
                             <button
                               onClick={(e) => { e.stopPropagation(); handleDeleteImage(url); }}

@@ -1,6 +1,6 @@
 import { getToken } from "./authStorage";
 
-const API_BASE_URL = "http://localhost:8080/api/users";
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL}/users`;
 
 export const fetchAnalyticsSummary = async () => {
   try {

@@ -4,39 +4,44 @@ import RoleDashboardLayout from "../../components/dashboard/RoleDashboardLayout"
 import StudentTicketView from "./StudentTicketView";
 import AdminTicketView from "./AdminTicketView";
 import TechnicianTicketView from "./TechnicianTicketView";
-import {
-  LayoutDashboard,
-  TriangleAlert,
-  ClipboardCheck,
-  ScrollText,
-  Shield,
-} from "lucide-react";
-
-const userTicketSidebar = [
-  { label: "Overview", icon: LayoutDashboard, path: "/dashboard" },
-  { label: "Incident Reports", icon: TriangleAlert, path: "/tickets" },
-  { label: "Ticketing Management", icon: ClipboardCheck, path: "/tickets", badge: "Active" },
-];
-
-const adminTicketSidebar = [
-  { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Audit Trail", icon: ScrollText, path: "/tickets" },
-  { label: "Ticket Management", icon: ClipboardCheck, path: "/tickets", badge: "Active" },
-];
+import SuperAdminTicketView from "./SuperAdminTicketView";
+import { userSidebar } from "../../config/userDashboardConfig";
+import { adminSidebar, superAdminSidebar } from "../AdminDashboardPage";
+import { technicianSidebar } from "../TechnicianDashboardPage";
 
 export default function TicketingPage() {
   const auth = getAuth();
   const role = (auth?.role || "USER").toUpperCase();
 
-  if (role === "ADMIN" || role === "SUPER_ADMIN") {
+  if (role === "SUPER_ADMIN") {
+    return (
+      <RoleDashboardLayout
+        sectionLabel="Super Admin Command Center"
+        dashboardTitle="Global Ticket & User Control"
+        dashboardSubtitle="Full oversight — manage all tickets and all user accounts."
+        roleLabel="SUPER_ADMIN"
+        auth={auth}
+        sidebarItems={superAdminSidebar}
+        kpis={[]}
+        quickActions={[]}
+        activityFeed={[]}
+        chartTitle=""
+        chartCaption=""
+        showInsightsPanel={false}
+        extraContent={<SuperAdminTicketView embedded />}
+      />
+    );
+  }
+
+  if (role === "ADMIN") {
     return (
       <RoleDashboardLayout
         sectionLabel="Admin Ticketing"
         dashboardTitle="Audit Trail - Ticket Management"
         dashboardSubtitle="Manage and monitor incident tickets with admin controls."
-        roleLabel={role}
+        roleLabel="ADMIN"
         auth={auth}
-        sidebarItems={adminTicketSidebar}
+        sidebarItems={adminSidebar}
         kpis={[]}
         quickActions={[]}
         activityFeed={[]}
@@ -47,7 +52,25 @@ export default function TicketingPage() {
       />
     );
   }
-  if (role === "TECHNICIAN") return <TechnicianTicketView />;
+  if (role === "TECHNICIAN") {
+    return (
+      <RoleDashboardLayout
+        sectionLabel="Technician Workspace"
+        dashboardTitle="My Assigned Tickets"
+        dashboardSubtitle="Manage and resolve your assigned campus incidents."
+        roleLabel="TECHNICIAN"
+        auth={auth}
+        sidebarItems={technicianSidebar}
+        kpis={[]}
+        quickActions={[]}
+        activityFeed={[]}
+        chartTitle=""
+        chartCaption=""
+        showInsightsPanel={false}
+        extraContent={<TechnicianTicketView embedded />}
+      />
+    );
+  }
   return (
     <RoleDashboardLayout
       sectionLabel="Incident Reports"
@@ -55,7 +78,7 @@ export default function TicketingPage() {
       dashboardSubtitle="Create, track, and manage your incident tickets."
       roleLabel="USER"
       auth={auth}
-      sidebarItems={userTicketSidebar}
+      sidebarItems={userSidebar}
       kpis={[]}
       quickActions={[]}
       activityFeed={[]}

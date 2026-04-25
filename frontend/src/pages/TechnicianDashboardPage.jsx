@@ -9,7 +9,7 @@ import {
   Handshake,
 } from "lucide-react";
 
-const technicianSidebar = [
+export const technicianSidebar = [
   { label: "My Board", icon: HardHat, path: "/technician" },
   { label: "Assigned Tickets", badge: "24", icon: ClipboardList, path: "/tickets" },
   { label: "Preventive Tasks", icon: Wrench },

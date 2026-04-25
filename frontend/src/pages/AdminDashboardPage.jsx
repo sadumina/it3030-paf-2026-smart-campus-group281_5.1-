@@ -9,9 +9,10 @@ import {
   ScrollText,
   BarChart3,
   Sparkles,
+  ShieldCheck,
 } from "lucide-react";
 
-const adminSidebar = [
+export const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
   { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/approvals" },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
@@ -20,6 +21,17 @@ const adminSidebar = [
   { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
   { label: "Incidents", badge: "6", icon: Siren },
   { label: "Audit Trail", icon: ScrollText, path: "/tickets", badge: "Tickets" },
+];
+
+export const superAdminSidebar = [
+  { label: "Dashboard", icon: Shield, path: "/admin" },
+  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/approvals" },
+  { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
+  { label: "Resource Matrix", icon: LayoutGrid, path: "/admin/resources" },
+  { label: "User Management", icon: Users, path: "/admin/users" },
+  { label: "Ticket Command", icon: ShieldCheck, path: "/tickets", badge: "SA" },
+  { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
+  { label: "Incidents", badge: "6", icon: Siren },
 ];
 
 const adminKpis = [

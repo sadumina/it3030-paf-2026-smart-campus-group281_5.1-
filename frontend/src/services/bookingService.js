@@ -1,6 +1,6 @@
 import { getToken } from "./authStorage";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/bookings`;
+const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8082/api"}/bookings`;
 
 async function parseResponse(response) {
   const data = await response.json().catch(() => null);
