@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
@@ -81,127 +82,186 @@ function SessionSync() {
   return null;
 }
 
-export default function AppRoutes() {
+const pageTransition = {
+  initial: { opacity: 0, y: 18, scale: 0.99 },
+  animate: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: -12, scale: 0.995 },
+  transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
+};
+
+function PageFrame({ children }) {
   return (
-    <Router>
-      <SessionSync />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+    <motion.div
+      className="min-h-screen w-full"
+      initial={pageTransition.initial}
+      animate={pageTransition.animate}
+      exit={pageTransition.exit}
+      transition={pageTransition.transition}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageFrame><LandingPage /></PageFrame>} />
+        <Route path="/login" element={<PageFrame><LoginPage /></PageFrame>} />
+        <Route path="/register" element={<PageFrame><RegisterPage /></PageFrame>} />
         <Route
           path="/dashboard"
           element={
-            <ProtectedRoute allowedRoles={["USER"]}>
-              <DashboardPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["USER"]}>
+                <DashboardPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/dashboard/bookings"
           element={
-            <ProtectedRoute allowedRoles={["USER"]}>
-              <MyBookingsPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["USER"]}>
+                <MyBookingsPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/dashboard/resources"
           element={
-            <ProtectedRoute allowedRoles={["USER"]}>
-              <ResourceCataloguePage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["USER"]}>
+                <ResourceCataloguePage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/dashboard/book-resource"
           element={
-            <ProtectedRoute allowedRoles={["USER"]}>
-              <ResourceBookingRedirectPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["USER"]}>
+                <ResourceBookingRedirectPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/tickets"
           element={
-            <ProtectedRoute>
-              <TicketingPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute>
+                <TicketingPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/admin"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
-              <AdminDashboardPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+                <AdminDashboardPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/admin/resources"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
-              <AdminResourceMatrixPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+                <AdminResourceMatrixPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/admin/resources/create"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
-              <ResourceFormPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+                <ResourceFormPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/admin/resources/:id/edit"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
-              <ResourceFormPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+                <ResourceFormPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/admin/approvals"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
-              <AdminApprovalsPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+                <AdminApprovalsPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/technician"
           element={
-            <ProtectedRoute allowedRoles={["TECHNICIAN"]}>
-              <TechnicianDashboardPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["TECHNICIAN"]}>
+                <TechnicianDashboardPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/admin/users"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
-              <AdminUsersPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+                <AdminUsersPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/admin/analytics"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
-              <AnalyticsDashboardPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+                <AnalyticsDashboardPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
         <Route
           path="/admin/innovation-lab"
           element={
-            <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
-              <InnovationLabPage />
-            </ProtectedRoute>
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
+                <InnovationLabPage />
+              </ProtectedRoute>
+            </PageFrame>
           }
         />
       </Routes>
+    </AnimatePresence>
+  );
+}
+
+export default function AppRoutes() {
+  return (
+    <Router>
+      <SessionSync />
+      <AnimatedRoutes />
     </Router>
   );
 }
