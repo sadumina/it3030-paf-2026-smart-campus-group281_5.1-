@@ -1,6 +1,8 @@
 import { getToken } from "./authStorage";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/bookings`;
+const ENABLE_DELETED_BOOKINGS_ENDPOINT =
+  import.meta.env.VITE_ENABLE_DELETED_BOOKINGS_ENDPOINT === "true";
 
 async function parseResponse(response) {
   const data = await response.json().catch(() => null);
@@ -51,6 +53,11 @@ export async function cancelBooking(bookingId) {
   return parseResponse(response);
 }
 
+/** USER: delete booking action maps to cancel in current backend API */
+export async function deleteBooking(bookingId) {
+  return cancelBooking(bookingId);
+}
+
 /** ADMIN: list all bookings */
 export async function fetchAllBookings() {
   const response = await fetch(API_BASE_URL, {
@@ -65,6 +72,10 @@ export const getAllBookings = fetchAllBookings;
 
 /** ADMIN: list soft-deleted bookings (optional endpoint) */
 export async function getDeletedBookings() {
+  if (!ENABLE_DELETED_BOOKINGS_ENDPOINT) {
+    return [];
+  }
+
   const response = await fetch(`${API_BASE_URL}/deleted`, {
     method: "GET",
     headers: getAuthHeaders(),

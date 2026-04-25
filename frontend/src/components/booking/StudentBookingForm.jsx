@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { createBooking, getAllBookings } from "../../services/bookingService";
+import { createBooking, getMyBookings } from "../../services/bookingService";
 import { getAuth } from "../../services/authStorage";
+import { fetchResources } from "../../services/resourceService";
 
 const RESOURCE_CATEGORIES = [
   { id: "", label: "Select Category..." },
@@ -32,6 +33,38 @@ const RESOURCE_OPTIONS = {
   ],
 };
 
+function resolveCategoryKey(resource) {
+  const categoryText = String(resource?.category || "").toLowerCase();
+  const typeText = String(resource?.type || "").toLowerCase();
+  const nameText = String(resource?.name || "").toLowerCase();
+  const combined = `${categoryText} ${typeText} ${nameText}`;
+
+  if (combined.includes("lecture")) {
+    return "lecture_halls";
+  }
+  if (combined.includes("lab")) {
+    return "labs";
+  }
+  if (
+    combined.includes("meeting") ||
+    combined.includes("seminar") ||
+    combined.includes("conference") ||
+    combined.includes("room")
+  ) {
+    return "meeting_rooms";
+  }
+  if (
+    combined.includes("equipment") ||
+    combined.includes("projector") ||
+    combined.includes("microphone") ||
+    combined.includes("camera")
+  ) {
+    return "equipment";
+  }
+
+  return null;
+}
+
 function StepIndicator({ step }) {
   const steps = ["Resource", "Date & Time", "Details", "Review"];
 
@@ -41,13 +74,12 @@ function StepIndicator({ step }) {
         <div key={label} className="flex items-center">
           <div className="flex flex-col items-center">
             <div
-              className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all duration-500 ease-out ${
-                index + 1 < step
+              className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition-all duration-500 ease-out ${index + 1 < step
                   ? "bg-emerald-600 text-white shadow-md shadow-emerald-500/30 scale-100 ring-2 ring-emerald-100 dark:ring-emerald-900"
                   : index + 1 === step
                     ? "bg-orange-600 text-white shadow-lg shadow-orange-500/40 scale-110 ring-4 ring-orange-100 dark:ring-orange-900/40"
                     : "bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500 scale-95 border border-slate-200 dark:border-slate-700"
-              }`}
+                }`}
             >
               {index + 1 < step ? (
                 <svg
@@ -68,13 +100,12 @@ function StepIndicator({ step }) {
               )}
             </div>
             <span
-              className={`mt-3 text-[11px] uppercase tracking-widest font-bold transition-colors duration-300 ${
-                index + 1 === step
+              className={`mt-3 text-[11px] uppercase tracking-widest font-bold transition-colors duration-300 ${index + 1 === step
                   ? "text-orange-600 dark:text-orange-400"
                   : index + 1 < step
                     ? "text-emerald-600 dark:text-emerald-400"
                     : "text-slate-400 dark:text-slate-500"
-              }`}
+                }`}
             >
               {label}
             </span>
@@ -108,6 +139,7 @@ export default function StudentBookingForm({
   const [error, setError] = useState("");
   const [animating, setAnimating] = useState(false);
   const [direction, setDirection] = useState("forward");
+  const [resources, setResources] = useState([]);
 
   const [form, setForm] = useState({
     categoryId: "",
@@ -120,6 +152,61 @@ export default function StudentBookingForm({
     purpose: "",
     expectedAttendees: 1,
   });
+
+  useEffect(() => {
+    let active = true;
+
+    const loadResources = async () => {
+      try {
+        const data = await fetchResources({ status: "ACTIVE" });
+        if (!active) {
+          return;
+        }
+        setResources(Array.isArray(data) ? data : []);
+      } catch {
+        if (active) {
+          setResources([]);
+        }
+      }
+    };
+
+    loadResources();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const resourceOptionsByCategory = useMemo(() => {
+    const mapped = {
+      lecture_halls: [],
+      labs: [],
+      meeting_rooms: [],
+      equipment: [],
+    };
+
+    resources.forEach((resource) => {
+      if (!resource?.id || !resource?.name) {
+        return;
+      }
+
+      const categoryKey = resolveCategoryKey(resource);
+      if (!categoryKey) {
+        return;
+      }
+
+      mapped[categoryKey].push({
+        value: resource.id,
+        label: resource.name,
+      });
+    });
+
+    Object.keys(mapped).forEach((key) => {
+      mapped[key].sort((a, b) => a.label.localeCompare(b.label));
+    });
+
+    return mapped;
+  }, [resources]);
 
   const handleChange = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value });
@@ -138,16 +225,26 @@ export default function StudentBookingForm({
     const requestedEnd = new Date(`${form.date}T${form.endTime}:00`);
 
     try {
-      const response = await getAllBookings();
-      const bookings = response?.data || [];
+      const response = await getMyBookings(accountUserId);
+      const bookings = Array.isArray(response)
+        ? response
+        : response?.data || [];
 
       return bookings.some((booking) => {
         if (booking.resourceId !== form.resourceId) {
           return false;
         }
 
-        const existingStart = new Date(booking.startTime);
-        const existingEnd = new Date(booking.endTime);
+        if (booking.date && booking.date !== form.date) {
+          return false;
+        }
+
+        const existingStart = booking.date
+          ? new Date(`${booking.date}T${String(booking.startTime).slice(0, 8)}`)
+          : new Date(booking.startTime);
+        const existingEnd = booking.date
+          ? new Date(`${booking.date}T${String(booking.endTime).slice(0, 8)}`)
+          : new Date(booking.endTime);
 
         if (
           Number.isNaN(existingStart.getTime()) ||
@@ -156,7 +253,7 @@ export default function StudentBookingForm({
           return false;
         }
 
-        return existingStart <= requestedEnd && existingEnd >= requestedStart;
+        return existingStart < requestedEnd && existingEnd > requestedStart;
       });
     } catch {
       return false;
@@ -171,6 +268,21 @@ export default function StudentBookingForm({
       }
       if (!form.resourceId) {
         setError("Please select a resource.");
+        return false;
+      }
+
+      const options = resourceOptionsByCategory[form.categoryId] || [];
+      if (options.length === 0) {
+        setError(
+          "No available resources found in this category. Please contact admin.",
+        );
+        return false;
+      }
+      const selectedExists = options.some(
+        (resource) => resource.value === form.resourceId,
+      );
+      if (!selectedExists) {
+        setError("Please select a valid available resource.");
         return false;
       }
     }
@@ -238,10 +350,9 @@ export default function StudentBookingForm({
     try {
       const bookingData = {
         resourceId: form.resourceId,
-        userId: accountUserId,
-        studentId: form.studentId,
-        startTime: `${form.date}T${form.startTime}:00`,
-        endTime: `${form.date}T${form.endTime}:00`,
+        date: form.date,
+        startTime: `${form.startTime}:00`,
+        endTime: `${form.endTime}:00`,
         purpose: form.purpose,
         expectedAttendees: Number(form.expectedAttendees) || 1,
       };
@@ -276,8 +387,8 @@ export default function StudentBookingForm({
   };
 
   const getResourceLabel = (val) => {
-    for (const key in RESOURCE_OPTIONS) {
-      const found = RESOURCE_OPTIONS[key].find((r) => r.value === val);
+    for (const key in resourceOptionsByCategory) {
+      const found = resourceOptionsByCategory[key].find((r) => r.value === val);
       if (found) return found.label;
     }
     return val;
@@ -493,52 +604,52 @@ export default function StudentBookingForm({
                       </div>
                     </div>
 
-                    {form.categoryId && RESOURCE_OPTIONS[form.categoryId] && (
-                      <div className="space-y-2 animate-[slideDown_0.3s_ease-out]">
-                        <label className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 ml-1 mt-4 block">
-                          Available Resources
-                        </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {RESOURCE_OPTIONS[form.categoryId].map(
-                            (resource, idx) => (
-                              <label
-                                key={resource.value}
-                                className={`group relative flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-4 transition-all duration-300 hover:shadow-md ${
-                                  form.resourceId === resource.value
-                                    ? "border-orange-600 bg-orange-50 shadow-lg shadow-orange-500/10 scale-[1.02] dark:border-orange-600 dark:bg-orange-900/30"
-                                    : "border-slate-200 bg-white hover:border-orange-400 hover:bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-orange-500/40"
-                                }`}
-                                style={{ animationDelay: `${idx * 0.1}s` }}
-                              >
-                                <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 bg-white group-hover:border-orange-600 dark:border-slate-600 dark:bg-slate-800">
-                                  {form.resourceId === resource.value && (
-                                    <div className="h-2.5 w-2.5 rounded-full bg-orange-600 animate-[scaleIn_0.2s_ease-out]" />
-                                  )}
-                                </div>
-                                <input
-                                  type="radio"
-                                  name="resourceId"
-                                  value={resource.value}
-                                  checked={form.resourceId === resource.value}
-                                  onChange={handleChange}
-                                  className="hidden"
-                                />
-                                <div className="flex-1">
-                                  <p
-                                    className={`font-bold transition-colors ${form.resourceId === resource.value ? "text-orange-700 dark:text-orange-200" : "text-slate-800 dark:text-slate-200"}`}
-                                  >
-                                    {resource.label}
-                                  </p>
-                                  <p className="text-xs font-medium text-slate-400 mt-0.5 dark:text-slate-500">
-                                    {resource.value}
-                                  </p>
-                                </div>
-                              </label>
-                            ),
-                          )}
+                    {form.categoryId &&
+                      resourceOptionsByCategory[form.categoryId] && (
+                        <div className="space-y-2 animate-[slideDown_0.3s_ease-out]">
+                          <label className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 ml-1 mt-4 block">
+                            Available Resources
+                          </label>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {resourceOptionsByCategory[form.categoryId].map(
+                              (resource, idx) => (
+                                <label
+                                  key={resource.value}
+                                  className={`group relative flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-4 transition-all duration-300 hover:shadow-md ${form.resourceId === resource.value
+                                      ? "border-orange-600 bg-orange-50 shadow-lg shadow-orange-500/10 scale-[1.02] dark:border-orange-600 dark:bg-orange-900/30"
+                                      : "border-slate-200 bg-white hover:border-orange-400 hover:bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-orange-500/40"
+                                    }`}
+                                  style={{ animationDelay: `${idx * 0.1}s` }}
+                                >
+                                  <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 bg-white group-hover:border-orange-600 dark:border-slate-600 dark:bg-slate-800">
+                                    {form.resourceId === resource.value && (
+                                      <div className="h-2.5 w-2.5 rounded-full bg-orange-600 animate-[scaleIn_0.2s_ease-out]" />
+                                    )}
+                                  </div>
+                                  <input
+                                    type="radio"
+                                    name="resourceId"
+                                    value={resource.value}
+                                    checked={form.resourceId === resource.value}
+                                    onChange={handleChange}
+                                    className="hidden"
+                                  />
+                                  <div className="flex-1">
+                                    <p
+                                      className={`font-bold transition-colors ${form.resourceId === resource.value ? "text-orange-700 dark:text-orange-200" : "text-slate-800 dark:text-slate-200"}`}
+                                    >
+                                      {resource.label}
+                                    </p>
+                                    <p className="text-xs font-medium text-slate-400 mt-0.5 dark:text-slate-500">
+                                      {resource.value}
+                                    </p>
+                                  </div>
+                                </label>
+                              ),
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </div>
                 )}
 
