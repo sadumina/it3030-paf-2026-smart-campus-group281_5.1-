@@ -17,13 +17,28 @@ import { fetchAllUsers } from "../services/adminUserService";
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/approvals" },
+  {
+    label: "Booking Approvals",
+    badge: "18",
+    icon: ClipboardCheck,
+    path: "/admin/bookings",
+  },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "Resource Matrix", icon: LayoutGrid, path: "/admin/resources" },
   { label: "User Management", icon: Users, path: "/admin/users" },
-  { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
+  {
+    label: "Innovation Lab",
+    icon: Sparkles,
+    path: "/admin/innovation-lab",
+    badge: "New",
+  },
   { label: "Incidents", badge: "6", icon: Siren },
-  { label: "Audit Trail", icon: ScrollText, path: "/tickets", badge: "Tickets" },
+  {
+    label: "Audit Trail",
+    icon: ScrollText,
+    path: "/tickets",
+    badge: "Tickets",
+  },
 ];
 
 const LAST_LOGIN_RISK_DAYS = 14;
@@ -54,7 +69,10 @@ function getRiskInfo(profile) {
     return {
       level: role === "SUPER_ADMIN" ? "HIGH" : "MEDIUM",
       reason: `Inactive for ${days} days`,
-      className: role === "SUPER_ADMIN" ? "bg-red-100 text-red-700 border-red-200" : "bg-amber-100 text-amber-700 border-amber-200",
+      className:
+        role === "SUPER_ADMIN"
+          ? "bg-red-100 text-red-700 border-red-200"
+          : "bg-amber-100 text-amber-700 border-amber-200",
     };
   }
 
@@ -136,7 +154,7 @@ export default function InnovationLabPage() {
           acc[risk.level] += 1;
           return acc;
         },
-        { LOW: 0, MEDIUM: 0, HIGH: 0 }
+        { LOW: 0, MEDIUM: 0, HIGH: 0 },
       );
   }, [allUsers]);
 
@@ -152,15 +170,20 @@ export default function InnovationLabPage() {
   const suggestedActions = useMemo(() => {
     const actions = [];
 
-    const highRiskProfiles = privilegedProfiles.filter((profile) => getRiskInfo(profile).level === "HIGH");
+    const highRiskProfiles = privilegedProfiles.filter(
+      (profile) => getRiskInfo(profile).level === "HIGH",
+    );
     if (highRiskProfiles.length > 0) {
       actions.push({
         title: `Review ${highRiskProfiles.length} high-risk privileged account(s)`,
-        detail: "Accounts with no login record or long inactivity need immediate review.",
+        detail:
+          "Accounts with no login record or long inactivity need immediate review.",
       });
     }
 
-    const superAdmins = privilegedProfiles.filter((profile) => (profile.role || "").toUpperCase() === "SUPER_ADMIN");
+    const superAdmins = privilegedProfiles.filter(
+      (profile) => (profile.role || "").toUpperCase() === "SUPER_ADMIN",
+    );
     if (superAdmins.length === 1) {
       actions.push({
         title: "Only one SUPER_ADMIN detected",
@@ -199,27 +222,63 @@ export default function InnovationLabPage() {
 
   return (
     <RoleDashboardLayout
-      sectionLabel={isSuperAdmin ? "Super Admin Innovation Lab" : "Admin Innovation Lab"}
+      sectionLabel={
+        isSuperAdmin ? "Super Admin Innovation Lab" : "Admin Innovation Lab"
+      }
       dashboardTitle="Smart User Management"
       dashboardSubtitle="Track privileged profiles, risk levels, and login activity with actionable insights."
       roleLabel={role}
       auth={auth}
       sidebarItems={adminSidebar}
       kpis={[
-        { label: "Privileged Accounts", value: String(privilegedProfiles.length), change: "ADMIN + SUPER_ADMIN" },
-        { label: "Active in 7 Days", value: String(activeInLast7Days), change: "Recently logged in" },
-        { label: "High Risk", value: String(riskSummary.HIGH), change: "Needs immediate review" },
-        { label: "Low Risk", value: String(riskSummary.LOW), change: "Healthy accounts" },
+        {
+          label: "Privileged Accounts",
+          value: String(privilegedProfiles.length),
+          change: "ADMIN + SUPER_ADMIN",
+        },
+        {
+          label: "Active in 7 Days",
+          value: String(activeInLast7Days),
+          change: "Recently logged in",
+        },
+        {
+          label: "High Risk",
+          value: String(riskSummary.HIGH),
+          change: "Needs immediate review",
+        },
+        {
+          label: "Low Risk",
+          value: String(riskSummary.LOW),
+          change: "Healthy accounts",
+        },
       ]}
       quickActions={[
-        { title: "Review high-risk accounts", description: "Open flagged accounts and verify role necessity." },
-        { title: "Confirm super admin redundancy", description: "Ensure at least two SUPER_ADMIN users exist." },
-        { title: "Clean inactive privileged users", description: "Downgrade unused privileged accounts when needed." },
+        {
+          title: "Review high-risk accounts",
+          description: "Open flagged accounts and verify role necessity.",
+        },
+        {
+          title: "Confirm super admin redundancy",
+          description: "Ensure at least two SUPER_ADMIN users exist.",
+        },
+        {
+          title: "Clean inactive privileged users",
+          description: "Downgrade unused privileged accounts when needed.",
+        },
       ]}
       activityFeed={[
-        { title: "Privileged profile visibility enabled", meta: "ADMIN + SUPER_ADMIN tracking" },
-        { title: "Risk labels generated from login activity", meta: "Smart governance signal" },
-        { title: "Suggested actions generated automatically", meta: "Operator guidance" },
+        {
+          title: "Privileged profile visibility enabled",
+          meta: "ADMIN + SUPER_ADMIN tracking",
+        },
+        {
+          title: "Risk labels generated from login activity",
+          meta: "Smart governance signal",
+        },
+        {
+          title: "Suggested actions generated automatically",
+          meta: "Operator guidance",
+        },
       ]}
       chartTitle="Privileged account activity"
       chartCaption="Live posture view based on role and login freshness."
@@ -230,9 +289,12 @@ export default function InnovationLabPage() {
           <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <h2 className="text-sm font-semibold text-slate-900">Privileged Profiles</h2>
+                <h2 className="text-sm font-semibold text-slate-900">
+                  Privileged Profiles
+                </h2>
                 <p className="mt-1 text-xs text-slate-600">
-                  ADMIN and SUPER_ADMIN profiles with last recorded login timestamps.
+                  ADMIN and SUPER_ADMIN profiles with last recorded login
+                  timestamps.
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -268,24 +330,42 @@ export default function InnovationLabPage() {
             ) : null}
 
             {loadingUsers ? (
-              <div className="mt-4 py-8 text-center text-sm text-slate-500">Loading privileged profiles...</div>
+              <div className="mt-4 py-8 text-center text-sm text-slate-500">
+                Loading privileged profiles...
+              </div>
             ) : (
               <div className="mt-4 overflow-x-auto rounded-lg border border-slate-200">
                 <table className="w-full divide-y divide-slate-200 text-sm">
                   <thead className="bg-slate-50">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Name</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Email</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Role</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Risk</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Last Login Day</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Last Login Time</th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">Risk Reason</th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        Name
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        Email
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        Role
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        Risk
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        Last Login Day
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        Last Login Time
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-600">
+                        Risk Reason
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 bg-white">
                     {privilegedProfiles.map((profile) => {
-                      const normalizedRole = (profile?.role || "").toUpperCase();
+                      const normalizedRole = (
+                        profile?.role || ""
+                      ).toUpperCase();
                       const risk = getRiskInfo(profile);
                       const roleBadgeClass =
                         normalizedRole === "SUPER_ADMIN"
@@ -294,27 +374,44 @@ export default function InnovationLabPage() {
 
                       return (
                         <tr key={profile.id} className="hover:bg-slate-50">
-                          <td className="px-4 py-3 font-medium text-slate-900">{profile.name || "-"}</td>
-                          <td className="px-4 py-3 text-xs text-slate-600">{profile.email || "-"}</td>
+                          <td className="px-4 py-3 font-medium text-slate-900">
+                            {profile.name || "-"}
+                          </td>
+                          <td className="px-4 py-3 text-xs text-slate-600">
+                            {profile.email || "-"}
+                          </td>
                           <td className="px-4 py-3">
-                            <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${roleBadgeClass}`}>
+                            <span
+                              className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${roleBadgeClass}`}
+                            >
                               {normalizedRole || "-"}
                             </span>
                           </td>
                           <td className="px-4 py-3">
-                            <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${risk.className}`}>
+                            <span
+                              className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${risk.className}`}
+                            >
                               {risk.level}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-xs text-slate-700">{formatLastLoginDay(profile.lastLoginAt)}</td>
-                          <td className="px-4 py-3 text-xs text-slate-600">{formatLastLogin(profile.lastLoginAt)}</td>
-                          <td className="px-4 py-3 text-xs text-slate-600">{risk.reason}</td>
+                          <td className="px-4 py-3 text-xs text-slate-700">
+                            {formatLastLoginDay(profile.lastLoginAt)}
+                          </td>
+                          <td className="px-4 py-3 text-xs text-slate-600">
+                            {formatLastLogin(profile.lastLoginAt)}
+                          </td>
+                          <td className="px-4 py-3 text-xs text-slate-600">
+                            {risk.reason}
+                          </td>
                         </tr>
                       );
                     })}
                     {!privilegedProfiles.length ? (
                       <tr>
-                        <td colSpan={7} className="px-4 py-8 text-center text-sm text-slate-500">
+                        <td
+                          colSpan={7}
+                          className="px-4 py-8 text-center text-sm text-slate-500"
+                        >
                           No ADMIN or SUPER_ADMIN profiles found.
                         </td>
                       </tr>
@@ -326,20 +423,30 @@ export default function InnovationLabPage() {
           </section>
 
           <section className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-            <h2 className="text-sm font-semibold text-slate-900">Smart Suggested Actions</h2>
+            <h2 className="text-sm font-semibold text-slate-900">
+              Smart Suggested Actions
+            </h2>
             <p className="mt-1 text-xs text-slate-600">
-              Recommendations are generated from current privileged account posture.
+              Recommendations are generated from current privileged account
+              posture.
             </p>
             <div className="mt-4 space-y-3">
               {suggestedActions.map((action) => (
-                <article key={action.title} className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <article
+                  key={action.title}
+                  className="rounded-lg border border-slate-200 bg-slate-50 p-3"
+                >
                   <div className="flex items-start gap-2">
                     <div className="rounded-md bg-orange-100 p-1.5 text-orange-700">
                       <AlertTriangle className="h-4 w-4" />
                     </div>
                     <div>
-                      <h3 className="text-sm font-semibold text-slate-900">{action.title}</h3>
-                      <p className="mt-1 text-xs text-slate-600">{action.detail}</p>
+                      <h3 className="text-sm font-semibold text-slate-900">
+                        {action.title}
+                      </h3>
+                      <p className="mt-1 text-xs text-slate-600">
+                        {action.detail}
+                      </p>
                     </div>
                   </div>
                 </article>

@@ -28,4 +28,12 @@ public interface BookingRepository extends MongoRepository<Booking, String> {
 
     // Find DELETED bookings whose deletedAt is before a given cutoff (for 7-day purge)
     List<Booking> findByStatusAndDeletedAtBefore(BookingStatus status, LocalDateTime cutoff);
+
+    // Find ACTIVE (PENDING + APPROVED) overlapping bookings for capacity check
+    List<Booking> findByResourceIdAndStatusInAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
+        String resourceId,
+        List<BookingStatus> statuses,
+        LocalDateTime endTime,
+        LocalDateTime startTime
+    );
 }

@@ -18,7 +18,7 @@ import BookingCalendar from "../components/analytics/BookingCalendar";
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
   {
-    label: "Approvals",
+    label: "Booking Approvals",
     badge: "18",
     icon: ClipboardCheck,
     path: "/admin/bookings",

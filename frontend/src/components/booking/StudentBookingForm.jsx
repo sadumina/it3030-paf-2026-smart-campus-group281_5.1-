@@ -1,35 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { createBooking, getAllBookings } from "../../services/bookingService";
+import { createBooking, getAllBookings, getResources, getResourceCapacity } from "../../services/bookingService";
 import { getAuth } from "../../services/authStorage";
 
-const RESOURCE_CATEGORIES = [
-  { id: "", label: "Select Category..." },
-  { id: "lecture_halls", label: "Lecture Halls" },
-  { id: "labs", label: "Labs" },
-  { id: "meeting_rooms", label: "Meeting Rooms" },
-  { id: "equipment", label: "Equipment" },
-];
-
-const RESOURCE_OPTIONS = {
-  lecture_halls: [
-    { value: "LH-A", label: "Lecture Hall A" },
-    { value: "LH-B", label: "Lecture Hall B" },
-  ],
-  labs: [
-    { value: "LAB-01", label: "Computer Lab 01" },
-    { value: "LAB-02", label: "Computer Lab 02" },
-  ],
-  meeting_rooms: [
-    { value: "SEM-01", label: "Seminar Room 01" },
-    { value: "SEM-02", label: "Seminar Room 02" },
-    { value: "CONF-01", label: "Conference Room 01" },
-  ],
-  equipment: [
-    { value: "EQ-PROJ", label: "4K Multimedia Projector" },
-    { value: "EQ-MIC", label: "Wireless Microphone System" },
-    { value: "EQ-CAM", label: "Video Conference Camera" },
-  ],
+// Type strings returned by the Resource API
+const TYPE_LABELS = {
+  "Lecture Hall": "Lecture Halls",
+  "Lab": "Labs",
+  "Meeting Room": "Meeting Rooms",
+  "Equipment": "Equipment",
 };
 
 function StepIndicator({ step }) {
@@ -109,6 +88,15 @@ export default function StudentBookingForm({
   const [animating, setAnimating] = useState(false);
   const [direction, setDirection] = useState("forward");
 
+  // Live resources from the API
+  const [resources, setResources] = useState([]);
+  const [resourcesLoading, setResourcesLoading] = useState(true);
+  const [resourcesError, setResourcesError] = useState("");
+
+  // Capacity info: { available: number, unlimited: boolean } | null
+  const [capacityInfo, setCapacityInfo] = useState(null);
+  const [capacityLoading, setCapacityLoading] = useState(false);
+
   const [form, setForm] = useState({
     categoryId: "",
     resourceId: "",
@@ -120,6 +108,48 @@ export default function StudentBookingForm({
     purpose: "",
     expectedAttendees: 1,
   });
+
+  // Fetch resources on mount
+  useEffect(() => {
+    setResourcesLoading(true);
+    getResources()
+      .then((res) => setResources(res.data || []))
+      .catch(() => setResourcesError("Could not load resources. Please refresh."))
+      .finally(() => setResourcesLoading(false));
+  }, []);
+
+  // Fetch capacity whenever step 3 becomes active (resource + time must be selected)
+  useEffect(() => {
+    if (step !== 3 || !form.resourceId || !form.date || !form.startTime || !form.endTime) {
+      setCapacityInfo(null);
+      return;
+    }
+    const startISO = `${form.date}T${form.startTime}:00`;
+    const endISO = `${form.date}T${form.endTime}:00`;
+    setCapacityLoading(true);
+    getResourceCapacity(form.resourceId, startISO, endISO)
+      .then((res) => setCapacityInfo(res.data))
+      .catch(() => setCapacityInfo(null))
+      .finally(() => setCapacityLoading(false));
+  }, [step, form.resourceId, form.date, form.startTime, form.endTime]);
+
+  // Derive unique category types from live data
+  const categories = useMemo(() => {
+    const types = [...new Set(resources.map((r) => r.type).filter(Boolean))];
+    return types.sort();
+  }, [resources]);
+
+  // Resources filtered by selected category
+  const filteredResources = useMemo(() => {
+    if (!form.categoryId) return [];
+    return resources.filter((r) => r.type === form.categoryId);
+  }, [resources, form.categoryId]);
+
+  // Selected resource object (for review screen)
+  const selectedResource = useMemo(
+    () => resources.find((r) => r.id === form.resourceId) || null,
+    [resources, form.resourceId],
+  );
 
   const handleChange = (event) => {
     setForm({ ...form, [event.target.name]: event.target.value });
@@ -207,6 +237,17 @@ export default function StudentBookingForm({
         setError("Please describe the purpose of your booking.");
         return false;
       }
+      // Capacity check
+      if (
+        capacityInfo &&
+        !capacityInfo.unlimited &&
+        Number(form.expectedAttendees) > capacityInfo.available
+      ) {
+        setError(
+          `Not enough capacity. Only ${capacityInfo.available} spot(s) remaining for this time slot.`,
+        );
+        return false;
+      }
     }
     return true;
   };
@@ -275,15 +316,8 @@ export default function StudentBookingForm({
     }
   };
 
-  const getResourceLabel = (val) => {
-    for (const key in RESOURCE_OPTIONS) {
-      const found = RESOURCE_OPTIONS[key].find((r) => r.value === val);
-      if (found) return found.label;
-    }
-    return val;
-  };
-
-  const resourceLabel = getResourceLabel(form.resourceId);
+  // Use the live resource name instead of a hardcoded lookup
+  const resourceLabel = selectedResource?.name || form.resourceId || "—";
 
   if (success) {
     return (
@@ -448,96 +482,193 @@ export default function StudentBookingForm({
                 className={`w-full transition-all duration-300 transform ease-in-out ${animationClass}`}
               >
                 {step === 1 && (
-                  <div className="space-y-6">
-                    <div className="text-center mb-6">
+                  <div className="space-y-5">
+                    <div className="text-center mb-4">
                       <h3 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                         What do you need?
                       </h3>
                       <p className="text-sm text-slate-500 mt-1 dark:text-slate-400">
-                        Select a category and choose a specific resource.
+                        Select a category, then pick an available resource.
                       </p>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 ml-1">
-                        Resource Category
-                      </label>
-                      <div className="relative">
-                        <select
-                          name="categoryId"
-                          value={form.categoryId}
-                          onChange={handleChange}
-                          className="w-full appearance-none rounded-2xl border-2 border-slate-200 bg-white/50 px-5 py-4 text-base font-semibold text-slate-700 transition-all duration-200 focus:border-orange-600 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-500/10 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-100 dark:focus:border-orange-600 dark:focus:bg-slate-800 cursor-pointer"
-                        >
-                          {RESOURCE_CATEGORIES.map((cat, idx) => (
-                            <option key={idx} value={cat.id} disabled={!cat.id}>
-                              {cat.label}
-                            </option>
+                    {/* Loading / error state */}
+                    {resourcesLoading && (
+                      <div className="space-y-3 animate-pulse">
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="h-9 flex-1 rounded-full bg-slate-100 dark:bg-slate-800" />
                           ))}
-                        </select>
-                        <div className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 text-slate-400">
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
                         </div>
+                        <div className="h-28 rounded-2xl bg-slate-100 dark:bg-slate-800" />
+                        <div className="h-28 rounded-2xl bg-slate-100 dark:bg-slate-800" />
                       </div>
-                    </div>
+                    )}
 
-                    {form.categoryId && RESOURCE_OPTIONS[form.categoryId] && (
-                      <div className="space-y-2 animate-[slideDown_0.3s_ease-out]">
-                        <label className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 ml-1 mt-4 block">
-                          Available Resources
-                        </label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          {RESOURCE_OPTIONS[form.categoryId].map(
-                            (resource, idx) => (
-                              <label
-                                key={resource.value}
-                                className={`group relative flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-4 transition-all duration-300 hover:shadow-md ${
-                                  form.resourceId === resource.value
-                                    ? "border-orange-600 bg-orange-50 shadow-lg shadow-orange-500/10 scale-[1.02] dark:border-orange-600 dark:bg-orange-900/30"
-                                    : "border-slate-200 bg-white hover:border-orange-400 hover:bg-slate-50/50 dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-orange-500/40"
-                                }`}
-                                style={{ animationDelay: `${idx * 0.1}s` }}
-                              >
-                                <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-slate-300 bg-white group-hover:border-orange-600 dark:border-slate-600 dark:bg-slate-800">
-                                  {form.resourceId === resource.value && (
-                                    <div className="h-2.5 w-2.5 rounded-full bg-orange-600 animate-[scaleIn_0.2s_ease-out]" />
-                                  )}
-                                </div>
-                                <input
-                                  type="radio"
-                                  name="resourceId"
-                                  value={resource.value}
-                                  checked={form.resourceId === resource.value}
-                                  onChange={handleChange}
-                                  className="hidden"
-                                />
-                                <div className="flex-1">
-                                  <p
-                                    className={`font-bold transition-colors ${form.resourceId === resource.value ? "text-orange-700 dark:text-orange-200" : "text-slate-800 dark:text-slate-200"}`}
-                                  >
-                                    {resource.label}
-                                  </p>
-                                  <p className="text-xs font-medium text-slate-400 mt-0.5 dark:text-slate-500">
-                                    {resource.value}
-                                  </p>
-                                </div>
-                              </label>
-                            ),
-                          )}
+                    {resourcesError && !resourcesLoading && (
+                      <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-700 dark:bg-rose-900/20 dark:text-rose-300">
+                        {resourcesError}
+                      </p>
+                    )}
+
+                    {!resourcesLoading && !resourcesError && (
+                      <>
+                        {/* Category tab pills */}
+                        <div className="flex flex-wrap gap-2">
+                          {categories.map((type) => (
+                            <button
+                              key={type}
+                              type="button"
+                              onClick={() =>
+                                setForm((prev) => ({
+                                  ...prev,
+                                  categoryId: type,
+                                  resourceId: "",
+                                }))
+                              }
+                              className={`rounded-full border-2 px-4 py-1.5 text-sm font-semibold transition-all duration-200 ${
+                                form.categoryId === type
+                                  ? "border-orange-600 bg-orange-600 text-white shadow-md shadow-orange-500/20"
+                                  : "border-slate-200 bg-white/60 text-slate-600 hover:border-orange-400 hover:text-orange-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-orange-500"
+                              }`}
+                            >
+                              {TYPE_LABELS[type] || type}
+                            </button>
+                          ))}
                         </div>
-                      </div>
+
+                        {/* Resource cards */}
+                        {form.categoryId && (
+                          <div className="space-y-2 animate-[slideDown_0.3s_ease-out]">
+                            <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 ml-1">
+                              {filteredResources.length} resource{filteredResources.length !== 1 ? "s" : ""} available
+                            </p>
+
+                            {filteredResources.length === 0 && (
+                              <p className="rounded-xl border border-dashed border-slate-300 py-6 text-center text-sm text-slate-400 dark:border-slate-700 dark:text-slate-500">
+                                No resources found in this category.
+                              </p>
+                            )}
+
+                            <div className="grid grid-cols-1 gap-3">
+                              {filteredResources.map((resource, idx) => {
+                                const isActive =
+                                  resource.status === "ACTIVE" ||
+                                  resource.availability === "Available";
+                                const isSelected = form.resourceId === resource.id;
+
+                                return (
+                                  <label
+                                    key={resource.id}
+                                    className={`group relative flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-4 transition-all duration-300 ${
+                                      !isActive
+                                        ? "cursor-not-allowed border-slate-100 bg-slate-50/50 opacity-60 dark:border-slate-700/50 dark:bg-slate-800/30"
+                                        : isSelected
+                                          ? "border-orange-600 bg-orange-50 shadow-lg shadow-orange-500/10 scale-[1.01] dark:border-orange-500 dark:bg-orange-900/30"
+                                          : "border-slate-200 bg-white hover:border-orange-400 hover:shadow-md dark:border-slate-700 dark:bg-slate-800/60 dark:hover:border-orange-500/40"
+                                    }`}
+                                    style={{ animationDelay: `${idx * 0.06}s` }}
+                                  >
+                                    {/* Radio indicator */}
+                                    <div
+                                      className={`mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                                        !isActive
+                                          ? "border-slate-200 bg-slate-50 dark:border-slate-700"
+                                          : isSelected
+                                            ? "border-orange-600 bg-white"
+                                            : "border-slate-300 bg-white group-hover:border-orange-500 dark:border-slate-600 dark:bg-slate-800"
+                                      }`}
+                                    >
+                                      {isSelected && isActive && (
+                                        <div className="h-2.5 w-2.5 rounded-full bg-orange-600 animate-[scaleIn_0.2s_ease-out]" />
+                                      )}
+                                    </div>
+
+                                    <input
+                                      type="radio"
+                                      name="resourceId"
+                                      value={resource.id}
+                                      checked={isSelected}
+                                      disabled={!isActive}
+                                      onChange={(e) => {
+                                        if (isActive) handleChange(e);
+                                      }}
+                                      className="hidden"
+                                    />
+
+                                    {/* Info */}
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <p
+                                          className={`font-bold text-sm transition-colors ${
+                                            isSelected && isActive
+                                              ? "text-orange-700 dark:text-orange-300"
+                                              : "text-slate-800 dark:text-slate-200"
+                                          }`}
+                                        >
+                                          {resource.name}
+                                        </p>
+                                        {/* Status badge */}
+                                        <span
+                                          className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                                            isActive
+                                              ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                                              : "bg-rose-100 text-rose-600 dark:bg-rose-900/30 dark:text-rose-400"
+                                          }`}
+                                        >
+                                          {isActive ? "Available" : "Unavailable"}
+                                        </span>
+                                      </div>
+
+                                      {/* Location + Capacity row */}
+                                      <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                                        {resource.location && (
+                                          <span className="flex items-center gap-1">
+                                            <svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            {resource.location}
+                                          </span>
+                                        )}
+                                        {resource.capacity != null && (
+                                          <span className="flex items-center gap-1">
+                                            <svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            Capacity {resource.capacity}
+                                          </span>
+                                        )}
+                                      </div>
+
+                                      {/* Description */}
+                                      {resource.description && (
+                                        <p className="mt-1 text-xs text-slate-400 dark:text-slate-500 line-clamp-2">
+                                          {resource.description}
+                                        </p>
+                                      )}
+
+                                      {/* Availability windows */}
+                                      {resource.availabilityWindows?.length > 0 && isActive && (
+                                        <p className="mt-1 text-[11px] font-medium text-orange-600/80 dark:text-orange-400/80">
+                                          🕐 {resource.availabilityWindows[0]}
+                                        </p>
+                                      )}
+                                    </div>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Prompt when no category selected */}
+                        {!form.categoryId && (
+                          <p className="rounded-xl border border-dashed border-slate-200 py-8 text-center text-sm text-slate-400 dark:border-slate-700 dark:text-slate-500">
+                            Choose a category above to see available resources.
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
                 )}

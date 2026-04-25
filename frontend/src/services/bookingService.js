@@ -42,6 +42,21 @@ export const deleteBooking = (id, userId) =>
 export const getDeletedBookings = () =>
   axios.get(`${API_URL}/deleted`, authConfig());
 
+// Fetch all resources (from friend's Resource module) — no filters = all resources
+export const getResources = (params = {}) =>
+  axios.get("http://localhost:8081/api/resources", {
+    params,
+    ...authConfig(),
+  });
+
+// Check remaining capacity for a resource in a given time window
+// Returns { available: number, unlimited: boolean }
+export const getResourceCapacity = (resourceId, startTime, endTime) =>
+  axios.get(`${API_URL}/capacity`, {
+    params: { resourceId, startTime, endTime },
+    ...authConfig(),
+  });
+
 const toData = (response) => response?.data ?? response;
 
 // Backward-compatible aliases used by older pages.

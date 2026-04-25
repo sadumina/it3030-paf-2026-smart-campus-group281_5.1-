@@ -16,24 +16,41 @@ import {
 
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
-import { fetchAllBookings, updateBookingStatus } from "../services/bookingService";
+import {
+  fetchAllBookings,
+  updateBookingStatus,
+} from "../services/bookingService";
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Approvals", badge: "Bookings", icon: ClipboardCheck, path: "/admin/approvals" },
+  {
+    label: "Booking Approvals",
+    badge: "Bookings",
+    icon: ClipboardCheck,
+    path: "/admin/bookings",
+  },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "Resource Matrix", icon: LayoutGrid, path: "/admin/resources" },
   { label: "User Management", icon: Users, path: "/admin/users" },
   { label: "Incidents", badge: "Tickets", icon: Siren, path: "/tickets" },
-  { label: "Audit Trail", icon: ScrollText, path: "/tickets", badge: "Tickets" },
+  {
+    label: "Audit Trail",
+    icon: ScrollText,
+    path: "/tickets",
+    badge: "Tickets",
+  },
 ];
 
 const STATUS_STYLES = {
-  PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-  APPROVED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-  CONFIRMED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+  PENDING:
+    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+  APPROVED:
+    "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
+  CONFIRMED:
+    "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
   REJECTED: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
-  CANCELLED: "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
+  CANCELLED:
+    "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
 };
 
 const STATUS_FILTERS = ["ALL", "PENDING", "APPROVED", "REJECTED", "CANCELLED"];
@@ -76,14 +93,18 @@ export default function AdminApprovalsPage() {
       return;
     }
 
-    if (!window.confirm(`Are you sure you want to set this booking to ${status}?`)) {
+    if (
+      !window.confirm(`Are you sure you want to set this booking to ${status}?`)
+    ) {
       return;
     }
 
     setActionLoading(bookingId);
     try {
       const updated = await updateBookingStatus(bookingId, status, reason);
-      setBookings((prev) => prev.map((b) => (b.id === bookingId ? { ...b, ...updated } : b)));
+      setBookings((prev) =>
+        prev.map((b) => (b.id === bookingId ? { ...b, ...updated } : b)),
+      );
       setReasonById((current) => {
         const next = { ...current };
         delete next[bookingId];
@@ -96,15 +117,25 @@ export default function AdminApprovalsPage() {
     }
   }
 
-  const pendingCount = bookings.filter((b) => normalizeBookingStatus(b.status) === "PENDING").length;
-  const approvedCount = bookings.filter((b) => normalizeBookingStatus(b.status) === "APPROVED").length;
-  const rejectedCount = bookings.filter((b) => normalizeBookingStatus(b.status) === "REJECTED").length;
+  const pendingCount = bookings.filter(
+    (b) => normalizeBookingStatus(b.status) === "PENDING",
+  ).length;
+  const approvedCount = bookings.filter(
+    (b) => normalizeBookingStatus(b.status) === "APPROVED",
+  ).length;
+  const rejectedCount = bookings.filter(
+    (b) => normalizeBookingStatus(b.status) === "REJECTED",
+  ).length;
 
   const filteredBookings = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
     return [...bookings]
-      .filter((booking) => statusFilter === "ALL" || normalizeBookingStatus(booking.status) === statusFilter)
+      .filter(
+        (booking) =>
+          statusFilter === "ALL" ||
+          normalizeBookingStatus(booking.status) === statusFilter,
+      )
       .filter((booking) => {
         if (!query) {
           return true;
@@ -140,10 +171,26 @@ export default function AdminApprovalsPage() {
       auth={getAuth()}
       sidebarItems={adminSidebar}
       kpis={[
-        { label: "Pending Requests", value: String(pendingCount), change: "Awaiting review" },
-        { label: "Approved", value: String(approvedCount), change: "Ready to use" },
-        { label: "Rejected", value: String(rejectedCount), change: "Reason required" },
-        { label: "Matrix Sync", value: "Live", change: "Conflict checks active" },
+        {
+          label: "Pending Requests",
+          value: String(pendingCount),
+          change: "Awaiting review",
+        },
+        {
+          label: "Approved",
+          value: String(approvedCount),
+          change: "Ready to use",
+        },
+        {
+          label: "Rejected",
+          value: String(rejectedCount),
+          change: "Reason required",
+        },
+        {
+          label: "Matrix Sync",
+          value: "Live",
+          change: "Conflict checks active",
+        },
       ]}
       quickActions={[]}
       activityFeed={bookings.slice(0, 5).map((b) => ({
@@ -159,9 +206,12 @@ export default function AdminApprovalsPage() {
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Booking Queue</h3>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                  Booking Queue
+                </h3>
                 <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  Workflow: PENDING to APPROVED or REJECTED. Approved bookings can later be cancelled.
+                  Workflow: PENDING to APPROVED or REJECTED. Approved bookings
+                  can later be cancelled.
                 </p>
               </div>
               <button
@@ -202,38 +252,59 @@ export default function AdminApprovalsPage() {
             </div>
 
             {loading ? (
-              <p className="text-sm text-slate-500 dark:text-slate-400">Loading booking queue...</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                Loading booking queue...
+              </p>
             ) : error ? (
               <p className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300">
                 {error}
               </p>
             ) : filteredBookings.length === 0 ? (
-              <p className="text-sm text-slate-500 dark:text-slate-400">No booking records found.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                No booking records found.
+              </p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-left text-sm">
                   <thead>
                     <tr className="border-b border-slate-100 dark:border-slate-700">
-                      <th className="pb-3 pr-4 font-semibold text-slate-700 dark:text-slate-300">Resource / Student</th>
-                      <th className="px-4 pb-3 font-semibold text-slate-700 dark:text-slate-300">Date & Time</th>
-                      <th className="px-4 pb-3 font-semibold text-slate-700 dark:text-slate-300">Status</th>
-                      <th className="pb-3 pl-4 text-right font-semibold text-slate-700 dark:text-slate-300">Actions</th>
+                      <th className="pb-3 pr-4 font-semibold text-slate-700 dark:text-slate-300">
+                        Resource / Student
+                      </th>
+                      <th className="px-4 pb-3 font-semibold text-slate-700 dark:text-slate-300">
+                        Date & Time
+                      </th>
+                      <th className="px-4 pb-3 font-semibold text-slate-700 dark:text-slate-300">
+                        Status
+                      </th>
+                      <th className="pb-3 pl-4 text-right font-semibold text-slate-700 dark:text-slate-300">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                     {filteredBookings.map((booking) => {
-                      const displayStatus = normalizeBookingStatus(booking.status);
+                      const displayStatus = normalizeBookingStatus(
+                        booking.status,
+                      );
                       const isBusy = actionLoading === booking.id;
 
                       return (
-                        <tr key={booking.id} className="group transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-900/50">
+                        <tr
+                          key={booking.id}
+                          className="group transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-900/50"
+                        >
                           <td className="py-4 pr-4 align-top">
-                            <p className="font-semibold text-slate-900 dark:text-slate-100">{booking.resourceName}</p>
+                            <p className="font-semibold text-slate-900 dark:text-slate-100">
+                              {booking.resourceName}
+                            </p>
                             <p className="text-xs text-slate-500 dark:text-slate-400">
                               {booking.userName} ({booking.userEmail})
                             </p>
                             {booking.purpose ? (
-                              <p className="mt-1 text-xs italic text-slate-400 dark:text-slate-500">"{booking.purpose}"</p>
+                              <p className="mt-1 text-xs italic text-slate-400 dark:text-slate-500">
+                                "{booking.purpose}"
+                              </p>
                             ) : null}
                             {booking.rejectionReason ? (
                               <p className="mt-1 text-xs font-medium text-rose-600 dark:text-rose-300">
@@ -251,12 +322,15 @@ export default function AdminApprovalsPage() {
                             </p>
                             {booking.expectedAttendees ? (
                               <p className="ml-5 mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                                {booking.expectedAttendees} attendee{booking.expectedAttendees === 1 ? "" : "s"}
+                                {booking.expectedAttendees} attendee
+                                {booking.expectedAttendees === 1 ? "" : "s"}
                               </p>
                             ) : null}
                           </td>
                           <td className="px-4 py-4 align-top">
-                            <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLES[displayStatus] || "bg-slate-100"}`}>
+                            <span
+                              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${STATUS_STYLES[displayStatus] || "bg-slate-100"}`}
+                            >
                               {displayStatus}
                             </span>
                           </td>
@@ -267,14 +341,19 @@ export default function AdminApprovalsPage() {
                                   rows={2}
                                   value={reasonById[booking.id] || ""}
                                   onChange={(event) =>
-                                    setReasonById((current) => ({ ...current, [booking.id]: event.target.value }))
+                                    setReasonById((current) => ({
+                                      ...current,
+                                      [booking.id]: event.target.value,
+                                    }))
                                   }
                                   placeholder="Reason for rejection"
                                   className="w-full min-w-[220px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 outline-none focus:border-rose-300 focus:ring-2 focus:ring-rose-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
                                 />
                                 <div className="flex items-center justify-end gap-2">
                                   <button
-                                    onClick={() => handleStatusUpdate(booking.id, "APPROVED")}
+                                    onClick={() =>
+                                      handleStatusUpdate(booking.id, "APPROVED")
+                                    }
                                     disabled={isBusy}
                                     className="rounded-lg p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50 disabled:opacity-60 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
                                     title="Approve"
@@ -286,7 +365,9 @@ export default function AdminApprovalsPage() {
                                     )}
                                   </button>
                                   <button
-                                    onClick={() => handleStatusUpdate(booking.id, "REJECTED")}
+                                    onClick={() =>
+                                      handleStatusUpdate(booking.id, "REJECTED")
+                                    }
                                     disabled={isBusy}
                                     className="rounded-lg p-1.5 text-rose-600 transition-colors hover:bg-rose-50 disabled:opacity-60 dark:text-rose-400 dark:hover:bg-rose-900/30"
                                     title="Reject"
@@ -297,7 +378,9 @@ export default function AdminApprovalsPage() {
                               </div>
                             ) : displayStatus === "APPROVED" ? (
                               <button
-                                onClick={() => handleStatusUpdate(booking.id, "CANCELLED")}
+                                onClick={() =>
+                                  handleStatusUpdate(booking.id, "CANCELLED")
+                                }
                                 disabled={isBusy}
                                 className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 disabled:opacity-60 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-900"
                                 title="Cancel approved booking"
@@ -306,7 +389,9 @@ export default function AdminApprovalsPage() {
                                 Cancel
                               </button>
                             ) : (
-                              <span className="text-xs italic text-slate-400 dark:text-slate-500">No actions</span>
+                              <span className="text-xs italic text-slate-400 dark:text-slate-500">
+                                No actions
+                              </span>
                             )}
                           </td>
                         </tr>

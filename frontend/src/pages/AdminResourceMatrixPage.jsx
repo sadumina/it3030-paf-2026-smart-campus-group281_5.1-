@@ -19,13 +19,28 @@ import { deleteResource, fetchResources } from "../services/resourceService";
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/approvals" },
+  {
+    label: "Booking Approvals",
+    badge: "18",
+    icon: ClipboardCheck,
+    path: "/admin/bookings",
+  },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "Resource Matrix", icon: LayoutGrid, path: "/admin/resources" },
   { label: "User Management", icon: Users, path: "/admin/users" },
-  { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
+  {
+    label: "Innovation Lab",
+    icon: Sparkles,
+    path: "/admin/innovation-lab",
+    badge: "New",
+  },
   { label: "Incidents", badge: "6", icon: Siren },
-  { label: "Audit Trail", icon: ScrollText, path: "/tickets", badge: "Tickets" },
+  {
+    label: "Audit Trail",
+    icon: ScrollText,
+    path: "/tickets",
+    badge: "Tickets",
+  },
 ];
 
 const defaultFilters = {
@@ -46,14 +61,19 @@ export default function AdminResourceMatrixPage() {
   const [formTarget, setFormTarget] = useState(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
 
-  async function loadResources(activeGuard = () => true, silent = false, filterSnapshot = filters) {
+  async function loadResources(
+    activeGuard = () => true,
+    silent = false,
+    filterSnapshot = filters,
+  ) {
     try {
       if (!silent) {
         setLoading(true);
       }
       setError("");
       const normalizedCapacity =
-        filterSnapshot.minCapacity === "" || Number.isNaN(Number(filterSnapshot.minCapacity))
+        filterSnapshot.minCapacity === "" ||
+        Number.isNaN(Number(filterSnapshot.minCapacity))
           ? ""
           : Number(filterSnapshot.minCapacity);
 
@@ -109,7 +129,6 @@ export default function AdminResourceMatrixPage() {
     }));
   }
 
-
   function handleOpenStatusChange(resource) {
     if (!resource?.id) return;
     setStatusChangeTarget(resource);
@@ -117,7 +136,9 @@ export default function AdminResourceMatrixPage() {
 
   function handleStatusChangeSuccess(updated) {
     setResources((current) =>
-      current.map((item) => (item.id === updated.id ? { ...item, ...updated } : item)),
+      current.map((item) =>
+        item.id === updated.id ? { ...item, ...updated } : item,
+      ),
     );
     setStatusChangeTarget(null);
   }
@@ -140,7 +161,9 @@ export default function AdminResourceMatrixPage() {
 
     if (isEditMode && saved?.id) {
       setResources((current) =>
-        current.map((resource) => (resource.id === saved.id ? { ...resource, ...saved } : resource)),
+        current.map((resource) =>
+          resource.id === saved.id ? { ...resource, ...saved } : resource,
+        ),
       );
       return;
     }
@@ -150,7 +173,10 @@ export default function AdminResourceMatrixPage() {
       const data = await fetchResources(defaultFilters);
       setResources(data);
     } catch (requestError) {
-      setActionError(requestError.message || "Resource saved, but the list could not refresh.");
+      setActionError(
+        requestError.message ||
+          "Resource saved, but the list could not refresh.",
+      );
     }
   }
 
@@ -167,7 +193,9 @@ export default function AdminResourceMatrixPage() {
     setActionLoading(true);
     try {
       await deleteResource(resource.id);
-      setResources((current) => current.filter((item) => item.id !== resource.id));
+      setResources((current) =>
+        current.filter((item) => item.id !== resource.id),
+      );
     } catch (requestError) {
       setActionError(requestError.message || "Unable to delete resource.");
     } finally {
@@ -184,15 +212,30 @@ export default function AdminResourceMatrixPage() {
       auth={getAuth()}
       sidebarItems={adminSidebar}
       kpis={[
-        { label: "Total Resources", value: String(resources.length), change: "Filtered live" },
+        {
+          label: "Total Resources",
+          value: String(resources.length),
+          change: "Filtered live",
+        },
         {
           label: "Active",
-          value: String(resources.filter((resource) => String(resource.status || "").toUpperCase() === "ACTIVE").length),
+          value: String(
+            resources.filter(
+              (resource) =>
+                String(resource.status || "").toUpperCase() === "ACTIVE",
+            ).length,
+          ),
           change: "Operational now",
         },
         {
           label: "Out Of Service",
-          value: String(resources.filter((resource) => String(resource.status || "").toUpperCase() === "OUT_OF_SERVICE").length),
+          value: String(
+            resources.filter(
+              (resource) =>
+                String(resource.status || "").toUpperCase() ===
+                "OUT_OF_SERVICE",
+            ).length,
+          ),
           change: "Needs attention",
         },
         { label: "Matrix Scope", value: "Campus", change: "All categories" },
@@ -206,9 +249,18 @@ export default function AdminResourceMatrixPage() {
         },
       ]}
       activityFeed={[
-        { title: "Use Edit for metadata corrections", meta: "Admin-only action" },
-        { title: "Use status toggle for maintenance windows", meta: "ACTIVE / OUT_OF_SERVICE" },
-        { title: "Filters apply across all resource cards", meta: "Type, location, capacity, status" },
+        {
+          title: "Use Edit for metadata corrections",
+          meta: "Admin-only action",
+        },
+        {
+          title: "Use status toggle for maintenance windows",
+          meta: "ACTIVE / OUT_OF_SERVICE",
+        },
+        {
+          title: "Filters apply across all resource cards",
+          meta: "Type, location, capacity, status",
+        },
       ]}
       chartTitle="Resource status trend"
       chartCaption="Overview context for matrix operations."
@@ -218,9 +270,12 @@ export default function AdminResourceMatrixPage() {
           <section className="rounded-lg border border-orange-200 bg-orange-50 p-4 shadow-sm dark:border-orange-900/40 dark:bg-orange-950/20">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">Resource Matrix Controls</h2>
+                <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  Resource Matrix Controls
+                </h2>
                 <p className="mt-1 text-xs text-slate-700 dark:text-slate-300">
-                  Create a new resource here, then manage status, edits, and bookings from the cards below.
+                  Create a new resource here, then manage status, edits, and
+                  bookings from the cards below.
                 </p>
               </div>
               <button

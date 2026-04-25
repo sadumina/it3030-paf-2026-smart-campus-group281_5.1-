@@ -10,13 +10,22 @@ import org.springframework.stereotype.Service;
 import com.backend.backend.dto.BookingRequestDTO;
 import com.backend.backend.model.Booking;
 import com.backend.backend.model.BookingStatus;
+import com.backend.backend.model.Resource;
 import com.backend.backend.repository.BookingRepository;
+import com.backend.backend.repository.ResourceRepository;
 
 @Service
 public class BookingService {
 
+    // Statuses that "consume" capacity  (PENDING + APPROVED)
+    private static final List<BookingStatus> ACTIVE_STATUSES =
+            List.of(BookingStatus.PENDING, BookingStatus.APPROVED);
+
     @Autowired
     private BookingRepository bookingRepository;
+
+    @Autowired
+    private ResourceRepository resourceRepository;
 
     public Booking createBooking(BookingRequestDTO request) {
         if (!request.getEndTime().isAfter(request.getStartTime())) {
@@ -27,16 +36,35 @@ public class BookingService {
             throw new RuntimeException("Start time must be in the future");
         }
 
-        List<Booking> conflicts =
-                bookingRepository.findByResourceIdAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
+        // --- Capacity check ---
+        // Only count PENDING/APPROVED bookings in the requested window
+        List<Booking> overlapping = bookingRepository
+                .findByResourceIdAndStatusInAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
                         request.getResourceId(),
+                        ACTIVE_STATUSES,
                         request.getEndTime(),
-                        request.getStartTime()
-                );
+                        request.getStartTime());
 
-        if (!conflicts.isEmpty()) {
-            throw new RuntimeException("Time slot already booked!");
-        }
+        int usedCapacity = overlapping.stream()
+                .mapToInt(b -> b.getExpectedAttendees() != null ? b.getExpectedAttendees() : 0)
+                .sum();
+
+        // Try to get resource capacity; if found, enforce the limit
+        resourceRepository.findById(request.getResourceId()).ifPresent(resource -> {
+            Integer maxCapacity = resource.getCapacity();
+            if (maxCapacity != null) {
+                int incoming = request.getExpectedAttendees() != null ? request.getExpectedAttendees() : 1;
+                if (usedCapacity + incoming > maxCapacity) {
+                    int remaining = maxCapacity - usedCapacity;
+                    throw new RuntimeException(
+                            "Capacity full! This resource can only accommodate "
+                                    + maxCapacity + " people. "
+                                    + (remaining > 0
+                                    ? "Only " + remaining + " spot(s) remaining for this time slot."
+                                    : "No spots remaining for this time slot."));
+                }
+            }
+        });
 
         Booking booking = new Booking();
         booking.setResourceId(request.getResourceId());
@@ -48,6 +76,30 @@ public class BookingService {
         booking.setExpectedAttendees(request.getExpectedAttendees());
 
         return bookingRepository.save(booking);
+    }
+
+    /**
+     * Returns remaining capacity for a resource in a given time window.
+     * Returns -1 if the resource has no capacity limit defined.
+     */
+    public int getAvailableCapacity(String resourceId, LocalDateTime startTime, LocalDateTime endTime) {
+        Resource resource = resourceRepository.findById(resourceId).orElse(null);
+        if (resource == null || resource.getCapacity() == null) {
+            return -1; // no limit
+        }
+
+        List<Booking> overlapping = bookingRepository
+                .findByResourceIdAndStatusInAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
+                        resourceId,
+                        ACTIVE_STATUSES,
+                        endTime,
+                        startTime);
+
+        int used = overlapping.stream()
+                .mapToInt(b -> b.getExpectedAttendees() != null ? b.getExpectedAttendees() : 0)
+                .sum();
+
+        return Math.max(0, resource.getCapacity() - used);
     }
 
     public List<Booking> getAllBookings() {

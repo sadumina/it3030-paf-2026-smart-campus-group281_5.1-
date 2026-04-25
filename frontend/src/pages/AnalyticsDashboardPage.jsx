@@ -30,7 +30,12 @@ import {
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/bookings" },
+  {
+    label: "Booking Approvals",
+    badge: "18",
+    icon: ClipboardCheck,
+    path: "/admin/bookings",
+  },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "User Management", icon: Users, path: "/admin/users" },
   { label: "Incidents", badge: "6", icon: Siren },
@@ -80,7 +85,11 @@ const CustomTooltip = ({ active, payload, label }) => {
       <div className="rounded-lg border border-slate-200 bg-white p-2 shadow-lg">
         <p className="text-xs font-semibold text-slate-900">{label}</p>
         {payload.map((entry, index) => (
-          <p key={index} className="text-xs font-medium" style={{ color: entry.color }}>
+          <p
+            key={index}
+            className="text-xs font-medium"
+            style={{ color: entry.color }}
+          >
             {entry.name}: {entry.value}
           </p>
         ))}
@@ -135,10 +144,26 @@ export default function AnalyticsDashboardPage() {
   }
 
   const analyticsKpis = [
-    { label: "Total Users", value: String(analyticsData?.totalUsers || 0), change: `${analyticsData?.admins || 0} admins` },
-    { label: "Active Sessions", value: String(analyticsData?.activeSessions || 0), change: "Real-time" },
-    { label: "Technicians", value: String(analyticsData?.technicians || 0), change: "Support staff" },
-    { label: "System Uptime", value: analyticsData?.systemUptime || "99.8%", change: "Excellent" },
+    {
+      label: "Total Users",
+      value: String(analyticsData?.totalUsers || 0),
+      change: `${analyticsData?.admins || 0} admins`,
+    },
+    {
+      label: "Active Sessions",
+      value: String(analyticsData?.activeSessions || 0),
+      change: "Real-time",
+    },
+    {
+      label: "Technicians",
+      value: String(analyticsData?.technicians || 0),
+      change: "Support staff",
+    },
+    {
+      label: "System Uptime",
+      value: analyticsData?.systemUptime || "99.8%",
+      change: "Excellent",
+    },
   ];
 
   const userRoleData = analyticsData?.roleDistribution || [
@@ -151,16 +176,29 @@ export default function AnalyticsDashboardPage() {
     <RoleDashboardLayout
       sectionLabel="Admin Analytics"
       dashboardTitle="Analytics & Reports"
-      dashboardSubtitle={error ? `Error: ${error}` : "Comprehensive system analytics and performance insights."}
+      dashboardSubtitle={
+        error
+          ? `Error: ${error}`
+          : "Comprehensive system analytics and performance insights."
+      }
       roleLabel="ADMIN"
       auth={auth}
       sidebarItems={adminSidebar}
       kpis={analyticsKpis}
       quickActions={[]}
       activityFeed={[
-        { title: `Total ${analyticsData?.totalUsers || 0} users registered`, meta: "From database" },
-        { title: `${analyticsData?.technicians || 0} technicians on staff`, meta: "Support team" },
-        { title: `${analyticsData?.admins || 0} admin accounts active`, meta: "System administrators" },
+        {
+          title: `Total ${analyticsData?.totalUsers || 0} users registered`,
+          meta: "From database",
+        },
+        {
+          title: `${analyticsData?.technicians || 0} technicians on staff`,
+          meta: "Support team",
+        },
+        {
+          title: `${analyticsData?.admins || 0} admin accounts active`,
+          meta: "System administrators",
+        },
       ]}
       chartTitle="User Statistics"
       chartCaption="Real-time user data from database"
@@ -209,7 +247,9 @@ export default function AnalyticsDashboardPage() {
             <div className="space-y-4">
               {/* User Role Distribution */}
               <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-slate-900">User Role Distribution</h3>
+                <h3 className="mb-4 text-sm font-semibold text-slate-900">
+                  User Role Distribution
+                </h3>
                 {userRoleData && userRoleData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={300}>
                     <RechartsePieChart>
@@ -231,7 +271,9 @@ export default function AnalyticsDashboardPage() {
                     </RechartsePieChart>
                   </ResponsiveContainer>
                 ) : (
-                  <p className="text-sm text-slate-500">No user data available</p>
+                  <p className="text-sm text-slate-500">
+                    No user data available
+                  </p>
                 )}
               </div>
             </div>
@@ -241,22 +283,40 @@ export default function AnalyticsDashboardPage() {
           {activeTab === "users" && (
             <div className="space-y-4">
               <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-slate-900">User Statistics Summary</h3>
+                <h3 className="mb-4 text-sm font-semibold text-slate-900">
+                  User Statistics Summary
+                </h3>
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
-                    <p className="text-xs text-orange-700 font-semibold uppercase">ADMINS</p>
-                    <p className="text-3xl font-bold text-orange-900">{analyticsData?.admins || 0}</p>
-                    <p className="text-xs text-orange-600 mt-1">System administrators</p>
+                    <p className="text-xs text-orange-700 font-semibold uppercase">
+                      ADMINS
+                    </p>
+                    <p className="text-3xl font-bold text-orange-900">
+                      {analyticsData?.admins || 0}
+                    </p>
+                    <p className="text-xs text-orange-600 mt-1">
+                      System administrators
+                    </p>
                   </div>
                   <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                    <p className="text-xs text-blue-700 font-semibold uppercase">TECHNICIANS</p>
-                    <p className="text-3xl font-bold text-blue-900">{analyticsData?.technicians || 0}</p>
+                    <p className="text-xs text-blue-700 font-semibold uppercase">
+                      TECHNICIANS
+                    </p>
+                    <p className="text-3xl font-bold text-blue-900">
+                      {analyticsData?.technicians || 0}
+                    </p>
                     <p className="text-xs text-blue-600 mt-1">Support staff</p>
                   </div>
                   <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-                    <p className="text-xs text-slate-700 font-semibold uppercase">REGULAR USERS</p>
-                    <p className="text-3xl font-bold text-slate-900">{analyticsData?.regularUsers || 0}</p>
-                    <p className="text-xs text-slate-600 mt-1">Standard accounts</p>
+                    <p className="text-xs text-slate-700 font-semibold uppercase">
+                      REGULAR USERS
+                    </p>
+                    <p className="text-3xl font-bold text-slate-900">
+                      {analyticsData?.regularUsers || 0}
+                    </p>
+                    <p className="text-xs text-slate-600 mt-1">
+                      Standard accounts
+                    </p>
                   </div>
                 </div>
               </div>
@@ -268,11 +328,17 @@ export default function AnalyticsDashboardPage() {
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                  <h3 className="mb-3 text-sm font-semibold text-slate-900">API Performance</h3>
+                  <h3 className="mb-3 text-sm font-semibold text-slate-900">
+                    API Performance
+                  </h3>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-slate-600">Avg Response Time</span>
-                      <span className="text-sm font-semibold text-slate-900">245ms</span>
+                      <span className="text-xs text-slate-600">
+                        Avg Response Time
+                      </span>
+                      <span className="text-sm font-semibold text-slate-900">
+                        245ms
+                      </span>
                     </div>
                     <div className="h-2 rounded-full bg-slate-200">
                       <div className="h-full w-3/4 rounded-full bg-green-500" />
@@ -281,7 +347,9 @@ export default function AnalyticsDashboardPage() {
                   <div className="mt-3 space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-slate-600">Error Rate</span>
-                      <span className="text-sm font-semibold text-slate-900">0.12%</span>
+                      <span className="text-sm font-semibold text-slate-900">
+                        0.12%
+                      </span>
                     </div>
                     <div className="h-2 rounded-full bg-slate-200">
                       <div className="h-full w-1/12 rounded-full bg-green-500" />
@@ -290,11 +358,15 @@ export default function AnalyticsDashboardPage() {
                 </div>
 
                 <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                  <h3 className="mb-3 text-sm font-semibold text-slate-900">Database Performance</h3>
+                  <h3 className="mb-3 text-sm font-semibold text-slate-900">
+                    Database Performance
+                  </h3>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-slate-600">Query Time</span>
-                      <span className="text-sm font-semibold text-slate-900">156ms</span>
+                      <span className="text-sm font-semibold text-slate-900">
+                        156ms
+                      </span>
                     </div>
                     <div className="h-2 rounded-full bg-slate-200">
                       <div className="h-full w-1/2 rounded-full bg-green-500" />
@@ -302,8 +374,12 @@ export default function AnalyticsDashboardPage() {
                   </div>
                   <div className="mt-3 space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-slate-600">Connections</span>
-                      <span className="text-sm font-semibold text-slate-900">28/50</span>
+                      <span className="text-xs text-slate-600">
+                        Connections
+                      </span>
+                      <span className="text-sm font-semibold text-slate-900">
+                        28/50
+                      </span>
                     </div>
                     <div className="h-2 rounded-full bg-slate-200">
                       <div className="h-full w-7/12 rounded-full bg-orange-500" />

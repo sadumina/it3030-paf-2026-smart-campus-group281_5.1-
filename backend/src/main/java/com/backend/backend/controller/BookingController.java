@@ -5,8 +5,12 @@ import com.backend.backend.model.Booking;
 import com.backend.backend.service.BookingService;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -63,5 +67,26 @@ public class BookingController {
     @GetMapping("/deleted")
     public List<Booking> getDeletedBookings() {
         return bookingService.getDeletedBookings();
+    }
+
+    /**
+     * Returns the remaining available capacity for a resource in a time window.
+     * Used by the frontend to preview capacity before the student submits.
+     *
+     * GET /api/bookings/capacity?resourceId=...&startTime=...&endTime=...
+     * Response: { "available": 25, "unlimited": false }
+     */
+    @GetMapping("/capacity")
+    public ResponseEntity<Map<String, Object>> getAvailableCapacity(
+            @RequestParam String resourceId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime) {
+
+        int available = bookingService.getAvailableCapacity(resourceId, startTime, endTime);
+        boolean unlimited = available == -1;
+        return ResponseEntity.ok(Map.of(
+                "available", unlimited ? Integer.MAX_VALUE : available,
+                "unlimited", unlimited
+        ));
     }
 }
