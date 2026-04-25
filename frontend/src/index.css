@@ -90,6 +90,40 @@ code {
   background: transparent;
 }
 
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 560ms ease, transform 560ms ease;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal-on-scroll.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.subtle-hover {
+  transition: transform 180ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.subtle-hover:hover {
+  transform: translateY(-2px);
+}
+
+.cta-pulse {
+  animation: ctaPulse 3s ease-in-out infinite;
+}
+
+@keyframes ctaPulse {
+  0%,
+  100% {
+    box-shadow: 0 10px 24px rgba(249, 115, 22, 0.24);
+  }
+  50% {
+    box-shadow: 0 14px 30px rgba(249, 115, 22, 0.34);
+  }
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 8px;

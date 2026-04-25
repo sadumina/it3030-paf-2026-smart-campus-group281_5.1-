@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Building2, Menu, X } from "lucide-react";
 import { getAuth, isAuthenticated } from "../services/authStorage";
 import { getDashboardPathForRole } from "../services/roleDashboard";
 
@@ -28,7 +27,13 @@ export default function Navbar() {
   const goToSection = (href) => {
     setActiveSection(href);
     setIsMobileMenuOpen(false);
-    window.location.hash = href;
+    const section = document.querySelector(href);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    if (window.history?.replaceState) {
+      window.history.replaceState(null, "", href);
+    }
   };
 
   useEffect(() => {
@@ -41,76 +46,62 @@ export default function Navbar() {
   }, []);
 
   return (
-    <motion.header
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="sticky top-0 z-50 w-full border-b border-orange-200/70 bg-gradient-to-r from-orange-50/80 via-white/80 to-amber-50/80 backdrop-blur-xl"
-    >
+    <header className="sticky top-0 z-50 w-full border-b border-orange-100/80 bg-[#fffaf5]/95 backdrop-blur-xl">
       <div className="mx-auto px-4 py-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between rounded-2xl border border-orange-100/80 bg-gradient-to-r from-white/85 via-orange-50/55 to-white/85 px-4 py-3 shadow-[0_10px_30px_rgba(249,115,22,0.12)] backdrop-blur-xl">
-          <button onClick={() => navigate("/")} className="text-xl font-semibold text-slate-900">
+        <div className="flex items-center justify-between rounded-2xl border border-orange-100 bg-white/90 px-4 py-3 shadow-[0_10px_26px_rgba(249,115,22,0.10)]">
+          <button onClick={() => navigate("/")} className="inline-flex items-center gap-2 text-xl font-semibold text-slate-900">
+            <span className="rounded-lg bg-orange-100 p-1.5 text-orange-600">
+              <Building2 className="h-4 w-4" />
+            </span>
             Clever<span className="text-orange-500">Campus</span>
           </button>
 
-          <nav className="hidden items-center gap-1 md:flex">
+          <nav className="hidden items-center gap-1.5 md:flex">
             {navLinks.map((link) => (
-              <motion.a
+              <button
                 key={link.label}
-                href={link.href}
-                whileHover={{ y: -1 }}
-                onClick={() => setActiveSection(link.href)}
-                className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                type="button"
+                onClick={() => goToSection(link.href)}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
                   activeSection === link.href
-                    ? "bg-gradient-to-r from-orange-100 to-amber-100 text-orange-700 shadow-sm"
-                    : "text-slate-600 hover:bg-slate-100/80 hover:text-slate-900"
+                    ? "bg-orange-100 text-orange-700 shadow-sm"
+                    : "text-slate-600 hover:bg-orange-50 hover:text-slate-900"
                 }`}
               >
                 {link.label}
-              </motion.a>
+              </button>
             ))}
           </nav>
 
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-2.5 md:flex">
             {loggedIn ? (
-              <motion.button
+              <button
                 type="button"
-                whileHover={{ y: -2 }}
                 onClick={() => navigate(getDashboardPathForRole(auth?.role || "USER"))}
-                className="inline-flex items-center rounded-full border border-slate-200 bg-white p-1.5 text-sm font-semibold text-slate-900 shadow-sm"
-                title="Open profile dashboard"
+                className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-2.5 py-1.5 text-sm font-semibold text-slate-900 shadow-sm"
+                title="Open dashboard"
               >
                 <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-500 text-xs font-bold text-white shadow-[0_6px_16px_rgba(249,115,22,0.35)]">
                   {initials}
                 </span>
-                <span className="sr-only">Profile</span>
-              </motion.button>
+                Dashboard
+              </button>
             ) : (
               <>
-                <motion.button
+                <button
                   type="button"
-                  whileHover={{ y: -2 }}
-                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm"
+                  className="rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-orange-300 hover:text-slate-900"
                   onClick={() => navigate("/login")}
                 >
                   Login
-                </motion.button>
-                <motion.button
+                </button>
+                <button
                   type="button"
-                  whileHover={{ y: -2 }}
-                  className="rounded-full bg-slate-900 px-5 py-2 text-sm font-semibold text-white shadow-md"
-                  onClick={() => navigate("/login?role=student")}
-                >
-                  Login as Student
-                </motion.button>
-                <motion.button
-                  type="button"
-                  whileHover={{ y: -2 }}
                   className="rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(249,115,22,0.35)]"
                   onClick={() => navigate("/register")}
                 >
                   Get Started
-                </motion.button>
+                </button>
               </>
             )}
           </div>
@@ -125,22 +116,19 @@ export default function Navbar() {
           </button>
         </div>
 
-        <AnimatePresence>
-          {isMobileMenuOpen ? (
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2 }}
-              className="mt-2 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-[0_12px_30px_rgba(15,23,42,0.10)] backdrop-blur-xl md:hidden"
-            >
+        {isMobileMenuOpen ? (
+          <div className="mt-2 rounded-2xl border border-orange-100 bg-white p-3 shadow-[0_12px_30px_rgba(249,115,22,0.13)] md:hidden">
               <nav className="grid gap-1.5">
                 {navLinks.map((link) => (
                   <button
                     key={link.label}
                     type="button"
                     onClick={() => goToSection(link.href)}
-                    className="rounded-xl px-3 py-2 text-left text-sm font-semibold text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
+                    className={`rounded-xl px-3 py-2 text-left text-sm font-semibold transition ${
+                      activeSection === link.href
+                        ? "bg-orange-100 text-orange-700"
+                        : "text-slate-700 hover:bg-orange-50 hover:text-slate-900"
+                    }`}
                   >
                     {link.label}
                   </button>
@@ -155,12 +143,12 @@ export default function Navbar() {
                       navigate(getDashboardPathForRole(auth?.role || "USER"));
                       setIsMobileMenuOpen(false);
                     }}
-                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
+                    className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
                   >
                     <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-500 text-xs font-bold text-white">
                       {initials}
                     </span>
-                    Profile
+                    Dashboard
                   </button>
                 ) : (
                   <>
@@ -170,19 +158,9 @@ export default function Navbar() {
                         navigate("/login");
                         setIsMobileMenuOpen(false);
                       }}
-                      className="rounded-xl border border-white/80 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-900"
+                      className="rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
                     >
                       Login
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        navigate("/login?role=student");
-                        setIsMobileMenuOpen(false);
-                      }}
-                      className="rounded-xl bg-slate-900 px-3 py-2 text-sm font-semibold text-white"
-                    >
-                      Login as Student
                     </button>
                     <button
                       type="button"
@@ -197,10 +175,9 @@ export default function Navbar() {
                   </>
                 )}
               </div>
-            </motion.div>
-          ) : null}
-        </AnimatePresence>
+          </div>
+        ) : null}
       </div>
-    </motion.header>
+    </header>
   );
 }

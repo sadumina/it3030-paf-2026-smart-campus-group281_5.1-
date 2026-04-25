@@ -373,6 +373,16 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                 {role === "TECHNICIAN" && ticket.assignedTechnicianId === userId && (
                   <div style={{ marginTop: 22, borderTop: "1.5px solid var(--tkt-border)", paddingTop: 18 }}>
                     <p className="tkt-section-heading">🔧 Technician Actions</p>
+                    {ticket.status === "OPEN" && (
+                      <button
+                        className="tkt-btn-secondary"
+                        onClick={() => handleStatusChange("IN_PROGRESS")}
+                        disabled={loading}
+                        style={{ marginBottom: 12 }}
+                      >
+                        Start Progress
+                      </button>
+                    )}
                     <div className="tkt-form-group">
                       <label className="tkt-form-label">Resolution Note *</label>
                       <textarea

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ShieldCheck, Sparkles, UserCog } from "lucide-react";
+import { ArrowLeft, Lock, Mail, ShieldCheck, Sparkles, User, UserCog } from "lucide-react";
 import { registerUser } from "../services/authService";
 import { saveAuth } from "../services/authStorage";
 
@@ -61,8 +60,6 @@ export default function RegisterPage() {
         name: form.name.trim(),
         email: form.email.trim(),
         password: form.password,
-        // Note: Backend validates and forces role to USER for new registrations
-        // Roles are only assigned by admins via /api/users/{id}/role
       });
 
       saveAuth(response);
@@ -76,104 +73,127 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="relative h-screen overflow-hidden bg-[#f6f4ee] px-4 py-4 md:px-8 md:py-5">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#fffaf5] px-4 py-6 sm:px-6 lg:px-10">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-16 top-16 h-72 w-72 rounded-full bg-[#ffd2a5]/45 blur-3xl" />
-        <div className="absolute -right-16 bottom-16 h-80 w-80 rounded-full bg-[#8bc4ff]/35 blur-3xl" />
+        <div className="absolute -left-20 top-16 h-72 w-72 rounded-full bg-orange-200/45 blur-3xl" />
+        <div className="absolute -right-16 bottom-12 h-80 w-80 rounded-full bg-amber-200/35 blur-3xl" />
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 22 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45 }} className="relative z-10 mx-auto flex h-full max-w-6xl flex-col">
-        <div className="grid min-h-0 flex-1 overflow-hidden rounded-[2rem] border border-slate-200/70 bg-white/65 shadow-[0_35px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl lg:grid-cols-[1.08fr_0.92fr]">
-          <section className="relative overflow-hidden bg-[linear-gradient(160deg,#7b2d26_0%,#a1452b_45%,#f18f4f_100%)] p-6 text-white md:p-8">
-            <div className="absolute -right-12 top-8 h-40 w-40 rounded-full bg-white/20 blur-2xl" />
-            <div className="absolute -bottom-12 left-6 h-40 w-40 rounded-full bg-[#ffd4aa]/30 blur-2xl" />
+      <div className="relative z-10 mx-auto max-w-6xl">
+        <button
+          type="button"
+          onClick={() => navigate("/")}
+          className="mb-4 inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-orange-300 hover:text-slate-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Home
+        </button>
 
-            <p className="inline-flex rounded-full border border-white/30 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#fff1de]">
+        <div className="grid overflow-hidden rounded-[2rem] border border-orange-100 bg-white/90 shadow-[0_28px_70px_rgba(148,67,0,0.14)] backdrop-blur-sm lg:grid-cols-[1.05fr_0.95fr]">
+          <section className="relative border-b border-orange-100 bg-gradient-to-br from-orange-500 via-orange-400 to-amber-400 p-6 text-white lg:border-b-0 lg:border-r lg:p-10">
+            <div className="absolute -right-12 top-6 h-40 w-40 rounded-full bg-white/25 blur-2xl" />
+            <div className="absolute -bottom-12 left-8 h-44 w-44 rounded-full bg-amber-100/30 blur-2xl" />
+
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-white/95">
+              <Sparkles className="h-3.5 w-3.5" />
               New Member Onboarding
             </p>
-            <h1 className="mt-3 text-3xl font-bold leading-tight md:text-4xl">Create your campus workspace</h1>
-            <p className="mt-3 max-w-xl text-sm text-white/90">
-              Register once and step into a connected system for resource bookings, maintenance coordination, and team
-              notifications.
+            <h1 className="mt-4 font-['Outfit'] text-3xl font-extrabold leading-tight md:text-4xl">
+              Create your campus workspace
+            </h1>
+            <p className="mt-3 max-w-xl text-sm text-white/95">
+              Register once and step into one connected platform for resource bookings, incident tracking,
+              and operational collaboration.
             </p>
 
-            <div className="mt-5 space-y-2.5">
-              {steps.map((step, index) => (
-                <motion.article
+            <div className="mt-6 space-y-3">
+              {steps.map((step) => (
+                <article
                   key={step.title}
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 + index * 0.08, duration: 0.35 }}
-                  className="flex items-start gap-3 rounded-xl border border-white/25 bg-white/15 p-2.5"
+                  className="rounded-xl border border-white/30 bg-white/15 p-3 backdrop-blur-sm transition hover:bg-white/20"
                 >
-                  <div className="mt-0.5 rounded-lg bg-white/20 p-2 text-[#ffe6cc]">{step.icon}</div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{step.title}</p>
-                    <p className="text-xs text-white/90">{step.detail}</p>
+                  <div className="flex items-start gap-3">
+                    <span className="rounded-lg bg-white/20 p-2 text-white">{step.icon}</span>
+                    <div>
+                      <p className="text-sm font-semibold text-white">{step.title}</p>
+                      <p className="text-xs text-white/90">{step.detail}</p>
+                    </div>
                   </div>
-                </motion.article>
+                </article>
               ))}
+            </div>
+
+            <div className="mt-6 rounded-xl border border-white/25 bg-white/10 p-3">
+              <p className="text-xs uppercase tracking-[0.12em] text-white/80">Security Standard</p>
+              <p className="mt-1 text-sm font-semibold text-white">JWT authentication + encrypted credentials</p>
             </div>
           </section>
 
-          <section className="bg-white/90 p-6 md:p-8">
-            <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">Create your account</h2>
+          <section className="bg-white p-6 sm:p-8 lg:p-10">
+            <h2 className="font-['Outfit'] text-2xl font-bold text-slate-900 sm:text-3xl">Create your account</h2>
             <p className="mt-2 text-sm text-slate-500">Set up your profile and start collaborating instantly.</p>
 
-            <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
+            <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="name" className="mb-1.5 block text-sm font-semibold text-slate-700">
                   Full Name
                 </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  value={form.name}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-[#a1452b] focus:ring-4 focus:ring-[#a1452b]/15"
-                />
+                <div className="relative">
+                  <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    value={form.name}
+                    onChange={handleChange}
+                    placeholder="Enter your full name"
+                    className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-200/50"
+                  />
+                </div>
               </div>
 
               <div>
                 <label htmlFor="email" className="mb-1.5 block text-sm font-semibold text-slate-700">
                   Email Address
                 </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={form.email}
-                  onChange={handleChange}
-                  placeholder="you@university.edu"
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-[#a1452b] focus:ring-4 focus:ring-[#a1452b]/15"
-                />
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="you@university.edu"
+                    className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-200/50"
+                  />
+                </div>
               </div>
 
-              <div>
-                <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3">
-                  <p className="text-xs font-semibold text-blue-900">Account Type</p>
-                  <p className="mt-1 text-sm font-medium text-blue-800">Student Account</p>
-                  <p className="mt-1 text-xs text-blue-700">
-                    You're creating a student account. Admin and technician roles are assigned by administrators only.
-                  </p>
-                </div>
+              <div className="rounded-2xl border border-orange-200 bg-orange-50 px-4 py-3">
+                <p className="text-xs font-semibold text-orange-800">Account Type</p>
+                <p className="mt-1 text-sm font-medium text-orange-700">Student Account</p>
+                <p className="mt-1 text-xs text-orange-700">
+                  Admin and technician roles are assigned later by authorized administrators.
+                </p>
               </div>
 
               <div>
                 <label htmlFor="password" className="mb-1.5 block text-sm font-semibold text-slate-700">
                   Password
                 </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={form.password}
-                  onChange={handleChange}
-                  placeholder="At least 6 characters"
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-[#a1452b] focus:ring-4 focus:ring-[#a1452b]/15"
-                />
+                <div className="relative">
+                  <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    value={form.password}
+                    onChange={handleChange}
+                    placeholder="At least 6 characters"
+                    className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-slate-900 outline-none transition focus:border-orange-400 focus:ring-4 focus:ring-orange-200/50"
+                  />
+                </div>
               </div>
 
               {error ? <p className="text-sm font-medium text-red-600">{error}</p> : null}
@@ -182,7 +202,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-2xl bg-[#a1452b] px-6 py-3 font-semibold text-white shadow-lg shadow-[#a1452b]/25 transition hover:bg-[#873922] disabled:cursor-not-allowed disabled:opacity-70"
+                className="w-full rounded-2xl bg-orange-500 px-6 py-3 font-semibold text-white shadow-[0_14px_26px_rgba(249,115,22,0.3)] transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {loading ? "Creating account..." : "Create Account"}
               </button>
@@ -193,14 +213,14 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => navigate("/login")}
-                className="font-semibold text-[#a1452b] hover:text-[#873922]"
+                className="font-semibold text-orange-600 hover:text-orange-700"
               >
                 Sign in
               </button>
             </p>
           </section>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
