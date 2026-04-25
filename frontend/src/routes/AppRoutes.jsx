@@ -22,6 +22,7 @@ import TechnicianDashboardPage from "../pages/TechnicianDashboardPage";
 import InnovationLabPage from "../pages/InnovationLabPage";
 import ResourceFormPage from "../pages/ResourceFormPage";
 import TicketingPage from "../pages/ticketing/TicketingPage";
+
 import ProtectedRoute from "../components/ProtectedRoute";
 import { fetchCurrentUser } from "../services/authService";
 import {
@@ -142,6 +143,7 @@ export default function AppRoutes() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/admin"
           element={
@@ -211,6 +213,22 @@ export default function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={["ADMIN", "SUPER_ADMIN"]}>
               <InnovationLabPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/bookings"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <AdminBookingsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/booking-analytics"
+          element={
+            <ProtectedRoute allowedRoles={["ADMIN"]}>
+              <BookingAnalyticsPage />
             </ProtectedRoute>
           }
         />
