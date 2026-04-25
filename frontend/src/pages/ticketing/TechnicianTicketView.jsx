@@ -131,33 +131,49 @@ export default function TechnicianTicketView({ embedded = false, onTicketsChange
   return (
     <div className={embedded ? "tkt-root tkt-embedded tkt-technician-board" : "tkt-page tkt-root"}>
       <div className="tkt-container">
-        <div className="tkt-header">
-          <div className="tkt-header-left">
-            <span className="tkt-header-badge">Module C - Technician Workload</span>
-            <h1>My Assigned Tickets</h1>
-            <p>Start assigned work, update field comments, and resolve incidents with notes, {auth?.name}.</p>
-          </div>
-          <button className="tkt-btn-secondary" onClick={loadTickets} type="button">
-            <RefreshCw size={15} />
-            Refresh
-          </button>
-        </div>
-
-        <div className="tkt-stats-row">
-          {[
-            { label: "Assigned", value: allTickets.length, color: "#f97316" },
-            { label: "Open", value: statusCounts.OPEN, color: "#2563eb" },
-            { label: "In Progress", value: statusCounts.IN_PROGRESS, color: "#f97316" },
-            { label: "Resolved", value: statusCounts.RESOLVED, color: "#16a34a" },
-          ].map((stat) => (
-            <div key={stat.label} className="tkt-stat-card">
-              <div className="tkt-stat-value" style={{ color: stat.color }}>
-                {stat.value}
-              </div>
-              <div className="tkt-stat-label">{stat.label}</div>
+        {embedded ? (
+          <div className="tkt-board-bar">
+            <div>
+              <span className="tkt-header-badge">Technician Queue</span>
+              <h2>Assigned Incident Records</h2>
+              <p>Work only on incidents assigned by admin or super admin, then close them with clear resolution notes.</p>
             </div>
-          ))}
-        </div>
+            <button className="tkt-btn-secondary" onClick={loadTickets} type="button">
+              <RefreshCw size={15} />
+              Refresh
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="tkt-header">
+              <div className="tkt-header-left">
+                <span className="tkt-header-badge">Technician Intake</span>
+                <h1>Assigned Incident Board</h1>
+                <p>Review assigned incidents, update progress, and resolve with notes, {auth?.name}.</p>
+              </div>
+              <button className="tkt-btn-secondary" onClick={loadTickets} type="button">
+                <RefreshCw size={15} />
+                Refresh
+              </button>
+            </div>
+
+            <div className="tkt-stats-row">
+              {[
+                { label: "Assigned", value: allTickets.length, color: "#f97316" },
+                { label: "Open", value: statusCounts.OPEN, color: "#2563eb" },
+                { label: "In Progress", value: statusCounts.IN_PROGRESS, color: "#f97316" },
+                { label: "Resolved", value: statusCounts.RESOLVED, color: "#16a34a" },
+              ].map((stat) => (
+                <div key={stat.label} className="tkt-stat-card">
+                  <div className="tkt-stat-value" style={{ color: stat.color }}>
+                    {stat.value}
+                  </div>
+                  <div className="tkt-stat-label">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
         <div className="tkt-filter-section">
           <div className="tkt-filter-row">

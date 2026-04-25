@@ -1,11 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   ClipboardList,
-  Handshake,
-  HardHat,
-  NotebookPen,
-  Package,
-  Wrench,
+  BellDot,
 } from "lucide-react";
 
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
@@ -13,12 +9,8 @@ import { getAuth } from "../services/authStorage";
 import TechnicianTicketView from "./ticketing/TechnicianTicketView";
 
 const technicianSidebar = [
-  { label: "My Board", icon: HardHat, path: "/technician" },
-  { label: "Assigned Tickets", badge: "Live", icon: ClipboardList, path: "/technician" },
-  { label: "Preventive Tasks", icon: Wrench, path: "/technician" },
-  { label: "Resolution Notes", icon: NotebookPen, path: "/technician" },
-  { label: "Spare Inventory", badge: "9", icon: Package, path: "/technician" },
-  { label: "Shift Handover", icon: Handshake, path: "/technician" },
+  { label: "Assigned Incidents", icon: ClipboardList, path: "/technician", badge: "Live" },
+  { label: "Updates", icon: BellDot, path: "/technician?view=updates" },
 ];
 
 function countByStatus(tickets, status) {
@@ -35,42 +27,30 @@ export default function TechnicianDashboardPage() {
     const urgent = tickets.filter((ticket) => ["CRITICAL", "HIGH"].includes(ticket.priority)).length;
 
     return [
-      { label: "Assigned Tickets", value: String(tickets.length), change: "Your workload" },
-      { label: "Open", value: String(open), change: "Ready to start" },
-      { label: "In Progress", value: String(inProgress), change: "Needs resolution notes" },
+      { label: "Assigned Incidents", value: String(tickets.length), change: "Assigned by admin" },
+      { label: "Ready to Start", value: String(open), change: "Open requests" },
+      { label: "In Progress", value: String(inProgress), change: "Active technician work" },
       { label: "Resolved", value: String(resolved), change: `${urgent} urgent assigned` },
     ];
   }, [tickets]);
 
-  const activityFeed = useMemo(
-    () =>
-      tickets.slice(0, 5).map((ticket) => ({
-        title: `${ticket.ticketId || "Ticket"} - ${ticket.status}`,
-        meta: `${ticket.location || "No location"} - ${ticket.priority || "MEDIUM"}`,
-      })),
-    [tickets],
-  );
-
   return (
     <RoleDashboardLayout
       sectionLabel="Technician Workspace"
-      dashboardTitle="Service & Maintenance Dashboard"
-      dashboardSubtitle="Work assigned tickets, start progress, add comments, and submit resolution notes."
+      dashboardTitle="Assigned Incident Records"
+      dashboardSubtitle="Review assigned incidents, update progress, and submit resolution notes."
       roleLabel="TECHNICIAN"
       auth={getAuth()}
       sidebarItems={technicianSidebar}
       kpis={kpis}
-      quickActions={[
-        { title: "Open assigned board", description: "Review tickets assigned by admins." },
-        { title: "Start progress", description: "Move accepted jobs into active repair." },
-        { title: "Add field comments", description: "Keep users and admins updated." },
-        { title: "Resolve with notes", description: "Submit repair details before resolution." },
-      ]}
-      activityFeed={activityFeed}
-      chartTitle="Resolution velocity"
-      chartCaption="Live ticket completion trend."
-      chartColor="#f97316"
-      showNotifications={false}
+      quickActions={[]}
+      activityFeed={[]}
+      chartTitle=""
+      chartCaption=""
+      showInsightsPanel={false}
+      showNotifications
+      showBreadcrumb={false}
+      showUtilityActions={false}
       extraContent={<TechnicianTicketView embedded onTicketsChange={setTickets} />}
     />
   );

@@ -15,7 +15,7 @@ export const userSidebar = [
   { label: "New Reservation", icon: PlusCircle, path: "/dashboard/resources" },
   { label: "Incident Reports", icon: TriangleAlert, path: "/tickets" },
   { label: "Availability", icon: CalendarClock },
-  { label: "Support", icon: LifeBuoy },
+  { label: "Support", icon: LifeBuoy, path: "/dashboard/support" },
 ];
 
 export const userKpis = [

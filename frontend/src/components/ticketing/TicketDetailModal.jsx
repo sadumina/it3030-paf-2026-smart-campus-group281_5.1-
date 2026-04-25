@@ -22,6 +22,7 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
   const auth = getAuth();
   const role = auth?.role?.toUpperCase();
   const userId = auth?.id;
+  const isAdminRole = role === "ADMIN" || role === "SUPER_ADMIN";
 
   const [ticket, setTicket] = useState(initialTicket);
   const [comments, setComments] = useState([]);
@@ -39,7 +40,7 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
 
   useEffect(() => {
     loadComments();
-    if (role === "ADMIN") {
+    if (isAdminRole) {
       fetchTechnicians().then(setTechnicians).catch(() => {});
     }
   }, [ticket.id]);
@@ -124,7 +125,7 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
   };
 
   const isActive = ["OPEN", "IN_PROGRESS"].includes(ticket.status);
-  const canDeleteImages = role === "ADMIN" || userId === ticket.createdByUserId;
+  const canDeleteImages = isAdminRole || userId === ticket.createdByUserId;
 
   return (
     <>
@@ -311,7 +312,7 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                 )}
 
                 {/* ─── ADMIN ACTIONS ─── */}
-                {role === "ADMIN" && (
+                {isAdminRole && (
                   <div style={{ marginTop: 22, borderTop: "1.5px solid var(--tkt-border)", paddingTop: 18 }}>
                     <p className="tkt-section-heading">⚙ Admin Controls</p>
 
@@ -449,7 +450,7 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                       ) : (
                         <p className="tkt-comment-text">{c.content}</p>
                       )}
-                      {(c.authorId === userId || role === "ADMIN") && editingCid !== c.id && (
+                      {(c.authorId === userId || isAdminRole) && editingCid !== c.id && (
                         <div className="tkt-comment-actions">
                           {c.authorId === userId && (
                             <button className="tkt-btn-ghost" onClick={() => { setEditingCid(c.id); setEditContent(c.content); }}>

@@ -1,10 +1,12 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import {
-  fetchTickets, fetchStats, fetchTechnicians,
+  fetchTickets, fetchTechnicians,
   assignTechnician, deleteTicket,
 } from "../../services/ticketService";
 import TicketCard from "../../components/ticketing/TicketCard";
 import TicketDetailModal from "../../components/ticketing/TicketDetailModal";
+import { fetchCurrentUser } from "../../services/authService";
+import { clearAuth, getAuth, getToken, saveAuth } from "../../services/authStorage";
 
 const STATUSES = [
   { key: "ALL",         label: "All",         cls: "s-all" },
@@ -25,12 +27,25 @@ const PRIORITIES = [
 
 const CATEGORIES = ["ALL","ELECTRICAL","PLUMBING","IT","HVAC","STRUCTURAL","CLEANING","OTHER"];
 
+function normalizeRole(role) {
+  return (role || "")
+    .toUpperCase()
+    .replace(/^ROLE_/, "")
+    .replace(/\s+/g, "_");
+}
+
+function isAdminRole(role) {
+  const normalized = normalizeRole(role);
+  return normalized === "ADMIN" || normalized === "SUPER_ADMIN";
+}
+
 export default function AdminTicketView({ embedded = false }) {
   const [allTickets, setAllTickets]   = useState([]);
   const [apiTickets, setApiTickets]   = useState([]);
   const [stats, setStats]             = useState({});
   const [technicians, setTechnicians] = useState([]);
   const [loading, setLoading]         = useState(true);
+  const [accessDenied, setAccessDenied] = useState(false);
   const [selectedTicket, setSelected] = useState(null);
 
   const [keyword, setKeyword]         = useState("");
@@ -43,9 +58,42 @@ export default function AdminTicketView({ embedded = false }) {
   const loadAll = async () => {
     setLoading(true);
     try {
-      const [t, s, techs] = await Promise.all([fetchTickets(), fetchStats(), fetchTechnicians()]);
-      setAllTickets(t); setApiTickets(t); setStats(s); setTechnicians(techs);
-    } catch { /* ignore */ }
+      const token = getToken();
+      const currentUser = await fetchCurrentUser(token);
+
+      if (!isAdminRole(currentUser?.role)) {
+        setAccessDenied(true);
+        setAllTickets([]);
+        setApiTickets([]);
+        setStats({});
+        setTechnicians([]);
+        return;
+      }
+
+      saveAuth({
+        ...(getAuth() || {}),
+        ...currentUser,
+        token: currentUser.token || token,
+      });
+      setAccessDenied(false);
+      const [t, techs] = await Promise.all([fetchTickets(), fetchTechnicians()]);
+      setAllTickets(t);
+      setApiTickets(t);
+      setStats({
+        total: t.length,
+        open: t.filter((ticket) => ticket.status === "OPEN").length,
+        inProgress: t.filter((ticket) => ticket.status === "IN_PROGRESS").length,
+        resolved: t.filter((ticket) => ticket.status === "RESOLVED").length,
+        closed: t.filter((ticket) => ticket.status === "CLOSED").length,
+        rejected: t.filter((ticket) => ticket.status === "REJECTED").length,
+        critical: t.filter((ticket) => ticket.priority === "CRITICAL").length,
+        high: t.filter((ticket) => ticket.priority === "HIGH").length,
+      });
+      setTechnicians(techs);
+    } catch {
+      clearAuth();
+      setAccessDenied(true);
+    }
     finally { setLoading(false); }
   };
 
@@ -125,15 +173,29 @@ export default function AdminTicketView({ embedded = false }) {
   };
 
   const statCards = [
-    { label: "Total",       value: stats.total      || 0, color: "#f97316" },
-    { label: "Open",        value: stats.open        || 0, color: "#3b82f6" },
-    { label: "In Progress", value: stats.inProgress  || 0, color: "#f97316" },
-    { label: "Resolved",    value: stats.resolved    || 0, color: "#22c55e" },
-    { label: "Closed",      value: stats.closed      || 0, color: "#6b7280" },
-    { label: "Rejected",    value: stats.rejected    || 0, color: "#ef4444" },
-    { label: "Critical",    value: stats.critical    || 0, color: "#ef4444" },
-    { label: "High",        value: stats.high        || 0, color: "#f97316" },
+    { label: "Incidents",   value: statusCounts.ALL      || 0, color: "#f97316" },
+    { label: "Open",        value: statusCounts.OPEN     || 0, color: "#3b82f6" },
+    { label: "In Progress", value: statusCounts.IN_PROGRESS || 0, color: "#f97316" },
+    { label: "Resolved",    value: statusCounts.RESOLVED || 0, color: "#22c55e" },
+    { label: "Closed",      value: statusCounts.CLOSED   || 0, color: "#6b7280" },
+    { label: "Rejected",    value: statusCounts.REJECTED || 0, color: "#ef4444" },
+    { label: "Critical",    value: priorityCounts.CRITICAL || 0, color: "#ef4444" },
+    { label: "High",        value: priorityCounts.HIGH   || 0, color: "#f97316" },
   ];
+
+  if (accessDenied) {
+    return (
+      <div className={`tkt-root ${embedded ? "tkt-embedded" : "tkt-page"}`}>
+        <div className="tkt-container">
+          <div className="tkt-empty">
+            <div className="tkt-empty-icon">!</div>
+            <h3>Admin access required</h3>
+            <p>Your current session is not allowed to open the incident assignment desk.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`tkt-root ${embedded ? "tkt-embedded" : "tkt-page"}`}>
@@ -142,9 +204,9 @@ export default function AdminTicketView({ embedded = false }) {
         {/* Header */}
         <div className="tkt-header">
           <div className="tkt-header-left">
-            <span className="tkt-header-badge">Module C — Admin Control Panel</span>
-            <h1>🛠 All Tickets</h1>
-            <p>Manage, assign and monitor all campus incident tickets</p>
+            <span className="tkt-header-badge">Incident Desk</span>
+            <h1>Campus Incidents</h1>
+            <p>Review submitted support requests and assign registered technicians.</p>
           </div>
           <button className="tkt-btn-secondary" onClick={loadAll}>
             <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
-  BellDot,
   ChartNoAxesCombined,
   LogOut,
   Search,
@@ -21,14 +21,30 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import NotificationPanel from "../NotificationPanel";
 import { Breadcrumb } from "../Breadcrumb";
 import { UserProfileModal } from "./UserProfileModal";
+import DashboardNotificationBell from "./DashboardNotificationBell";
 import { useTheme } from "../../context/ThemeContext";
 import { reportExport } from "../../services/reportExport";
 import { notifyAlert } from "../../services/notificationHelper";
 import { userProfileService } from "../../services/userProfileService";
 import { clearAuth } from "../../services/authStorage";
+
+const dashboardContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.07,
+      delayChildren: 0.08,
+    },
+  },
+};
+
+const dashboardItem = {
+  hidden: { opacity: 0, y: 14 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } },
+};
 
 function ProfessionalChart({ points = [], color = "#ea580c" }) {
   const safePoints = points.length > 1 ? points : [28, 32, 30, 38, 36, 44, 42, 48, 50, 54, 52, 58, 60, 64];
@@ -130,6 +146,74 @@ function getRoleChartSeed(roleLabel, externalSeed) {
   return [22, 24, 21, 27, 25, 31, 29, 33, 32, 36, 35, 39, 38, 43];
 }
 
+function OperationalOverview({ kpis = [], activityFeed = [], chartTitle, chartCaption }) {
+  const overviewItems = kpis.slice(0, 4);
+  const activityItems = activityFeed.slice(0, 4);
+
+  return (
+    <section className="grid gap-5 xl:grid-cols-[1fr_340px]">
+      <div className="rounded-md border border-orange-100 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-slate-950 dark:text-slate-100">{chartTitle}</h2>
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{chartCaption}</p>
+          </div>
+          <span className="rounded-md border border-orange-200 bg-orange-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-orange-700">
+            Live Workspace
+          </span>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {overviewItems.map((item, index) => {
+            const progressValues = [86, 72, 64, 91];
+            const progress = progressValues[index % progressValues.length];
+            const neonAccents = [
+              "hover:border-orange-400 hover:shadow-[0_0_0_1px_rgba(249,115,22,0.65),0_18px_40px_rgba(249,115,22,0.22)]",
+              "hover:border-blue-400 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.65),0_18px_40px_rgba(59,130,246,0.2)]",
+              "hover:border-emerald-400 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.65),0_18px_40px_rgba(16,185,129,0.2)]",
+              "hover:border-amber-400 hover:shadow-[0_0_0_1px_rgba(245,158,11,0.65),0_18px_40px_rgba(245,158,11,0.22)]",
+            ];
+            return (
+              <article
+                key={item.label}
+                className={`rounded-md border border-slate-200 bg-slate-50 p-4 transition duration-300 hover:-translate-y-1 dark:border-slate-800 dark:bg-slate-950 ${neonAccents[index % neonAccents.length]}`}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{item.label}</p>
+                  <span className="text-lg font-bold text-orange-600">{item.value}</span>
+                </div>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{item.change}</p>
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-white dark:bg-slate-800">
+                  <div className="h-full rounded-full bg-orange-500" style={{ width: `${progress}%` }} />
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="mt-5 rounded-md border border-orange-100 bg-orange-50 p-4 dark:border-orange-900/40 dark:bg-orange-950/20">
+          <p className="text-sm font-semibold text-orange-800 dark:text-orange-200">Today&apos;s focus</p>
+          <p className="mt-1 text-sm text-orange-700 dark:text-orange-300">
+            Review active requests, keep alerts updated, and resolve pending work from the action panel.
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-md border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+        <h2 className="text-base font-semibold text-slate-950 dark:text-slate-100">Recent Activity</h2>
+        <div className="mt-4 space-y-3">
+          {activityItems.map((item) => (
+            <article key={item.title} className="border-l-2 border-orange-400 bg-slate-50 px-3 py-2 dark:bg-slate-950">
+              <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
+              <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{item.meta}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function RoleDashboardLayout({
   sectionLabel,
   dashboardTitle,
@@ -147,6 +231,8 @@ export default function RoleDashboardLayout({
   extraContent,
   showInsightsPanel = true,
   showNotifications = true,
+  showBreadcrumb = true,
+  showUtilityActions = true,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -208,24 +294,24 @@ export default function RoleDashboardLayout({
   };
 
   return (
-    <div className="dashboard-page min-h-screen p-3 md:p-4 bg-white dark:bg-slate-950">
-      <div className="relative mx-auto flex min-h-[calc(100vh-1.5rem)] max-w-full overflow-hidden rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
-        <aside
-          className="hidden w-64 flex-col bg-orange-600 p-4 text-white md:flex dark:bg-slate-800"
-          style={{ backgroundImage: isDark ? "linear-gradient(180deg, #1e293b 0%, #334155 52%, #475569 100%)" : "linear-gradient(180deg, #ea580c 0%, #f97316 52%, #fb923c 100%)" }}
-        >
+    <div className="dashboard-page min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="relative flex min-h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-950">
+        <aside className="hidden w-64 shrink-0 flex-col border-r border-orange-100 bg-white p-4 text-slate-900 md:flex dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100">
           <div className="mb-6">
-            <p className="font-display text-xl font-semibold leading-none">Campus Flow</p>
-            <p className="mt-0.5 text-xs uppercase tracking-widest text-orange-100">{roleLabel}</p>
+            <p className="font-display text-xl font-semibold leading-none">
+              Campus<span className="text-orange-500">Flow</span>
+            </p>
+            <p className="mt-1 text-xs uppercase tracking-widest text-orange-600">{roleLabel}</p>
           </div>
 
           <nav className="space-y-1.5">
             {sidebarItems.map((item) => {
               const ItemIcon = item.icon;
-              const isActive = item.path && location.pathname === item.path;
+              const currentRoute = `${location.pathname}${location.search}`;
+              const isActive = item.path && currentRoute === item.path;
               const itemClassName = isActive
-                ? "flex w-full items-center justify-between rounded-lg border border-white/40 bg-white/25 px-3 py-2 text-xs font-semibold text-white transition"
-                : "flex w-full items-center justify-between rounded-lg border border-white/0 bg-white/0 px-3 py-2 text-xs font-medium text-white transition hover:bg-white/15";
+                ? "flex w-full items-center justify-between rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-700 transition"
+                : "flex w-full items-center justify-between rounded-md border border-transparent px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-orange-100 hover:bg-orange-50 hover:text-orange-700 dark:text-slate-300 dark:hover:bg-slate-800";
 
               return (
               <button
@@ -243,7 +329,7 @@ export default function RoleDashboardLayout({
                   {item.label}
                 </span>
                 {item.badge ? (
-                  <span className="rounded-full bg-orange-200 px-1.5 py-0.5 text-xs font-semibold text-orange-900">
+                  <span className={`rounded-full px-1.5 py-0.5 text-xs font-semibold ${isActive ? "bg-orange-100 text-orange-700" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}>
                     {item.badge}
                   </span>
                 ) : null}
@@ -252,26 +338,26 @@ export default function RoleDashboardLayout({
             })}
           </nav>
 
-          <div className="mt-auto rounded-lg border border-white/25 bg-white/10 p-3">
-            <p className="text-xs uppercase tracking-wider text-orange-100">System Status</p>
-            <p className="mt-1 text-xs font-light text-orange-50">
+          <div className="mt-auto rounded-md border border-orange-100 bg-orange-50 p-3 dark:border-slate-800 dark:bg-slate-800">
+            <p className="text-xs uppercase tracking-wider text-orange-700 dark:text-orange-300">System Status</p>
+            <p className="mt-1 text-xs font-light text-slate-600 dark:text-slate-300">
               Campus systems online and synchronized.
             </p>
           </div>
         </aside>
 
-        <div className="flex min-w-0 flex-1 flex-col bg-white dark:bg-slate-900">
-          <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 md:px-6">
+        <div className="flex min-w-0 flex-1 flex-col bg-slate-50 dark:bg-slate-950">
+          <div className="border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 md:px-6">
             <div className="flex items-center justify-between gap-3">
-              <div className="text-xs font-medium uppercase tracking-widest text-slate-600 dark:text-slate-400">
+              <div className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                 Smart Campus Platform
               </div>
 
               <div
                 onClick={() => setIsProfileModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 cursor-pointer transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-slate-200 bg-white px-3 py-1.5 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700"
               >
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-orange-600 text-xs font-bold text-white">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-orange-500 text-xs font-bold text-white">
                   {initials}
                 </div>
                 <div className="hidden sm:block">
@@ -282,63 +368,65 @@ export default function RoleDashboardLayout({
             </div>
           </div>
 
-          <header className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 md:px-6">
+          <header className="border-b border-slate-200 bg-white px-4 py-4 dark:border-slate-800 dark:bg-slate-900 md:px-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">{sectionLabel}</p>
-                <h1 className="mt-0.5 text-lg font-semibold text-slate-900 dark:text-slate-100">{dashboardTitle}</h1>
+                <h1 className="mt-1 text-2xl font-semibold text-slate-950 dark:text-slate-100">{dashboardTitle}</h1>
                 <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">
                   {dashboardSubtitle}
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => navigate("/")}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
-                >
-                  <House className="h-3.5 w-3.5" />
-                  Landing Page
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
-                >
-                  <Search className="h-3.5 w-3.5" />
-                  Search
-                </button>
+                {showUtilityActions ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/")}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    >
+                      <House className="h-3.5 w-3.5" />
+                      Landing Page
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    >
+                      <Search className="h-3.5 w-3.5" />
+                      Search
+                    </button>
+                  </>
+                ) : null}
                 {showNotifications ? (
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
-                  >
-                    <BellDot className="h-3.5 w-3.5" />
-                    Alerts
-                  </button>
+                  <DashboardNotificationBell />
+                ) : null}
+                {showUtilityActions ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleExportPDF}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                      title="Export as PDF"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      PDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleExportCSV}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                      title="Export as CSV"
+                    >
+                      <FileJson className="h-3.5 w-3.5" />
+                      CSV
+                    </button>
+                  </>
                 ) : null}
                 <button
                   type="button"
-                  onClick={handleExportPDF}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
-                  title="Export as PDF"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  PDF
-                </button>
-                <button
-                  type="button"
-                  onClick={handleExportCSV}
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
-                  title="Export as CSV"
-                >
-                  <FileJson className="h-3.5 w-3.5" />
-                  CSV
-                </button>
-                <button
-                  type="button"
                   onClick={toggleTheme}
-                  className="inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-700"
+                  className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                   title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
                 >
                   {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
@@ -346,7 +434,7 @@ export default function RoleDashboardLayout({
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-red-600 dark:bg-red-700 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-red-700 dark:hover:bg-red-800"
+                  className="inline-flex items-center gap-1.5 rounded-md bg-orange-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-orange-700"
                 >
                   <LogOut className="h-3.5 w-3.5" />
                   Logout
@@ -355,37 +443,45 @@ export default function RoleDashboardLayout({
             </div>
           </header>
 
-          <div className="border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 md:px-6">
-            <Breadcrumb />
-          </div>
+          {showBreadcrumb ? (
+            <div className="border-b border-slate-200 bg-white px-4 py-2 dark:border-slate-800 dark:bg-slate-900 md:px-6">
+              <Breadcrumb />
+            </div>
+          ) : null}
 
-          <main className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-5 bg-white dark:bg-slate-900">
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <motion.main
+            variants={dashboardContainer}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-1 flex-col gap-5 overflow-y-auto bg-slate-50 p-4 dark:bg-slate-950 md:p-6"
+          >
+            <motion.div variants={dashboardItem} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               {kpis.map((kpi, index) => {
-                const neonColors = [
-                  { bg: "from-pink-500 via-pink-600 to-red-600", border: "border-pink-400", label: "text-pink-100", value: "text-white", change: "text-pink-100", shadow: "shadow-lg shadow-pink-500/50 hover:shadow-pink-500/80" },
-                  { bg: "from-red-500 via-orange-600 to-yellow-500", border: "border-orange-400", label: "text-orange-100", value: "text-white", change: "text-orange-100", shadow: "shadow-lg shadow-orange-500/50 hover:shadow-orange-500/80" },
-                  { bg: "from-green-400 via-emerald-500 to-cyan-500", border: "border-green-300", label: "text-green-100", value: "text-white", change: "text-green-100", shadow: "shadow-lg shadow-green-500/50 hover:shadow-green-500/80" },
-                  { bg: "from-cyan-400 via-blue-500 to-purple-600", border: "border-cyan-300", label: "text-cyan-100", value: "text-white", change: "text-cyan-100", shadow: "shadow-lg shadow-blue-500/50 hover:shadow-blue-500/80" },
+                const cardAccents = [
+                  "border-l-orange-500 hover:border-orange-300 hover:shadow-[0_0_0_1px_rgba(249,115,22,0.65),0_18px_42px_rgba(249,115,22,0.24)]",
+                  "border-l-blue-600 hover:border-blue-300 hover:shadow-[0_0_0_1px_rgba(59,130,246,0.65),0_18px_42px_rgba(59,130,246,0.22)]",
+                  "border-l-emerald-600 hover:border-emerald-300 hover:shadow-[0_0_0_1px_rgba(16,185,129,0.65),0_18px_42px_rgba(16,185,129,0.22)]",
+                  "border-l-amber-500 hover:border-amber-300 hover:shadow-[0_0_0_1px_rgba(245,158,11,0.65),0_18px_42px_rgba(245,158,11,0.24)]",
                 ];
-                const color = neonColors[index % 4];
                 return (
-                  <article
+                  <motion.article
                     key={kpi.label}
-                    className={`rounded-lg border-2 ${color.border} bg-gradient-to-br ${color.bg} p-4 ${color.shadow} transition duration-300 hover:scale-105 cursor-pointer backdrop-blur-sm`}
+                    variants={dashboardItem}
+                    whileHover={{ y: -3 }}
+                    className={`cursor-pointer rounded-md border border-l-4 border-slate-200 ${cardAccents[index % 4]} bg-white p-4 shadow-sm transition duration-300 dark:border-slate-800 dark:bg-slate-900`}
                   >
-                    <p className={`text-xs font-semibold ${color.label} uppercase tracking-wider opacity-90`}>{kpi.label}</p>
-                    <p className={`mt-1.5 text-3xl font-black ${color.value}`}>{kpi.value}</p>
-                    <p className={`mt-0.5 text-xs ${color.change} opacity-90`}>{kpi.change}</p>
-                  </article>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{kpi.label}</p>
+                    <p className="mt-2 text-3xl font-bold text-slate-950 dark:text-slate-100">{kpi.value}</p>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{kpi.change}</p>
+                  </motion.article>
                 );
               })}
-            </div>
+            </motion.div>
 
-            {quickActions?.some((action) => action.label || action.onClick) ? (
-              <div className="flex flex-wrap gap-2">
+            {quickActions?.some((action) => action.label || action.title || action.onClick) ? (
+              <motion.div variants={dashboardItem} className="flex flex-wrap gap-2">
                 {quickActions
-                  .filter((action) => action.label || action.onClick)
+                  .filter((action) => action.label || action.title || action.onClick)
                   .map((action, index) => {
                     const ActionIcon = action.icon;
                     const isPrimary = action.variant === "primary";
@@ -396,7 +492,7 @@ export default function RoleDashboardLayout({
                         onClick={action.onClick}
                         className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition ${
                           isPrimary
-                            ? "bg-[#a1452b] text-white shadow-lg shadow-[#a1452b]/25 hover:bg-[#873922]"
+                            ? "bg-orange-600 text-white shadow-sm hover:bg-orange-700"
                             : "border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700"
                         }`}
                       >
@@ -405,56 +501,22 @@ export default function RoleDashboardLayout({
                       </button>
                     );
                   })}
-              </div>
+              </motion.div>
             ) : null}
 
             {showInsightsPanel ? (
-              <div className="grid flex-1 gap-4 lg:grid-cols-[1fr_280px]">
-                <section className="flex flex-col rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
-                  <div className="mb-4">
-                    <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">{chartTitle}</h2>
-                    <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-400">{chartCaption}</p>
-                  </div>
-
-                  <div className="mb-2 flex flex-wrap gap-1.5">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-orange-100 dark:bg-orange-900/30 px-2 py-0.5 text-xs text-orange-700 dark:text-orange-300">
-                      <ChartNoAxesCombined className="h-3 w-3" />
-                      Primary Metric
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-pink-100 dark:bg-pink-900/30 px-2 py-0.5 text-xs text-pink-700 dark:text-pink-300">
-                      <ChartNoAxesCombined className="h-3 w-3" />
-                      Secondary Metric
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 dark:bg-slate-700 px-2 py-0.5 text-xs text-slate-700 dark:text-slate-300">
-                      Live (2.4s)
-                    </span>
-                  </div>
-
-                  <div className="flex-1 min-h-0 -mx-4">
-                    <ProfessionalChart points={livePoints} color={chartColor} />
-                  </div>
-                </section>
-
-                <div className="flex flex-col gap-4">
-                  <section className="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 shadow-sm">
-                    <h2 className="mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100">Live Activity</h2>
-                    <div className="space-y-2">
-                      {activityFeed.slice(0, 4).map((item) => (
-                        <article key={item.title} className="rounded-md border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-700 p-2">
-                          <p className="text-xs font-medium text-slate-900 dark:text-slate-100">{item.title}</p>
-                          <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400">{item.meta}</p>
-                        </article>
-                      ))}
-                    </div>
-                  </section>
-
-                  {showNotifications ? <NotificationPanel /> : null}
-                </div>
-              </div>
+              <motion.div variants={dashboardItem} className="flex flex-col gap-5">
+                <OperationalOverview
+                  kpis={kpis}
+                  activityFeed={activityFeed}
+                  chartTitle={chartTitle}
+                  chartCaption={chartCaption}
+                />
+              </motion.div>
             ) : null}
 
             {extraContent ? extraContent : null}
-          </main>
+          </motion.main>
         </div>
       </div>
 

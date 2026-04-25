@@ -45,6 +45,21 @@ public class TicketController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    private String normalizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "USER";
+        }
+        return role.trim()
+                .toUpperCase()
+                .replaceFirst("^ROLE_", "")
+                .replaceAll("\\s+", "_");
+    }
+
+    private boolean isAdminRole(User user) {
+        String role = normalizeRole(user.getRole());
+        return "ADMIN".equals(role) || "SUPER_ADMIN".equals(role);
+    }
+
     // ─── POST /api/tickets — Create ticket ───────────────────────────────────
     @PostMapping
     public ResponseEntity<?> createTicket(@RequestBody Map<String, String> body,
@@ -91,7 +106,7 @@ public class TicketController {
     @GetMapping("/stats")
     public ResponseEntity<?> getStats(Authentication auth) {
         User user = getUser(auth);
-        if (!"ADMIN".equals(user.getRole())) {
+        if (!isAdminRole(user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Admin only"));
         }
         return ResponseEntity.ok(ticketService.getStats());
@@ -101,7 +116,7 @@ public class TicketController {
     @GetMapping("/technicians")
     public ResponseEntity<?> getTechnicians(Authentication auth) {
         User user = getUser(auth);
-        if (!"ADMIN".equals(user.getRole())) {
+        if (!isAdminRole(user)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Admin only"));
         }
         return ResponseEntity.ok(ticketService.getTechnicians());
@@ -123,10 +138,12 @@ public class TicketController {
 
         Ticket ticket = opt.get();
         // Enforce access: student can only see own tickets
-        if ("USER".equals(user.getRole()) && !user.getId().equals(ticket.getCreatedByUserId())) {
+        String role = normalizeRole(user.getRole());
+        if ("USER".equals(role) && !user.getId().equals(ticket.getCreatedByUserId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access denied"));
         }
-        if ("TECHNICIAN".equals(user.getRole()) && !user.getId().equals(ticket.getAssignedTechnicianId())) {
+        if ("TECHNICIAN".equals(role)
+                && !user.getId().equals(ticket.getAssignedTechnicianId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access denied"));
         }
 
@@ -140,7 +157,7 @@ public class TicketController {
                                               Authentication auth) {
         try {
             User user = getUser(auth);
-            if (!"ADMIN".equals(user.getRole())) {
+            if (!isAdminRole(user)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Admin only"));
             }
 
@@ -190,7 +207,7 @@ public class TicketController {
             return ResponseEntity.notFound().build();
         }
         Ticket ticket = existing.get();
-        boolean isAdmin = "ADMIN".equals(user.getRole());
+        boolean isAdmin = isAdminRole(user);
         boolean isCreator = user.getId().equals(ticket.getCreatedByUserId());
         if (!isAdmin && !isCreator) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access denied"));
@@ -211,7 +228,7 @@ public class TicketController {
             if (ticketOpt.isEmpty()) return ResponseEntity.notFound().build();
 
             Ticket ticket = ticketOpt.get();
-            if (!user.getId().equals(ticket.getCreatedByUserId()) && !"ADMIN".equals(user.getRole())) {
+            if (!user.getId().equals(ticket.getCreatedByUserId()) && !isAdminRole(user)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access denied"));
             }
 

@@ -8,6 +8,7 @@ import DashboardPage from "../pages/DashboardPage";
 import MyBookingsPage from "../pages/MyBookingsPage";
 import ResourceCataloguePage from "../pages/ResourceCataloguePage";
 import ResourceBookingRedirectPage from "../pages/ResourceBookingRedirectPage";
+import SupportPage from "../pages/SupportPage";
 import AdminDashboardPage from "../pages/AdminDashboardPage";
 import AdminResourceMatrixPage from "../pages/AdminResourceMatrixPage";
 import AdminApprovalsPage from "../pages/AdminApprovalsPage";
@@ -148,6 +149,16 @@ function AnimatedRoutes() {
             <PageFrame>
               <ProtectedRoute allowedRoles={["USER"]}>
                 <ResourceBookingRedirectPage />
+              </ProtectedRoute>
+            </PageFrame>
+          }
+        />
+        <Route
+          path="/dashboard/support"
+          element={
+            <PageFrame>
+              <ProtectedRoute allowedRoles={["USER"]}>
+                <SupportPage />
               </ProtectedRoute>
             </PageFrame>
           }
