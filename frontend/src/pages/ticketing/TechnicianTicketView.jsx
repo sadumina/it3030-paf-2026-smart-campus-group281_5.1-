@@ -129,7 +129,7 @@ export default function TechnicianTicketView({ embedded = false, onTicketsChange
   };
 
   return (
-    <div className={embedded ? "tkt-root tkt-embedded tkt-technician-board" : "tkt-page tkt-root"}>
+    <div className={embedded ? "tkt-root tkt-embedded tkt-technician-board tkt-admin-board" : "tkt-page tkt-root tkt-technician-board tkt-admin-board"}>
       <div className="tkt-container">
         {embedded ? (
           <div className="tkt-board-bar">
@@ -216,6 +216,7 @@ export default function TechnicianTicketView({ embedded = false, onTicketsChange
                   onClick={() => setPriority(priority.key)}
                   type="button"
                 >
+                  <span className="tkt-priority-dot" aria-hidden="true" />
                   {priority.label}
                   {priority.key !== "ALL" ? (
                     <span style={{ opacity: 0.65, fontSize: "0.68rem" }}>
