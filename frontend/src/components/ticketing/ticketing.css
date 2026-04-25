@@ -2237,6 +2237,48 @@
   background: #ffe4e6;
 }
 
+.tkt-admin-board .tkt-btn-primary {
+  border-radius: 8px;
+  padding: 10px 16px;
+  background: #ea580c;
+  box-shadow: none;
+}
+
+.tkt-admin-board .tkt-btn-primary:hover {
+  transform: none;
+  background: #c2410c;
+  box-shadow: none;
+  filter: none;
+}
+
+.tkt-student-board .tkt-header {
+  border-left: 4px solid #f97316;
+}
+
+.tkt-student-board .tkt-content-scroll {
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.tkt-student-board .tkt-card-actions {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--tkt-border);
+}
+
+.tkt-student-board .tkt-card-delete-btn {
+  border: 1px solid #fecdd3;
+  border-radius: 8px;
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.tkt-student-board .tkt-card-delete-btn:hover:not(:disabled) {
+  border-color: #fda4af;
+  background: #ffe4e6;
+}
+
 /* ─── Fade animation class (used by .tkt-fade on cards) ─────── */
 .tkt-fade {
   animation: tkt-fade-up 0.35s ease both;
