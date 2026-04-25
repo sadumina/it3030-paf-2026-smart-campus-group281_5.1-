@@ -51,7 +51,7 @@ export default function AdminDashboardPage() {
   return (
     <RoleDashboardLayout
       sectionLabel={isSuperAdmin ? "Super Admin Command Center" : "Admin Command Center"}
-      dashboardTitle="Campus Operations Dashboard"
+      dashboardTitle="CleverCampus Operations Dashboard"
       dashboardSubtitle={
         isSuperAdmin
           ? "Global governance, privileged access, and full control in one place."

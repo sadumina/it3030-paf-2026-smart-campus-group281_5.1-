@@ -6,7 +6,7 @@ export default function DashboardPage() {
   return (
     <RoleDashboardLayout
       sectionLabel="User Workspace"
-      dashboardTitle="Smart Campus Dashboard"
+      dashboardTitle="CleverCampus Dashboard"
       dashboardSubtitle="Manage bookings, requests, and alerts in one place."
       roleLabel="USER"
       auth={getAuth()}
@@ -20,3 +20,4 @@ export default function DashboardPage() {
     />
   );
 }
+
