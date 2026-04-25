@@ -1,6 +1,7 @@
 import { getToken } from "./authStorage";
 
 const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/bookings`;
+const RESOURCES_API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/resources`;
 const ENABLE_DELETED_BOOKINGS_ENDPOINT =
   import.meta.env.VITE_ENABLE_DELETED_BOOKINGS_ENDPOINT === "true";
 
@@ -69,6 +70,42 @@ export async function fetchAllBookings() {
 }
 
 export const getAllBookings = fetchAllBookings;
+
+/** RESOURCE: list resources (axios-like response shape for legacy callers) */
+export async function getResources() {
+  const response = await fetch(RESOURCES_API_BASE_URL, {
+    method: "GET",
+    headers: {},
+  });
+  const data = await parseResponse(response);
+  return { data: Array.isArray(data) ? data : [] };
+}
+
+/** RESOURCE: capacity lookup (axios-like response shape for legacy callers) */
+export async function getResourceCapacity(resourceId, _startTime, _endTime) {
+  if (!resourceId) {
+    throw new Error("Resource id is required");
+  }
+
+  const response = await fetch(
+    `${RESOURCES_API_BASE_URL}/${resourceId}/booking-context`,
+    {
+      method: "GET",
+      headers: {},
+    },
+  );
+
+  const resource = await parseResponse(response);
+  const numericCapacity = Number(resource?.capacity);
+  const hasCapacity = Number.isFinite(numericCapacity) && numericCapacity > 0;
+
+  return {
+    data: {
+      available: hasCapacity ? numericCapacity : Number.MAX_SAFE_INTEGER,
+      unlimited: !hasCapacity,
+    },
+  };
+}
 
 /** ADMIN: list soft-deleted bookings (optional endpoint) */
 export async function getDeletedBookings() {
