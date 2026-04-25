@@ -89,7 +89,7 @@ export default function LandingPage() {
             <div className="reveal-on-scroll mx-auto max-w-4xl">
               <span className="inline-flex items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">
                 <Sparkles className="h-3.5 w-3.5" />
-                Professional Campus Platform
+                Professional CleverCampus Platform
               </span>
 
               <h1 className="mt-5 font-['Outfit'] text-4xl font-extrabold leading-tight text-slate-900 sm:text-5xl">
