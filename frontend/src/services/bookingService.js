@@ -1,7 +1,7 @@
 import axios from "axios";
-import { getToken } from "./authStorage";
+import { getAuth, getToken } from "./authStorage";
 
-const API_URL = "http://localhost:8080/api/bookings";
+const API_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8081/api"}/bookings`;
 
 const authConfig = () => ({
   headers: {
@@ -41,3 +41,28 @@ export const deleteBooking = (id, userId) =>
 // Admin: fetch all soft-deleted bookings
 export const getDeletedBookings = () =>
   axios.get(`${API_URL}/deleted`, authConfig());
+
+const toData = (response) => response?.data ?? response;
+
+// Backward-compatible aliases used by older pages.
+export const fetchAllBookings = () => getAllBookings().then(toData);
+export const fetchMyBookings = (userId) => {
+  const resolvedUserId = userId || getAuth()?.id || "";
+  return getMyBookings(resolvedUserId).then(toData);
+};
+
+export const updateBookingStatus = (id, status, reason = "") => {
+  if (status === "APPROVED") {
+    return approveBooking(id).then(toData);
+  }
+
+  if (status === "REJECTED") {
+    return rejectBooking(id, reason).then(toData);
+  }
+
+  if (status === "CANCELLED") {
+    return cancelBooking(id).then(toData);
+  }
+
+  return Promise.reject(new Error(`Unsupported booking status: ${status}`));
+};
