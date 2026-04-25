@@ -118,6 +118,100 @@
   padding: 0;
 }
 
+.tkt-technician-board {
+  --tkt-bg: #ffffff;
+  --tkt-bg2: #f8fafc;
+  --tkt-surface: #ffffff;
+  --tkt-surface2: #f8fafc;
+  --tkt-border: rgba(226, 232, 240, 0.95);
+  --tkt-border-strong: rgba(148, 163, 184, 0.45);
+  --tkt-text: #0f172a;
+  --tkt-text-muted: #64748b;
+  --tkt-text-dimmed: #94a3b8;
+}
+
+.dark .tkt-technician-board {
+  --tkt-bg: #0f172a;
+  --tkt-bg2: #111827;
+  --tkt-surface: #1e293b;
+  --tkt-surface2: #0f172a;
+  --tkt-border: rgba(51, 65, 85, 0.9);
+  --tkt-border-strong: rgba(100, 116, 139, 0.55);
+  --tkt-text: #f8fafc;
+  --tkt-text-muted: #cbd5e1;
+  --tkt-text-dimmed: #94a3b8;
+}
+
+.tkt-technician-board .tkt-container {
+  max-width: none;
+}
+
+.tkt-technician-board .tkt-header {
+  margin-bottom: 18px;
+  padding: 20px 22px;
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.98));
+  border-color: rgba(251, 146, 60, 0.28);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+.dark .tkt-technician-board .tkt-header {
+  background:
+    linear-gradient(135deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.98));
+  box-shadow: 0 10px 30px rgba(2, 6, 23, 0.3);
+}
+
+.tkt-technician-board .tkt-header::before {
+  height: 3px;
+}
+
+.tkt-technician-board .tkt-header-left h1 {
+  font-size: 1.25rem;
+}
+
+.tkt-technician-board .tkt-stats-row {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.tkt-technician-board .tkt-stat-card,
+.tkt-technician-board .tkt-filter-section,
+.tkt-technician-board .tkt-card {
+  border-radius: 12px;
+  background: var(--tkt-surface);
+  border-color: var(--tkt-border);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+
+.tkt-technician-board .tkt-filter-section {
+  padding: 16px;
+  margin-bottom: 14px;
+}
+
+.tkt-technician-board .tkt-content-scroll {
+  max-height: none;
+  overflow: visible;
+  padding-right: 0;
+}
+
+.tkt-technician-board .tkt-cards-grid {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+@media (max-width: 900px) {
+  .tkt-technician-board .tkt-stats-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .tkt-technician-board .tkt-stats-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 .tkt-container {
   max-width: 1200px;
   margin: 0 auto;
