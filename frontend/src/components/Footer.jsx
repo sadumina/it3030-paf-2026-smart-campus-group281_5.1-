@@ -28,8 +28,8 @@ export default function Footer() {
               Clever<span className="text-orange-500">Campus</span>
             </p>
             <p className="text-sm leading-relaxed text-slate-600">
-              Smart and professional campus operations platform for bookings, support workflows, and
-              institutional performance.
+              CleverCampus is a professional operations platform for bookings, support workflows,
+              and institutional performance.
             </p>
           </div>
 
@@ -75,7 +75,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-4 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
-          <p>© {currentYear} Clever Campus. All rights reserved.</p>
+          <p>&copy; {currentYear} CleverCampus. All rights reserved.</p>
           <p className="inline-flex items-center gap-2">
             <CalendarCheck2 className="h-4 w-4 text-orange-500" />
             Trusted by modern campus teams
@@ -85,3 +85,4 @@ export default function Footer() {
     </footer>
   );
 }
+
