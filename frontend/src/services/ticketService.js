@@ -1,4 +1,12 @@
 const API_BASE = "http://localhost:8080/api/tickets";
+const USERS_BASE = "http://localhost:8080/api/users";
+
+function normalizeRole(role) {
+  return (role || "")
+    .toUpperCase()
+    .replace(/^ROLE_/, "")
+    .replace(/\s+/g, "_");
+}
 
 function authHeader() {
   const raw = localStorage.getItem("campusAuth");
@@ -86,8 +94,11 @@ export async function fetchStats() {
 }
 
 export async function fetchTechnicians() {
-  const res = await fetch(`${API_BASE}/technicians`, { headers: authHeader() });
-  return handleResponse(res);
+  const res = await fetch(USERS_BASE, { headers: authHeader() });
+  const users = await handleResponse(res);
+  return Array.isArray(users)
+    ? users.filter((user) => normalizeRole(user.role) === "TECHNICIAN")
+    : [];
 }
 
 // ─── Image Upload / Delete ─────────────────────────────────────────────

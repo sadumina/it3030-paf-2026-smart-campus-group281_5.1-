@@ -88,8 +88,8 @@ public class TicketService {
 
         notificationService.createNotificationsForAdmins(
                 "TICKET_CREATED",
-                "New Ticket: " + saved.getTicketId(),
-                creator.getName() + " raised " + title,
+                "New Incident: " + saved.getTicketId(),
+                creator.getName() + " submitted " + title,
                 "TICKET", saved.getId());
 
         return saved;
@@ -97,7 +97,7 @@ public class TicketService {
 
     // ─── Get Tickets (role-aware, with optional filters) ────────────────────
     public List<Ticket> getTicketsForUser(User user, String status, String priority, String category) {
-        List<Ticket> tickets = switch (user.getRole()) {
+        List<Ticket> tickets = switch (normalizeRole(user.getRole())) {
             case "ADMIN", "SUPER_ADMIN" -> ticketRepository.findAllByOrderByCreatedAtDesc();
             case "TECHNICIAN" -> ticketRepository.findByAssignedTechnicianIdOrderByCreatedAtDesc(user.getId());
             default -> ticketRepository.findByCreatedByUserIdOrderByCreatedAtDesc(user.getId());
@@ -126,7 +126,7 @@ public class TicketService {
             return Optional.empty();
 
         Optional<User> techOpt = userRepository.findById(technicianId);
-        if (techOpt.isEmpty() || !"TECHNICIAN".equals(techOpt.get().getRole())) {
+        if (techOpt.isEmpty() || !"TECHNICIAN".equals(normalizeRole(techOpt.get().getRole()))) {
             throw new IllegalArgumentException("User is not a technician");
         }
 
@@ -176,7 +176,11 @@ public class TicketService {
 
         Ticket ticket = opt.get();
         String currentStatus = ticket.getStatus();
-        String role = actor.getRole();
+        String role = normalizeRole(actor.getRole());
+
+        if ("TECHNICIAN".equalsIgnoreCase(role) && !actor.getId().equals(ticket.getAssignedTechnicianId())) {
+            throw new IllegalStateException("Technician must be assigned to the ticket before updating status");
+        }
 
         // Validate transitions
         validateTransition(currentStatus, newStatus, role);
@@ -241,7 +245,18 @@ public class TicketService {
     }
 
     private boolean isAdminRole(String role) {
-        return "ADMIN".equalsIgnoreCase(role) || "SUPER_ADMIN".equalsIgnoreCase(role);
+        String normalized = normalizeRole(role);
+        return "ADMIN".equals(normalized) || "SUPER_ADMIN".equals(normalized);
+    }
+
+    private String normalizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "USER";
+        }
+        return role.trim()
+                .toUpperCase()
+                .replaceFirst("^ROLE_", "")
+                .replaceAll("\\s+", "_");
     }
 
     // ─── Image Upload ─────────────────────────────────────────────────────────
@@ -410,7 +425,7 @@ public class TicketService {
     // ─── Get Technicians ──────────────────────────────────────────────────────
     public List<User> getTechnicians() {
         return userRepository.findAll().stream()
-                .filter(u -> "TECHNICIAN".equals(u.getRole()))
+                .filter(u -> "TECHNICIAN".equals(normalizeRole(u.getRole())))
                 .toList();
     }
 
@@ -418,7 +433,7 @@ public class TicketService {
     public List<Ticket> searchTickets(String keyword, User user) {
         if (isAdminRole(user.getRole())) {
             return ticketRepository.searchByKeyword(keyword);
-        } else if ("TECHNICIAN".equals(user.getRole())) {
+        } else if ("TECHNICIAN".equals(normalizeRole(user.getRole()))) {
             return ticketRepository.searchByKeyword(keyword).stream()
                     .filter(t -> user.getId().equals(t.getAssignedTechnicianId()))
                     .toList();

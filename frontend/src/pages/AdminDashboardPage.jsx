@@ -18,8 +18,8 @@ const adminSidebar = [
   { label: "Resource Matrix", icon: LayoutGrid, path: "/admin/resources" },
   { label: "User Management", icon: Users, path: "/admin/users" },
   { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
-  { label: "Incidents", badge: "6", icon: Siren },
-  { label: "Audit Trail", icon: ScrollText, path: "/tickets", badge: "Tickets" },
+  { label: "Incidents", badge: "Assign", icon: Siren, path: "/tickets" },
+  { label: "Audit Trail", icon: ScrollText, path: "/tickets?desk=audit", badge: "Tickets" },
 ];
 
 const adminKpis = [

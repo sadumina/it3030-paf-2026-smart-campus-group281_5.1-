@@ -231,6 +231,8 @@ export default function RoleDashboardLayout({
   extraContent,
   showInsightsPanel = true,
   showNotifications = true,
+  showBreadcrumb = true,
+  showUtilityActions = true,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -305,7 +307,8 @@ export default function RoleDashboardLayout({
           <nav className="space-y-1.5">
             {sidebarItems.map((item) => {
               const ItemIcon = item.icon;
-              const isActive = item.path && location.pathname === item.path;
+              const currentRoute = `${location.pathname}${location.search}`;
+              const isActive = item.path && currentRoute === item.path;
               const itemClassName = isActive
                 ? "flex w-full items-center justify-between rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-700 transition"
                 : "flex w-full items-center justify-between rounded-md border border-transparent px-3 py-2 text-xs font-medium text-slate-600 transition hover:border-orange-100 hover:bg-orange-50 hover:text-orange-700 dark:text-slate-300 dark:hover:bg-slate-800";
@@ -376,42 +379,50 @@ export default function RoleDashboardLayout({
               </div>
 
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => navigate("/")}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                >
-                  <House className="h-3.5 w-3.5" />
-                  Landing Page
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                >
-                  <Search className="h-3.5 w-3.5" />
-                  Search
-                </button>
+                {showUtilityActions ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => navigate("/")}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    >
+                      <House className="h-3.5 w-3.5" />
+                      Landing Page
+                    </button>
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                    >
+                      <Search className="h-3.5 w-3.5" />
+                      Search
+                    </button>
+                  </>
+                ) : null}
                 {showNotifications ? (
                   <DashboardNotificationBell />
                 ) : null}
-                <button
-                  type="button"
-                  onClick={handleExportPDF}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                  title="Export as PDF"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  PDF
-                </button>
-                <button
-                  type="button"
-                  onClick={handleExportCSV}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                  title="Export as CSV"
-                >
-                  <FileJson className="h-3.5 w-3.5" />
-                  CSV
-                </button>
+                {showUtilityActions ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={handleExportPDF}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                      title="Export as PDF"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                      PDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleExportCSV}
+                      className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                      title="Export as CSV"
+                    >
+                      <FileJson className="h-3.5 w-3.5" />
+                      CSV
+                    </button>
+                  </>
+                ) : null}
                 <button
                   type="button"
                   onClick={toggleTheme}
@@ -432,9 +443,11 @@ export default function RoleDashboardLayout({
             </div>
           </header>
 
-          <div className="border-b border-slate-200 bg-white px-4 py-2 dark:border-slate-800 dark:bg-slate-900 md:px-6">
-            <Breadcrumb />
-          </div>
+          {showBreadcrumb ? (
+            <div className="border-b border-slate-200 bg-white px-4 py-2 dark:border-slate-800 dark:bg-slate-900 md:px-6">
+              <Breadcrumb />
+            </div>
+          ) : null}
 
           <motion.main
             variants={dashboardContainer}
@@ -465,10 +478,10 @@ export default function RoleDashboardLayout({
               })}
             </motion.div>
 
-            {quickActions?.some((action) => action.label || action.onClick) ? (
+            {quickActions?.some((action) => action.label || action.title || action.onClick) ? (
               <motion.div variants={dashboardItem} className="flex flex-wrap gap-2">
                 {quickActions
-                  .filter((action) => action.label || action.onClick)
+                  .filter((action) => action.label || action.title || action.onClick)
                   .map((action, index) => {
                     const ActionIcon = action.icon;
                     const isPrimary = action.variant === "primary";

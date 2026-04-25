@@ -45,8 +45,19 @@ public class TicketController {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    private String normalizeRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "USER";
+        }
+        return role.trim()
+                .toUpperCase()
+                .replaceFirst("^ROLE_", "")
+                .replaceAll("\\s+", "_");
+    }
+
     private boolean isAdminRole(User user) {
-        return "ADMIN".equalsIgnoreCase(user.getRole()) || "SUPER_ADMIN".equalsIgnoreCase(user.getRole());
+        String role = normalizeRole(user.getRole());
+        return "ADMIN".equals(role) || "SUPER_ADMIN".equals(role);
     }
 
     // ─── POST /api/tickets — Create ticket ───────────────────────────────────
@@ -127,10 +138,12 @@ public class TicketController {
 
         Ticket ticket = opt.get();
         // Enforce access: student can only see own tickets
-        if ("USER".equals(user.getRole()) && !user.getId().equals(ticket.getCreatedByUserId())) {
+        String role = normalizeRole(user.getRole());
+        if ("USER".equals(role) && !user.getId().equals(ticket.getCreatedByUserId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access denied"));
         }
-        if ("TECHNICIAN".equals(user.getRole()) && !user.getId().equals(ticket.getAssignedTechnicianId())) {
+        if ("TECHNICIAN".equals(role)
+                && !user.getId().equals(ticket.getAssignedTechnicianId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "Access denied"));
         }
 

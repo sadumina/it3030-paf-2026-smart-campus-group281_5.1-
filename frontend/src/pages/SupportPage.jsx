@@ -129,7 +129,7 @@ export default function SupportPage() {
         priority: form.priority,
       });
 
-      setMessage(`Support request ${created.ticketId || ""} submitted successfully.`);
+      setMessage(`Support request ${created.ticketId || ""} submitted successfully. It is now visible in the admin incident desk for technician assignment.`);
       setForm(initialForm);
       setSelectedType("IT Support");
     } catch (requestError) {
