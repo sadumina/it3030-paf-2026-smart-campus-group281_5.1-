@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 
 import org.springframework.stereotype.Service;
 
+import com.backend.backend.dto.BookingPendingUpdateRequest;
 import com.backend.backend.dto.BookingRequest;
 import com.backend.backend.model.Booking;
 import com.backend.backend.model.Resource;
@@ -42,30 +43,15 @@ public class BookingService {
             throw new IllegalStateException("Resource is not available for booking");
         }
 
-        // Validate date / time
-        if (request.getDate() == null) {
-            throw new IllegalArgumentException("Booking date is required");
-        }
-        if (request.getDate().isBefore(LocalDate.now())) {
-            throw new IllegalArgumentException("Booking date cannot be in the past");
-        }
-        if (request.getStartTime() == null || request.getEndTime() == null) {
-            throw new IllegalArgumentException("Start time and end time are required");
-        }
-        if (!request.getEndTime().isAfter(request.getStartTime())) {
-            throw new IllegalArgumentException("End time must be after start time");
-        }
-        if (request.getExpectedAttendees() != null && request.getExpectedAttendees() < 1) {
-            throw new IllegalArgumentException("Expected attendees must be at least 1");
-        }
-        if (request.getExpectedAttendees() != null
-                && resource.getCapacity() != null
-                && request.getExpectedAttendees() > resource.getCapacity()) {
-            throw new IllegalArgumentException("Expected attendees cannot exceed resource capacity");
-        }
+        validateBookingInput(
+                request.getDate(),
+                request.getStartTime(),
+                request.getEndTime(),
+                request.getExpectedAttendees(),
+                resource.getCapacity());
 
         // Validate no overlaps
-        checkOverlap(resource.getId(), request.getDate(), request.getStartTime(), request.getEndTime());
+        checkOverlap(resource.getId(), request.getDate(), request.getStartTime(), request.getEndTime(), null);
 
         // Resolve user info
         User user = userRepository.findByEmail(userEmail).orElse(null);
@@ -95,13 +81,49 @@ public class BookingService {
         return saved;
     }
 
-    private void checkOverlap(String resourceId, java.time.LocalDate date, java.time.LocalTime start, java.time.LocalTime end) {
+    private void validateBookingInput(
+            java.time.LocalDate date,
+            java.time.LocalTime start,
+            java.time.LocalTime end,
+            Integer expectedAttendees,
+            Integer resourceCapacity) {
+        if (date == null) {
+            throw new IllegalArgumentException("Booking date is required");
+        }
+        if (date.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Booking date cannot be in the past");
+        }
+        if (start == null || end == null) {
+            throw new IllegalArgumentException("Start time and end time are required");
+        }
+        if (!end.isAfter(start)) {
+            throw new IllegalArgumentException("End time must be after start time");
+        }
+        if (expectedAttendees != null && expectedAttendees < 1) {
+            throw new IllegalArgumentException("Expected attendees must be at least 1");
+        }
+        if (expectedAttendees != null
+                && resourceCapacity != null
+                && expectedAttendees > resourceCapacity) {
+            throw new IllegalArgumentException("Expected attendees cannot exceed resource capacity");
+        }
+    }
+
+    private void checkOverlap(
+            String resourceId,
+            java.time.LocalDate date,
+            java.time.LocalTime start,
+            java.time.LocalTime end,
+            String excludedBookingId) {
         List<Booking> existingBookings = bookingRepository.findByResourceIdAndDateAndStatusIn(
                 resourceId,
                 date,
                 List.of("PENDING", "APPROVED", "CONFIRMED"));
 
         for (Booking b : existingBookings) {
+            if (excludedBookingId != null && excludedBookingId.equals(b.getId())) {
+                continue;
+            }
             if (start.isBefore(b.getEndTime()) && b.getStartTime().isBefore(end)) {
                 throw new IllegalStateException("Requested time slot overlaps with an existing booking (" + b.getStartTime() + " - " + b.getEndTime() + ")");
             }
@@ -124,8 +146,16 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NoSuchElementException("Booking not found"));
 
-        if (!booking.getUserEmail().equalsIgnoreCase(userEmail)) {
-            throw new IllegalStateException("You can only cancel your own bookings");
+        User user = userRepository.findByEmail(userEmail).orElse(null);
+        String userId = user != null ? user.getId() : null;
+        boolean emailMatches = booking.getUserEmail() != null && booking.getUserEmail().equalsIgnoreCase(userEmail);
+        boolean idMatches = userId != null && booking.getUserId() != null && booking.getUserId().equals(userId);
+
+        if (!emailMatches && !idMatches) {
+            throw new SecurityException("You can only cancel your own bookings");
+        }
+        if (!"PENDING".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Only pending bookings can be cancelled");
         }
 
         booking.setStatus("CANCELLED");
@@ -141,9 +171,75 @@ public class BookingService {
         return saved;
     }
 
+    public void deleteBooking(String bookingId, String userEmail) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NoSuchElementException("Booking not found"));
+
+        User user = userRepository.findByEmail(userEmail).orElse(null);
+        String userId = user != null ? user.getId() : null;
+        boolean emailMatches = booking.getUserEmail() != null && booking.getUserEmail().equalsIgnoreCase(userEmail);
+        boolean idMatches = userId != null && booking.getUserId() != null && booking.getUserId().equals(userId);
+
+        if (!emailMatches && !idMatches) {
+            throw new SecurityException("You can only delete your own bookings");
+        }
+        
+        bookingRepository.deleteById(bookingId);
+    }
+
+    public Booking updatePendingBooking(String bookingId, BookingPendingUpdateRequest request, String userEmail) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NoSuchElementException("Booking not found"));
+
+        User user = userRepository.findByEmail(userEmail).orElse(null);
+        String userId = user != null ? user.getId() : null;
+        boolean emailMatches = booking.getUserEmail() != null && booking.getUserEmail().equalsIgnoreCase(userEmail);
+        boolean idMatches = userId != null && booking.getUserId() != null && booking.getUserId().equals(userId);
+
+        if (!emailMatches && !idMatches) {
+            throw new SecurityException("You can only update your own bookings");
+        }
+        if (!"PENDING".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Only pending bookings can be updated");
+        }
+
+        Resource resource = resourceRepository.findById(booking.getResourceId())
+                .orElseThrow(() -> new NoSuchElementException("Resource not found"));
+
+        if (!"ACTIVE".equalsIgnoreCase(resource.getStatus())) {
+            throw new IllegalStateException("Resource is not available for booking");
+        }
+
+        validateBookingInput(
+                request.getDate(),
+                request.getStartTime(),
+                request.getEndTime(),
+                request.getExpectedAttendees(),
+                resource.getCapacity());
+
+        checkOverlap(
+                booking.getResourceId(),
+                request.getDate(),
+                request.getStartTime(),
+                request.getEndTime(),
+                booking.getId());
+
+        booking.setDate(request.getDate());
+        booking.setStartTime(request.getStartTime());
+        booking.setEndTime(request.getEndTime());
+        booking.setPurpose(request.getPurpose());
+        booking.setExpectedAttendees(request.getExpectedAttendees());
+
+        return bookingRepository.save(booking);
+    }
+
     public Booking updateBookingStatus(String bookingId, String status, String reason) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NoSuchElementException("Booking not found"));
+
+        if (!"PENDING".equalsIgnoreCase(booking.getStatus())) {
+            throw new IllegalStateException("Only pending bookings can be updated");
+        }
 
         String normalized = status != null ? status.trim().toUpperCase() : "";
         if ("CONFIRMED".equals(normalized)) {

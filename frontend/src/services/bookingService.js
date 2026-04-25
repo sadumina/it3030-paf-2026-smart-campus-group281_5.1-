@@ -6,7 +6,17 @@ const ENABLE_DELETED_BOOKINGS_ENDPOINT =
   import.meta.env.VITE_ENABLE_DELETED_BOOKINGS_ENDPOINT === "true";
 
 async function parseResponse(response) {
-  const data = await response.json().catch(() => null);
+  const raw = await response.text();
+  let data = null;
+
+  if (raw) {
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      data = raw;
+    }
+  }
+
   if (!response.ok) {
     throw new Error(
       typeof data === "string" ? data : data?.message || "Request failed",
@@ -45,6 +55,16 @@ export async function fetchMyBookings() {
 
 export const getMyBookings = fetchMyBookings;
 
+/** USER: update own pending booking details */
+export async function updatePendingBooking(bookingId, payload) {
+  const response = await fetch(`${API_BASE_URL}/${bookingId}`, {
+    method: "PATCH",
+    headers: getAuthHeaders(),
+    body: JSON.stringify(payload),
+  });
+  return parseResponse(response);
+}
+
 /** USER: cancel a booking */
 export async function cancelBooking(bookingId) {
   const response = await fetch(`${API_BASE_URL}/${bookingId}/cancel`, {
@@ -54,9 +74,13 @@ export async function cancelBooking(bookingId) {
   return parseResponse(response);
 }
 
-/** USER: delete booking action maps to cancel in current backend API */
+/** USER: delete booking permanently via REST API */
 export async function deleteBooking(bookingId) {
-  return cancelBooking(bookingId);
+  const response = await fetch(`${API_BASE_URL}/${bookingId}`, {
+    method: "DELETE",
+    headers: getAuthHeaders(),
+  });
+  return parseResponse(response);
 }
 
 /** ADMIN: list all bookings */

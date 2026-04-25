@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { Pencil, Trash2, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function BookingDetailsModal({
@@ -6,7 +6,14 @@ export default function BookingDetailsModal({
   onClose,
   statusClasses,
   formatDateTime,
+  onUpdatePending,
+  onDeletePending,
+  updateBusy = false,
+  deleteBusy = false,
 }) {
+  const currentStatus = booking?.status || "PENDING";
+  const isPending = currentStatus === "PENDING";
+
   return (
     <AnimatePresence>
       {booking && (
@@ -32,9 +39,9 @@ export default function BookingDetailsModal({
                 <h3 className="font-semibold text-slate-900 dark:text-slate-100 flex items-center gap-2">
                   Booking Details
                   <span
-                    className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wider ${statusClasses[booking.status || "PENDING"] || "border-slate-200 bg-slate-50 text-slate-700"}`}
+                    className={`rounded-full border px-2 py-0.5 text-[10px] uppercase tracking-wider ${statusClasses[currentStatus] || "border-slate-200 bg-slate-50 text-slate-700"}`}
                   >
-                    {booking.status || "PENDING"}
+                    {currentStatus}
                   </span>
                 </h3>
               </div>
@@ -111,14 +118,45 @@ export default function BookingDetailsModal({
             </div>
 
             {/* Footer */}
-            <div className="shrink-0 border-t border-slate-100 bg-slate-50 px-5 py-4 dark:border-slate-800 dark:bg-slate-800 flex justify-end">
-              <button
-                type="button"
-                onClick={onClose}
-                className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 border border-slate-200 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-colors dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700 dark:hover:border-slate-600"
-              >
-                Close
-              </button>
+            <div className="shrink-0 border-t border-slate-100 bg-slate-50 px-5 py-4 dark:border-slate-800 dark:bg-slate-800">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {isPending
+                    ? "This booking is pending. You can update or delete it."
+                    : "Only pending bookings can be updated or deleted."}
+                </p>
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                  {isPending && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => onUpdatePending?.(booking)}
+                        disabled={updateBusy || deleteBusy}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-700 transition hover:bg-orange-100 disabled:opacity-60 dark:border-orange-600/60 dark:bg-orange-900/20 dark:text-orange-300 dark:hover:bg-orange-900/40"
+                      >
+                        <Pencil className="h-3.5 w-3.5" />
+                        {updateBusy ? "Updating..." : "Update"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => onDeletePending?.(booking)}
+                        disabled={updateBusy || deleteBusy}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-100 disabled:opacity-60 dark:border-rose-700/60 dark:bg-rose-900/20 dark:text-rose-300 dark:hover:bg-rose-900/40"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        {deleteBusy ? "Deleting..." : "Delete"}
+                      </button>
+                    </>
+                  )}
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 border border-slate-200 shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-colors dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700 dark:hover:border-slate-600"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
             </div>
           </motion.div>
         </motion.div>

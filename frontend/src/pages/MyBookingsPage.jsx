@@ -14,8 +14,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import StudentBookingForm from "../components/booking/StudentBookingForm";
 import BookingDetailsModal from "../components/booking/BookingDetailsModal";
+import PendingBookingUpdateModal from "../components/booking/PendingBookingUpdateModal";
 import { getAuth } from "../services/authStorage";
-import { getMyBookings, deleteBooking } from "../services/bookingService";
+import {
+  getMyBookings,
+  deleteBooking,
+  updatePendingBooking,
+} from "../services/bookingService";
 
 const statusClasses = {
   PENDING:
@@ -71,6 +76,9 @@ export default function MyBookingsPage() {
   const [error, setError] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [editingBooking, setEditingBooking] = useState(null);
+  const [updateBusy, setUpdateBusy] = useState(false);
+  const [updateError, setUpdateError] = useState("");
 
   // Delete confirmation state
   const [deleteConfirm, setDeleteConfirm] = useState(null); // booking to delete
@@ -96,8 +104,8 @@ export default function MyBookingsPage() {
     } catch (requestError) {
       setError(
         requestError?.response?.data?.message ||
-          requestError.message ||
-          "Failed to load your bookings.",
+        requestError.message ||
+        "Failed to load your bookings.",
       );
       setBookings([]);
     } finally {
@@ -135,11 +143,38 @@ export default function MyBookingsPage() {
     } catch (err) {
       setDeleteError(
         err?.response?.data?.message ||
-          err.message ||
-          "Failed to delete booking.",
+        err.message ||
+        "Failed to delete booking.",
       );
     } finally {
       setDeleteBusyId(null);
+    }
+  };
+
+  const handleUpdateBookingSubmit = async (payload) => {
+    if (!editingBooking) return;
+
+    setUpdateBusy(true);
+    setUpdateError("");
+
+    try {
+      await updatePendingBooking(editingBooking.id, payload);
+      const updatedBookingId = editingBooking.id;
+      setEditingBooking(null);
+
+      if (selectedBooking?.id === updatedBookingId) {
+        setSelectedBooking(null);
+      }
+
+      await loadBookings();
+    } catch (requestError) {
+      setUpdateError(
+        requestError?.response?.data?.message ||
+        requestError.message ||
+        "Failed to update booking.",
+      );
+    } finally {
+      setUpdateBusy(false);
     }
   };
 
@@ -246,28 +281,27 @@ export default function MyBookingsPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 {bookings.map((booking) => {
                   const status = booking.status || "PENDING";
-                  const isPending = status === "PENDING";
                   const startDate =
                     booking.date && booking.startTime
                       ? new Date(
-                          `${booking.date}T${String(booking.startTime).slice(0, 8)}`,
-                        )
+                        `${booking.date}T${String(booking.startTime).slice(0, 8)}`,
+                      )
                       : booking.startTime
                         ? new Date(booking.startTime)
                         : null;
                   const displayDate =
                     startDate && !Number.isNaN(startDate.getTime())
                       ? startDate.toLocaleDateString("en-GB", {
-                          month: "short",
-                          day: "numeric",
-                        })
+                        month: "short",
+                        day: "numeric",
+                      })
                       : "-";
                   const displayTime =
                     startDate && !Number.isNaN(startDate.getTime())
                       ? startDate.toLocaleTimeString("en-GB", {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
                       : "-";
 
                   return (
@@ -293,23 +327,6 @@ export default function MyBookingsPage() {
                           >
                             {status}
                           </span>
-
-                          {/* Delete button — only for PENDING bookings */}
-                          {isPending && (
-                            <button
-                              type="button"
-                              id={`delete-booking-${booking.id}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeleteConfirm(booking);
-                                setDeleteError("");
-                              }}
-                              title="Delete this pending booking"
-                              className="inline-flex items-center justify-center rounded-lg border border-rose-200 bg-rose-50 p-1.5 text-rose-600 transition-all duration-200 hover:bg-rose-100 hover:border-rose-300 hover:shadow-sm dark:border-rose-700/60 dark:bg-rose-900/20 dark:text-rose-400 dark:hover:bg-rose-900/40"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                            </button>
-                          )}
                         </div>
                       </div>
                     </article>
@@ -396,6 +413,19 @@ export default function MyBookingsPage() {
         )}
       </AnimatePresence>
 
+      <PendingBookingUpdateModal
+        booking={editingBooking}
+        isOpen={Boolean(editingBooking)}
+        onClose={() => {
+          if (updateBusy) return;
+          setEditingBooking(null);
+          setUpdateError("");
+        }}
+        onSubmit={handleUpdateBookingSubmit}
+        loading={updateBusy}
+        errorMessage={updateError}
+      />
+
       {/* Add Booking Modal */}
       <AnimatePresence>
         {showAddModal && (
@@ -445,6 +475,18 @@ export default function MyBookingsPage() {
         onClose={() => setSelectedBooking(null)}
         statusClasses={statusClasses}
         formatDateTime={formatDateTime}
+        onUpdatePending={(booking) => {
+          setSelectedBooking(null);
+          setEditingBooking(booking);
+          setUpdateError("");
+        }}
+        onDeletePending={(booking) => {
+          setSelectedBooking(null);
+          setDeleteConfirm(booking);
+          setDeleteError("");
+        }}
+        updateBusy={updateBusy}
+        deleteBusy={deleteBusyId === selectedBooking?.id}
       />
     </>
   );

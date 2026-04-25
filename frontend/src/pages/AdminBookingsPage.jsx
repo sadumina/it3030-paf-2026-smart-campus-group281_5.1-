@@ -443,7 +443,6 @@ export default function AdminBookingsPage() {
               <div className="space-y-4">
                 {filteredBookings.map((booking) => {
                   const isPending = booking.status === "PENDING";
-                  const isApproved = booking.status === "APPROVED";
                   const isBusy = busyId === booking.id;
                   const reason = reasonById[booking.id] || "";
 
@@ -579,17 +578,7 @@ export default function AdminBookingsPage() {
                           </>
                         )}
 
-                        {isApproved && (
-                          <button
-                            onClick={() => openCancelConfirm(booking.id)}
-                            disabled={isBusy}
-                            className="rounded-md border border-red-200 dark:border-red-700 bg-red-50 dark:bg-red-900/20 px-3 py-1.5 text-xs font-semibold text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/40 disabled:opacity-60 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm"
-                          >
-                            {isBusy ? "Processing..." : "Cancel"}
-                          </button>
-                        )}
-
-                        {!isPending && !isApproved && (
+                        {!isPending && (
                           <div className="rounded-md bg-slate-100 dark:bg-slate-600 px-3 py-1.5 text-xs text-slate-600 dark:text-slate-300">
                             No more actions available
                           </div>
@@ -634,7 +623,8 @@ export default function AdminBookingsPage() {
                   <p className="mb-3 text-xs text-rose-600 dark:text-rose-400">
                     These bookings were soft-deleted by students and will be
                     permanently purged{" "}
-                    <span className="font-semibold">7 days</span> after deletion.
+                    <span className="font-semibold">7 days</span> after
+                    deletion.
                   </p>
 
                   {deletedLoading ? (
@@ -649,15 +639,20 @@ export default function AdminBookingsPage() {
                   ) : (
                     <div className="space-y-3">
                       {deletedBookings.map((b) => {
-                        const deletedAt = b.deletedAt ? new Date(b.deletedAt) : null;
+                        const deletedAt = b.deletedAt
+                          ? new Date(b.deletedAt)
+                          : null;
                         const purgeDate = deletedAt
-                          ? new Date(deletedAt.getTime() + 7 * 24 * 60 * 60 * 1000)
+                          ? new Date(
+                              deletedAt.getTime() + 7 * 24 * 60 * 60 * 1000,
+                            )
                           : null;
                         const daysLeft = purgeDate
                           ? Math.max(
                               0,
                               Math.ceil(
-                                (purgeDate - Date.now()) / (1000 * 60 * 60 * 24),
+                                (purgeDate - Date.now()) /
+                                  (1000 * 60 * 60 * 24),
                               ),
                             )
                           : null;
@@ -674,25 +669,39 @@ export default function AdminBookingsPage() {
                                 </p>
                                 <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
                                   {String(b.id).slice(0, -4)}
-                                  <span className="text-rose-500">{String(b.id).slice(-4)}</span>
+                                  <span className="text-rose-500">
+                                    {String(b.id).slice(-4)}
+                                  </span>
                                 </p>
                               </div>
-                              <span className={`inline-flex rounded-full border px-3 py-0.5 text-xs font-semibold ${statusStyles.DELETED}`}>
+                              <span
+                                className={`inline-flex rounded-full border px-3 py-0.5 text-xs font-semibold ${statusStyles.DELETED}`}
+                              >
                                 DELETED
                               </span>
                             </div>
 
                             <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 text-xs">
                               <div>
-                                <p className="text-slate-400 dark:text-slate-500 font-medium">RESOURCE</p>
-                                <p className="mt-0.5 font-semibold text-slate-700 dark:text-slate-200">{b.resourceId}</p>
+                                <p className="text-slate-400 dark:text-slate-500 font-medium">
+                                  RESOURCE
+                                </p>
+                                <p className="mt-0.5 font-semibold text-slate-700 dark:text-slate-200">
+                                  {b.resourceId}
+                                </p>
                               </div>
                               <div>
-                                <p className="text-slate-400 dark:text-slate-500 font-medium">USER</p>
-                                <p className="mt-0.5 font-semibold text-slate-700 dark:text-slate-200">{b.userId}</p>
+                                <p className="text-slate-400 dark:text-slate-500 font-medium">
+                                  USER
+                                </p>
+                                <p className="mt-0.5 font-semibold text-slate-700 dark:text-slate-200">
+                                  {b.userId}
+                                </p>
                               </div>
                               <div>
-                                <p className="text-slate-400 dark:text-slate-500 font-medium">DELETED AT</p>
+                                <p className="text-slate-400 dark:text-slate-500 font-medium">
+                                  DELETED AT
+                                </p>
                                 <p className="mt-0.5 font-semibold text-slate-700 dark:text-slate-200">
                                   {deletedAt
                                     ? deletedAt.toLocaleString("en-GB", {
@@ -706,12 +715,16 @@ export default function AdminBookingsPage() {
                                 </p>
                               </div>
                               <div>
-                                <p className="text-slate-400 dark:text-slate-500 font-medium">PURGE IN</p>
-                                <p className={`mt-0.5 font-bold flex items-center gap-1 ${
-                                  daysLeft !== null && daysLeft <= 1
-                                    ? "text-rose-600 dark:text-rose-400"
-                                    : "text-amber-600 dark:text-amber-400"
-                                }`}>
+                                <p className="text-slate-400 dark:text-slate-500 font-medium">
+                                  PURGE IN
+                                </p>
+                                <p
+                                  className={`mt-0.5 font-bold flex items-center gap-1 ${
+                                    daysLeft !== null && daysLeft <= 1
+                                      ? "text-rose-600 dark:text-rose-400"
+                                      : "text-amber-600 dark:text-amber-400"
+                                  }`}
+                                >
                                   <Clock className="h-3 w-3" />
                                   {daysLeft !== null ? `${daysLeft}d` : "-"}
                                 </p>
@@ -720,8 +733,12 @@ export default function AdminBookingsPage() {
 
                             {b.purpose && (
                               <div className="mt-2 rounded-lg bg-slate-50 dark:bg-slate-700/60 border border-slate-100 dark:border-slate-600 p-2">
-                                <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">PURPOSE</p>
-                                <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">{b.purpose}</p>
+                                <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                                  PURPOSE
+                                </p>
+                                <p className="mt-0.5 text-xs text-slate-600 dark:text-slate-300">
+                                  {b.purpose}
+                                </p>
                               </div>
                             )}
                           </div>
