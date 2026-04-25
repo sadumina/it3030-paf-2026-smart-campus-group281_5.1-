@@ -61,7 +61,7 @@ export const reportExport = {
     
     // Header
     doc.setFontSize(18);
-    doc.text('Smart Campus Dashboard Report', 14, 15);
+    doc.text('CleverCampus Dashboard Report', 14, 15);
     
     doc.setFontSize(10);
     doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 23);
@@ -82,3 +82,4 @@ export const reportExport = {
     doc.save(filename);
   },
 };
+
