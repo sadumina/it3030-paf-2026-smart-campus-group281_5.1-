@@ -1,80 +1,43 @@
+import axios from "axios";
 import { getToken } from "./authStorage";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/bookings`;
+const API_URL = "http://localhost:8080/api/bookings";
 
-async function parseResponse(response) {
-  const data = await response.json().catch(() => null);
-  if (!response.ok) {
-    throw new Error(typeof data === "string" ? data : data?.message || "Request failed");
-  }
-  return data;
-}
+const authConfig = () => ({
+  headers: {
+    Authorization: `Bearer ${getToken()}`,
+  },
+});
 
-function getAuthHeaders() {
-  const token = getToken();
-  return {
-    "Content-Type": "application/json",
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-}
-
-/** USER: submit a new booking */
-export async function createBooking(payload) {
-  const response = await fetch(API_BASE_URL, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(payload),
+export const createBooking = (data) => axios.post(API_URL, data, authConfig());
+export const getBookingById = (id) =>
+  axios.get(`${API_URL}/${id}`, authConfig());
+export const getAllBookings = () => axios.get(API_URL, authConfig());
+export const getMyBookings = (userId) =>
+  axios.get(`${API_URL}/my`, {
+    params: { userId },
+    ...authConfig(),
   });
-  return parseResponse(response);
-}
-
-/** USER: list own bookings */
-export async function fetchMyBookings() {
-  const response = await fetch(`${API_BASE_URL}/my`, {
-    method: "GET",
-    headers: getAuthHeaders(),
+export const approveBooking = (id, adminId = "ADMIN-001") =>
+  axios.put(`${API_URL}/${id}/approve`, null, {
+    params: { adminId },
+    ...authConfig(),
   });
-  const data = await parseResponse(response);
-  return Array.isArray(data) ? data : [];
-}
-
-export const getMyBookings = fetchMyBookings;
-
-/** USER: cancel a booking */
-export async function cancelBooking(bookingId) {
-  const response = await fetch(`${API_BASE_URL}/${bookingId}/cancel`, {
-    method: "PATCH",
-    headers: getAuthHeaders(),
+export const rejectBooking = (id, reason) =>
+  axios.put(`${API_URL}/${id}/reject`, null, {
+    params: { reason },
+    ...authConfig(),
   });
-  return parseResponse(response);
-}
+export const cancelBooking = (id) =>
+  axios.put(`${API_URL}/${id}/cancel`, null, authConfig());
 
-/** ADMIN: list all bookings */
-export async function fetchAllBookings() {
-  const response = await fetch(API_BASE_URL, {
-    method: "GET",
-    headers: getAuthHeaders(),
+// Student soft-deletes a PENDING booking (permanently removed after 7 days)
+export const deleteBooking = (id, userId) =>
+  axios.delete(`${API_URL}/${id}`, {
+    params: { userId },
+    ...authConfig(),
   });
-  const data = await parseResponse(response);
-  return Array.isArray(data) ? data : [];
-}
 
-export const getAllBookings = fetchAllBookings;
-
-/** ADMIN: update a booking's status */
-export async function updateBookingStatus(bookingId, status, reason = "") {
-  const response = await fetch(`${API_BASE_URL}/${bookingId}/status`, {
-    method: "PATCH",
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ status, reason }),
-  });
-  return parseResponse(response);
-}
-
-export function approveBooking(bookingId) {
-  return updateBookingStatus(bookingId, "APPROVED");
-}
-
-export function rejectBooking(bookingId, reason) {
-  return updateBookingStatus(bookingId, "REJECTED", reason);
-}
+// Admin: fetch all soft-deleted bookings
+export const getDeletedBookings = () =>
+  axios.get(`${API_URL}/deleted`, authConfig());

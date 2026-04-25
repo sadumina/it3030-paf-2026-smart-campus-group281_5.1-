@@ -1,5 +1,11 @@
 import { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import LandingPage from "../pages/LandingPage";
 import LoginPage from "../pages/LoginPage";
 import RegisterPage from "../pages/RegisterPage";
@@ -18,8 +24,15 @@ import ResourceFormPage from "../pages/ResourceFormPage";
 import TicketingPage from "../pages/ticketing/TicketingPage";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { fetchCurrentUser } from "../services/authService";
-import { clearAuth, getAuth, getToken, saveAuth } from "../services/authStorage";
+import {
+  clearAuth,
+  getAuth,
+  getToken,
+  saveAuth,
+} from "../services/authStorage";
 import { getDashboardPathForRole } from "../services/roleDashboard";
+import AdminBookingsPage from "../pages/AdminBookingsPage";
+import BookingAnalyticsPage from "../pages/BookingAnalyticsPage";
 
 function SessionSync() {
   const location = useLocation();

@@ -1,96 +1,67 @@
 package com.backend.backend.controller;
 
-import java.security.Principal;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.backend.backend.dto.BookingRequest;
-import com.backend.backend.dto.BookingStatusUpdateRequest;
+import com.backend.backend.dto.BookingRequestDTO;
 import com.backend.backend.model.Booking;
 import com.backend.backend.service.BookingService;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.*;
+
 
 @RestController
 @RequestMapping("/api/bookings")
-@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:5176" })
+@RequiredArgsConstructor
+@CrossOrigin
 public class BookingController {
 
     private final BookingService bookingService;
 
-    public BookingController(BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
-
-    /** USER: create a booking */
     @PostMapping
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> createBooking(
-            @RequestBody BookingRequest request,
-            Principal principal) {
-        try {
-            Booking booking = bookingService.createBooking(request, principal.getName());
-            return new ResponseEntity<>(booking, HttpStatus.CREATED);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalArgumentException | IllegalStateException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public Booking createBooking(@RequestBody BookingRequestDTO request) {
+        return bookingService.createBooking(request);
     }
 
-    /** USER: list own bookings */
-    @GetMapping("/my")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<Booking>> getMyBookings(Principal principal) {
-        return ResponseEntity.ok(bookingService.getBookingsByUser(principal.getName()));
-    }
-
-    /** ADMIN: list all bookings */
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
-    public ResponseEntity<List<Booking>> getAllBookings() {
-        return ResponseEntity.ok(bookingService.getAllBookings());
+    public List<Booking> getAllBookings() {
+        return bookingService.getAllBookings();
     }
 
-    /** USER: cancel own booking */
-    @PatchMapping("/{id}/cancel")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<?> cancelBooking(
-            @PathVariable String id,
-            Principal principal) {
-        try {
-            Booking booking = bookingService.cancelBooking(id, principal.getName());
-            return ResponseEntity.ok(booking);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
-        }
+    @GetMapping("/my")
+    public List<Booking> getMyBookings(@RequestParam String userId) {
+        return bookingService.getMyBookings(userId);
     }
 
-    /** ADMIN: update booking status */
-    @PatchMapping("/{id}/status")
-    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
-    public ResponseEntity<?> updateBookingStatus(
-            @PathVariable String id,
-            @RequestBody BookingStatusUpdateRequest request) {
-        try {
-            Booking booking = bookingService.updateBookingStatus(id, request.getStatus(), request.getReason());
-            return ResponseEntity.ok(booking);
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @GetMapping("/{id}")
+    public Booking getBookingById(@PathVariable String id) {
+        return bookingService.getBookingById(id);
+    }
+
+    @PutMapping("/{id}/approve")
+    public Booking approveBooking(@PathVariable String id, @RequestParam(defaultValue = "ADMIN-001") String adminId) {
+        return bookingService.approveBooking(id, adminId);
+    }
+
+    @PutMapping("/{id}/reject")
+    public Booking rejectBooking(@PathVariable String id, @RequestParam String reason) {
+        return bookingService.rejectBooking(id, reason);
+    }
+
+    @PutMapping("/{id}/cancel")
+    public Booking cancelBooking(@PathVariable String id) {
+        return bookingService.cancelBooking(id);
+    }
+
+    // Student soft-deletes a PENDING booking; userId ensures ownership check
+    @DeleteMapping("/{id}")
+    public Booking softDeleteBooking(@PathVariable String id, @RequestParam String userId) {
+        return bookingService.softDeleteBooking(id, userId);
+    }
+
+    // Admin: list all soft-deleted bookings
+    @GetMapping("/deleted")
+    public List<Booking> getDeletedBookings() {
+        return bookingService.getDeletedBookings();
     }
 }
