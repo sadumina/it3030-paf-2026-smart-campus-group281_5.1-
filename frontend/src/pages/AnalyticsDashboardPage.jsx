@@ -6,10 +6,8 @@ import {
   Users,
   Shield,
   ClipboardCheck,
-  LayoutGrid,
   Siren,
   ScrollText,
-  Sparkles,
 } from "lucide-react";
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
@@ -32,13 +30,11 @@ import {
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/approvals" },
+  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/bookings" },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
-  { label: "Resource Matrix", icon: LayoutGrid, path: "/admin/resources" },
   { label: "User Management", icon: Users, path: "/admin/users" },
-  { label: "Innovation Lab", icon: Sparkles, path: "/admin/innovation-lab", badge: "New" },
   { label: "Incidents", badge: "6", icon: Siren },
-  { label: "Audit Trail", icon: ScrollText, path: "/tickets", badge: "Tickets" },
+  { label: "Audit Trail", icon: ScrollText },
 ];
 
 // Analytics data
@@ -96,8 +92,6 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 export default function AnalyticsDashboardPage() {
   const auth = getAuth();
-  const currentRole = (auth?.role || "ADMIN").toUpperCase();
-  const isSuperAdmin = currentRole === "SUPER_ADMIN";
   const [activeTab, setActiveTab] = useState("overview");
   const [analyticsData, setAnalyticsData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -124,10 +118,10 @@ export default function AnalyticsDashboardPage() {
   if (loading) {
     return (
       <RoleDashboardLayout
-        sectionLabel={isSuperAdmin ? "Super Admin Analytics" : "Admin Analytics"}
+        sectionLabel="Admin Analytics"
         dashboardTitle="Analytics & Reports"
         dashboardSubtitle="Loading analytics data..."
-        roleLabel={currentRole}
+        roleLabel="ADMIN"
         auth={auth}
         sidebarItems={adminSidebar}
         kpis={[]}
@@ -155,10 +149,10 @@ export default function AnalyticsDashboardPage() {
 
   return (
     <RoleDashboardLayout
-      sectionLabel={isSuperAdmin ? "Super Admin Analytics" : "Admin Analytics"}
+      sectionLabel="Admin Analytics"
       dashboardTitle="Analytics & Reports"
       dashboardSubtitle={error ? `Error: ${error}` : "Comprehensive system analytics and performance insights."}
-      roleLabel={currentRole}
+      roleLabel="ADMIN"
       auth={auth}
       sidebarItems={adminSidebar}
       kpis={analyticsKpis}
