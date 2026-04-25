@@ -7,7 +7,7 @@ import { googleLogin, loginUser } from "../services/authService";
 import { saveAuth } from "../services/authStorage";
 import { getDashboardPathForRole } from "../services/roleDashboard";
 
-const GSI_INIT_FLAG = "__smartCampusGsiInitialized";
+const GSI_INIT_FLAG = "__cleverCampusGsiInitialized";
 
 const authCardMotion = {
   initial: { opacity: 0, y: 24, scale: 0.985 },
@@ -156,7 +156,7 @@ export default function LoginPage() {
               >
                 <h1 className="font-['Outfit'] text-4xl font-extrabold text-slate-950">Welcome back!</h1>
                 <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-slate-500">
-                  Sign in to continue your smart campus workflow and boost your productivity.
+                  Sign in to continue your CleverCampus workflow and boost your productivity.
                 </p>
               </motion.div>
 
@@ -246,3 +246,4 @@ export default function LoginPage() {
     </div>
   );
 }
+
