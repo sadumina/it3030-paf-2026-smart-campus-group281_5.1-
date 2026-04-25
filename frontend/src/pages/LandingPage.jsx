@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Bell, CalendarClock, ChartColumnBig, CircleCheckBig, Sparkles, Ticket, UsersRound } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import LandingHeroAnimeVisual from "../components/LandingHeroAnimeVisual";
 import LandingWorkflowVisual from "../components/LandingWorkflowVisual";
 
 const serviceCards = [
@@ -86,9 +85,9 @@ export default function LandingPage() {
         <Navbar />
 
         <main className="mx-auto max-w-6xl px-4 pb-10 sm:px-6 lg:px-8">
-          <section id="home" className="scroll-mt-28 grid items-center gap-8 py-12 lg:grid-cols-2 lg:py-16">
-            <div className="reveal-on-scroll">
-              <span className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">
+          <section id="home" className="scroll-mt-28 py-12 text-center lg:py-16">
+            <div className="reveal-on-scroll mx-auto max-w-4xl">
+              <span className="inline-flex items-center justify-center gap-2 rounded-full border border-orange-200 bg-orange-50 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-orange-600">
                 <Sparkles className="h-3.5 w-3.5" />
                 Professional Campus Platform
               </span>
@@ -98,12 +97,12 @@ export default function LandingPage() {
                 <span className="text-orange-500"> for campus business</span>
               </h1>
 
-              <p className="mt-4 max-w-xl text-base text-slate-600 sm:text-lg">
+              <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg">
                 Manage resources, support requests, and campus operations from one modern dashboard built
                 for students, technicians, and administrators.
               </p>
 
-              <div className="mt-7 flex flex-wrap gap-3">
+              <div className="mt-7 flex flex-wrap justify-center gap-3">
                 <button
                   type="button"
                   onClick={() => navigate("/register")}
@@ -121,9 +120,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="reveal-on-scroll" style={{ "--reveal-delay": "120ms" }}>
-              <LandingHeroAnimeVisual />
-            </div>
           </section>
 
           <section
