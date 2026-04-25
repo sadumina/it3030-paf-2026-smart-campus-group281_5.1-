@@ -14,7 +14,7 @@ export const userSidebar = [
   { label: "My Bookings", badge: "Live", icon: CalendarDays, path: "/dashboard/bookings" },
   { label: "New Reservation", icon: PlusCircle, path: "/dashboard/resources" },
   { label: "Incident Reports", icon: TriangleAlert, path: "/tickets" },
-  { label: "Availability", icon: CalendarClock },
+  { label: "Availability", icon: CalendarClock, path: "/dashboard/availability" },
   { label: "Support", icon: LifeBuoy, path: "/dashboard/support" },
 ];
 
