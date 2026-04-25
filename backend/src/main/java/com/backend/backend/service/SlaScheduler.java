@@ -48,7 +48,7 @@ public class SlaScheduler {
         List<String> activeStatuses = List.of("OPEN", "IN_PROGRESS");
 
         List<User> admins = userRepository.findAll().stream()
-            .filter(u -> "ADMIN".equals(u.getRole()))
+            .filter(u -> "ADMIN".equalsIgnoreCase(u.getRole()) || "SUPER_ADMIN".equalsIgnoreCase(u.getRole()))
             .toList();
 
         checkEscalations(now, activeStatuses, admins);

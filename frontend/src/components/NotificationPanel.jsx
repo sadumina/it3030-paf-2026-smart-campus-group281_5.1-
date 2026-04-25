@@ -7,7 +7,7 @@ import {
   markNotificationAsRead,
 } from "../services/notificationService";
 
-export default function NotificationPanel() {
+export default function NotificationPanel({ variant = "panel", onClose, onChanged }) {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -22,6 +22,7 @@ export default function NotificationPanel() {
       ]);
       setNotifications(items);
       setUnreadCount(unread.unreadCount || 0);
+      onChanged?.(unread.unreadCount || 0);
     } catch (requestError) {
       setError(requestError.message || "Failed to load notifications");
     } finally {
@@ -66,28 +67,53 @@ export default function NotificationPanel() {
     }
   };
 
+  const isDropdown = variant === "dropdown";
+  const containerClassName = isDropdown
+    ? "w-[min(calc(100vw-2rem),24rem)] rounded-md border border-slate-200 bg-white p-4 shadow-2xl shadow-slate-900/15"
+    : "rounded-md border border-orange-100 bg-white p-5 shadow-sm";
+  const listClassName = isDropdown
+    ? "max-h-80 space-y-2 overflow-y-auto pr-1"
+    : "space-y-2";
+
   return (
-    <section className="rounded-2xl border border-orange-200 bg-white p-5 shadow-[0_14px_30px_rgba(251,146,60,0.12)]">
+    <section className={containerClassName}>
       <div className="mb-4 flex items-center justify-between gap-2">
-        <h2 className="text-lg font-semibold text-slate-900">Notifications</h2>
-        <span className="rounded-full border border-orange-200 bg-orange-100 px-2.5 py-1 text-xs font-semibold text-campusOrange-700">
-          {unreadCount} unread
-        </span>
+        <div>
+          <h2 className={`${isDropdown ? "text-base" : "text-lg"} font-semibold text-slate-900`}>Notifications</h2>
+          {isDropdown ? <p className="text-xs text-slate-500">Recent dashboard messages</p> : null}
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full border border-orange-200 bg-orange-50 px-2.5 py-1 text-xs font-semibold text-orange-700">
+            {unreadCount} unread
+          </span>
+          {isDropdown ? (
+            <button
+              type="button"
+              onClick={onClose}
+              className="grid h-7 w-7 place-items-center rounded-md border border-slate-200 text-sm font-semibold text-slate-500 transition hover:bg-slate-50"
+              aria-label="Close notifications"
+            >
+              x
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="mb-4 flex flex-wrap gap-2">
         <button
           onClick={handleMarkAll}
-          className="rounded-lg bg-campusOrange-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-campusOrange-700"
+          className="rounded-md bg-orange-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-orange-700"
         >
           Mark all read
         </button>
-        <button
-          onClick={handleCreateDemo}
-          className="rounded-lg border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-semibold text-campusOrange-700"
-        >
-          Create demo notification
-        </button>
+        {!isDropdown ? (
+          <button
+            onClick={handleCreateDemo}
+            className="rounded-md border border-orange-200 bg-orange-50 px-3 py-2 text-xs font-semibold text-orange-700"
+          >
+            Create demo notification
+          </button>
+        ) : null}
       </div>
 
       {loading ? <p className="text-sm text-slate-500">Loading notifications...</p> : null}
@@ -96,12 +122,12 @@ export default function NotificationPanel() {
       {!loading && notifications.length === 0 ? (
         <p className="text-sm text-slate-500">No notifications yet.</p>
       ) : (
-        <div className="space-y-2">
-          {notifications.map((notification) => (
+        <div className={listClassName}>
+          {notifications.slice(0, isDropdown ? 8 : notifications.length).map((notification) => (
             <article
               key={notification.id}
-              className={`rounded-xl border p-3 ${
-                notification.read ? "border-orange-100 bg-orange-50/40" : "border-orange-200 bg-orange-50"
+              className={`rounded-md border p-3 ${
+                notification.read ? "border-slate-200 bg-white" : "border-orange-200 bg-orange-50"
               }`}
             >
               <div className="flex items-start justify-between gap-2">
@@ -112,7 +138,7 @@ export default function NotificationPanel() {
                 {!notification.read ? (
                   <button
                     onClick={() => handleMarkRead(notification.id)}
-                    className="rounded-lg border border-orange-300 bg-white px-2 py-1 text-xs font-semibold text-campusOrange-700"
+                    className="rounded-md border border-orange-300 bg-white px-2 py-1 text-xs font-semibold text-orange-700"
                   >
                     Mark read
                   </button>

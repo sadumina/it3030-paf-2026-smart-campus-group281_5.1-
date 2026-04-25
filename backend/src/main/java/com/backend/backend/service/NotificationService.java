@@ -2,19 +2,24 @@ package com.backend.backend.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
 import com.backend.backend.model.Notification;
+import com.backend.backend.model.User;
 import com.backend.backend.repository.NotificationRepository;
+import com.backend.backend.repository.UserRepository;
 
 @Service
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, UserRepository userRepository) {
         this.notificationRepository = notificationRepository;
+        this.userRepository = userRepository;
     }
 
     public Notification createNotification(Notification notification) {
@@ -25,6 +30,35 @@ public class NotificationService {
             String referenceId) {
         Notification notification = new Notification(userId, type, title, message, referenceType, referenceId);
         return notificationRepository.save(notification);
+    }
+
+    public List<Notification> createNotificationsForRoles(Set<String> roles, String type, String title, String message,
+            String referenceType, String referenceId) {
+        Set<String> normalizedRoles = roles.stream()
+                .map(role -> role == null ? "" : role.trim().toUpperCase())
+                .collect(java.util.stream.Collectors.toSet());
+
+        List<Notification> notifications = userRepository.findAll().stream()
+                .filter(user -> normalizedRoles.contains(normalizeRole(user)))
+                .map(user -> new Notification(user.getId(), type, title, message, referenceType, referenceId))
+                .toList();
+
+        return notificationRepository.saveAll(notifications);
+    }
+
+    public List<Notification> createNotificationsForAdmins(String type, String title, String message,
+            String referenceType, String referenceId) {
+        return createNotificationsForRoles(
+                Set.of(UserService.ROLE_ADMIN, UserService.ROLE_SUPER_ADMIN),
+                type,
+                title,
+                message,
+                referenceType,
+                referenceId);
+    }
+
+    private String normalizeRole(User user) {
+        return user.getRole() == null ? "" : user.getRole().trim().toUpperCase();
     }
 
     public List<Notification> getMyNotifications(String userId) {

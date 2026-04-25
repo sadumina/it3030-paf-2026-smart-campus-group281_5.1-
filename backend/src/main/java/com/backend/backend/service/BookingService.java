@@ -20,14 +20,17 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final ResourceRepository resourceRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public BookingService(
             BookingRepository bookingRepository,
             ResourceRepository resourceRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            NotificationService notificationService) {
         this.bookingRepository = bookingRepository;
         this.resourceRepository = resourceRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     public Booking createBooking(BookingRequest request, String userEmail) {
@@ -80,7 +83,16 @@ public class BookingService {
         booking.setExpectedAttendees(request.getExpectedAttendees());
         booking.setStatus("PENDING");
 
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+
+        notificationService.createNotificationsForAdmins(
+                "BOOKING_REQUESTED",
+                "New Booking Request",
+                saved.getUserName() + " requested " + saved.getResourceName() + " on " + saved.getDate(),
+                "BOOKING",
+                saved.getId());
+
+        return saved;
     }
 
     private void checkOverlap(String resourceId, java.time.LocalDate date, java.time.LocalTime start, java.time.LocalTime end) {
@@ -117,7 +129,16 @@ public class BookingService {
         }
 
         booking.setStatus("CANCELLED");
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+
+        notificationService.createNotificationsForAdmins(
+                "BOOKING_CANCELLED",
+                "Booking Cancelled",
+                saved.getUserName() + " cancelled " + saved.getResourceName() + " on " + saved.getDate(),
+                "BOOKING",
+                saved.getId());
+
+        return saved;
     }
 
     public Booking updateBookingStatus(String bookingId, String status, String reason) {
@@ -135,8 +156,26 @@ public class BookingService {
             throw new IllegalArgumentException("Rejection reason is required");
         }
 
+        String previousStatus = booking.getStatus();
         booking.setStatus(normalized);
         booking.setRejectionReason("REJECTED".equals(normalized) ? reason.trim() : null);
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+
+        if (saved.getUserId() != null) {
+            String title = "Booking " + normalized.toLowerCase();
+            String message = saved.getResourceName() + " changed from " + previousStatus + " to " + normalized;
+            if ("REJECTED".equals(normalized) && saved.getRejectionReason() != null) {
+                message += ": " + saved.getRejectionReason();
+            }
+            notificationService.createNotification(
+                    saved.getUserId(),
+                    "BOOKING_STATUS_CHANGED",
+                    title,
+                    message,
+                    "BOOKING",
+                    saved.getId());
+        }
+
+        return saved;
     }
 }
