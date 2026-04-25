@@ -13,6 +13,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookingRepository extends MongoRepository<Booking, String> {
 
+    List<Booking> findByResourceId(String resourceId);
+
     List<Booking> findByResourceIdAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
         String resourceId,
         LocalDateTime endTime,

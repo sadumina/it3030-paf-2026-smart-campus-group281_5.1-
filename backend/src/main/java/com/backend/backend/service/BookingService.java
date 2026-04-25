@@ -2,10 +2,13 @@ package com.backend.backend.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.backend.backend.dto.BookingRequestDTO;
 import com.backend.backend.model.Booking;
@@ -18,24 +21,36 @@ public class BookingService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    private static final Set<BookingStatus> ACTIVE_BOOKING_STATUSES = Set.of(
+            BookingStatus.PENDING,
+            BookingStatus.APPROVED
+    );
+
     public Booking createBooking(BookingRequestDTO request) {
+        if (request.getStartTime() == null || request.getEndTime() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start time and end time are required");
+        }
+
         if (!request.getEndTime().isAfter(request.getStartTime())) {
-            throw new RuntimeException("End time must be after start time");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "End time must be after start time");
         }
 
         if (request.getStartTime().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Start time must be in the future");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Start time must be in the future");
         }
 
-        List<Booking> conflicts =
-                bookingRepository.findByResourceIdAndStartTimeLessThanEqualAndEndTimeGreaterThanEqual(
-                        request.getResourceId(),
+        List<Booking> conflicts = bookingRepository.findByResourceId(request.getResourceId())
+                .stream()
+                .filter(existing -> ACTIVE_BOOKING_STATUSES.contains(existing.getStatus()))
+                .filter(existing -> hasOverlap(
+                        request.getStartTime(),
                         request.getEndTime(),
-                        request.getStartTime()
-                );
+                        existing.getStartTime(),
+                        existing.getEndTime()))
+                .toList();
 
         if (!conflicts.isEmpty()) {
-            throw new RuntimeException("Time slot already booked!");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Time slot already booked");
         }
 
         Booking booking = new Booking();
@@ -48,6 +63,14 @@ public class BookingService {
         booking.setExpectedAttendees(request.getExpectedAttendees());
 
         return bookingRepository.save(booking);
+    }
+
+    private boolean hasOverlap(
+            LocalDateTime requestedStart,
+            LocalDateTime requestedEnd,
+            LocalDateTime existingStart,
+            LocalDateTime existingEnd) {
+        return requestedStart.isBefore(existingEnd) && requestedEnd.isAfter(existingStart);
     }
 
     public List<Booking> getAllBookings() {
