@@ -43,7 +43,7 @@ const userSidebar = [
   },
   { label: "New Reservation", icon: PlusCircle },
   { label: "Incident Reports", icon: TriangleAlert },
-  { label: "Availability", icon: CalendarClock },
+  { label: "Availability", icon: CalendarClock, path: "/dashboard/availability" },
   { label: "Support", icon: LifeBuoy },
 ];
 
