@@ -20,7 +20,7 @@ export const NotificationPanel = ({ isOpen, onClose }) => {
       {
         id: 2,
         title: 'System Maintenance Alert',
-        message: 'Scheduled maintenance on Campus Portal from 2-4 AM tonight',
+        message: 'Scheduled maintenance on CleverCampus Portal from 2-4 AM tonight',
         type: 'alert',
         timestamp: new Date(Date.now() - 30 * 60000), // 30 mins ago
         read: true,

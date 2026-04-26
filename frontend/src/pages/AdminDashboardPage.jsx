@@ -13,7 +13,7 @@ import {
 
 const adminSidebar = [
   { label: "Dashboard", icon: Shield, path: "/admin" },
-  { label: "Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/approvals" },
+  { label: "Booking Approvals", badge: "18", icon: ClipboardCheck, path: "/admin/bookings" },
   { label: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { label: "Resource Matrix", icon: LayoutGrid, path: "/admin/resources" },
   { label: "User Management", icon: Users, path: "/admin/users" },
@@ -51,7 +51,7 @@ export default function AdminDashboardPage() {
   return (
     <RoleDashboardLayout
       sectionLabel={isSuperAdmin ? "Super Admin Command Center" : "Admin Command Center"}
-      dashboardTitle="Campus Operations Dashboard"
+      dashboardTitle="CleverCampus Operations Dashboard"
       dashboardSubtitle={
         isSuperAdmin
           ? "Global governance, privileged access, and full control in one place."

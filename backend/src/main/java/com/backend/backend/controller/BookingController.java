@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.backend.dto.BookingRequest;
+import com.backend.backend.dto.BookingPendingUpdateRequest;
 import com.backend.backend.dto.BookingStatusUpdateRequest;
 import com.backend.backend.model.Booking;
 import com.backend.backend.service.BookingService;
@@ -62,9 +64,27 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.getAllBookings());
     }
 
+    /** USER: delete own booking */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> deleteBooking(
+            @PathVariable String id,
+            Principal principal) {
+        try {
+            bookingService.deleteBooking(id, principal.getName());
+            return ResponseEntity.ok().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     /** USER: cancel own booking */
     @PatchMapping("/{id}/cancel")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> cancelBooking(
             @PathVariable String id,
             Principal principal) {
@@ -73,8 +93,31 @@ public class BookingController {
             return ResponseEntity.ok(booking);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (IllegalStateException e) {
+        } catch (SecurityException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    /** USER: update own pending booking */
+    @PatchMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<?> updatePendingBooking(
+            @PathVariable String id,
+            @RequestBody BookingPendingUpdateRequest request,
+            Principal principal) {
+        try {
+            Booking booking = bookingService.updatePendingBooking(id, request, principal.getName());
+            return ResponseEntity.ok(booking);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (SecurityException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -89,6 +132,8 @@ public class BookingController {
             return ResponseEntity.ok(booking);
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

@@ -343,7 +343,7 @@ export default function SupportPage() {
             <div className="mt-4 space-y-3">
               {[
                 { icon: PhoneCall, title: "Urgent line", detail: "+94 11 234 5678" },
-                { icon: MessageSquareText, title: "Support email", detail: "support@campus.local" },
+                { icon: MessageSquareText, title: "Support email", detail: "support@clevercampus.io" },
                 { icon: Headphones, title: "Desk hours", detail: "8:00 AM - 6:00 PM" },
               ].map((item) => {
                 const Icon = item.icon;

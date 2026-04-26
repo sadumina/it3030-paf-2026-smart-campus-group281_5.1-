@@ -108,7 +108,7 @@ export default function FirebaseLoginPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Smart Campus</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">CleverCampus</h1>
           <p className="text-gray-600">Smart Academy Management System</p>
         </div>
 
@@ -381,9 +381,10 @@ export default function FirebaseLoginPage() {
 
         {/* Footer */}
         <div className="text-center mt-6 text-sm text-gray-600">
-          <p>Need help? Contact support@smartcampus.edu</p>
+          <p>Need help? Contact support@clevercampus.io</p>
         </div>
       </div>
     </div>
   );
 }
+

@@ -57,7 +57,7 @@ export default function NotificationPanel({ variant = "panel", onClose, onChange
       await createSeedNotification({
         type: "SYSTEM",
         title: "Workflow update",
-        message: "Your smart campus workflow has a new event.",
+        message: "Your CleverCampus workflow has a new event.",
         referenceType: "DASHBOARD",
         referenceId: "DEMO",
       });

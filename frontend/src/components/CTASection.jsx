@@ -35,9 +35,9 @@ export default function CTASection() {
               </div>
               <span className="text-sm font-semibold uppercase tracking-[0.4em] text-white/70">neon control</span>
             </div>
-            <h2 className="mt-6 text-4xl font-semibold text-white">Switch on the always-live Clever Campus dashboard</h2>
+            <h2 className="mt-6 text-4xl font-semibold text-white">Switch on the always-live CleverCampus dashboard</h2>
             <p className="mt-3 text-white/70">
-              Deploy the Clever Campus Operations Hub in hours, not weeks. Connect OAuth, import your resources, and watch every booking, ticket, and notification glow in real time.
+              Deploy the CleverCampus Operations Hub in hours, not weeks. Connect OAuth, import your resources, and watch every booking, ticket, and notification glow in real time.
             </p>
 
             <div className="mt-8 grid gap-4 text-white/70 sm:grid-cols-2">
@@ -74,7 +74,7 @@ export default function CTASection() {
             <p className="text-sm uppercase tracking-[0.4em] text-white/60">Ops hotline</p>
             <h3 className="mt-3 text-2xl font-semibold">Talk to a live engineer</h3>
             <p className="mt-3 text-white/80">+94 71 555 2314</p>
-            <p className="text-white/60">ops@campusflow.io</p>
+            <p className="text-white/60">ops@clevercampus.io</p>
             <button className="mt-8 flex w-full items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 py-3 text-sm font-semibold text-white">
               <PhoneCall className="h-4 w-4" />
               Request a callback
@@ -85,3 +85,4 @@ export default function CTASection() {
     </section>
   );
 }
+

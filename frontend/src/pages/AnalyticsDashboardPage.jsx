@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import {
   BarChart3,
+  Activity,
+  Clock,
+  Database,
   PieChart,
   TrendingUp,
   Users,
@@ -10,6 +13,9 @@ import {
   Siren,
   ScrollText,
   Sparkles,
+  TicketCheck,
+  Server,
+  Gauge,
 } from "lucide-react";
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
 import { getAuth } from "../services/authStorage";
@@ -20,6 +26,8 @@ import {
   PieChart as RechartsePieChart,
   Pie,
   Cell,
+  AreaChart,
+  Area,
   LineChart,
   Line,
   XAxis,
@@ -49,17 +57,18 @@ const userRoleData = [
 ];
 
 const userGrowthData = [
-  { month: "Jan", users: 12, admins: 1 },
-  { month: "Feb", users: 15, admins: 1 },
-  { month: "Mar", users: 18, admins: 2 },
-  { month: "Apr", users: 22, admins: 2 },
-  { month: "May", users: 25, admins: 2 },
+  { month: "Jan", users: 12, admins: 1, technicians: 2 },
+  { month: "Feb", users: 15, admins: 1, technicians: 3 },
+  { month: "Mar", users: 18, admins: 2, technicians: 4 },
+  { month: "Apr", users: 22, admins: 2, technicians: 5 },
+  { month: "May", users: 25, admins: 2, technicians: 6 },
 ];
 
 const incidentData = [
   { status: "Resolved", count: 34, fill: "#10b981" },
   { status: "In Progress", count: 12, fill: "#f59e0b" },
   { status: "Critical", count: 6, fill: "#ef4444" },
+  { status: "Open", count: 18, fill: "#3b82f6" },
 ];
 
 const activityData = [
@@ -72,10 +81,10 @@ const activityData = [
 ];
 
 const resourceUsageData = [
-  { resource: "CPU", usage: 65 },
-  { resource: "Memory", usage: 72 },
-  { resource: "Storage", usage: 45 },
-  { resource: "Network", usage: 38 },
+  { resource: "Lecture Halls", usage: 78 },
+  { resource: "Labs", usage: 64 },
+  { resource: "Equipment", usage: 52 },
+  { resource: "Meeting Rooms", usage: 41 },
 ];
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -93,6 +102,42 @@ const CustomTooltip = ({ active, payload, label }) => {
   }
   return null;
 };
+
+function MiniStatCard({ icon: Icon, label, value, caption, color = "orange", trend = "+0%" }) {
+  const tones = {
+    orange: "border-orange-200 bg-orange-50 text-orange-700",
+    blue: "border-blue-200 bg-blue-50 text-blue-700",
+    emerald: "border-emerald-200 bg-emerald-50 text-emerald-700",
+    rose: "border-rose-200 bg-rose-50 text-rose-700",
+    slate: "border-slate-200 bg-slate-50 text-slate-700",
+  };
+
+  return (
+    <article className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div className="flex items-start justify-between gap-3">
+        <div className={`rounded-lg border p-2 ${tones[color] || tones.orange}`}>
+          <Icon className="h-4 w-4" />
+        </div>
+        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600">{trend}</span>
+      </div>
+      <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-slate-500">{label}</p>
+      <p className="mt-1 text-2xl font-bold text-slate-950">{value}</p>
+      <p className="mt-1 text-xs text-slate-500">{caption}</p>
+    </article>
+  );
+}
+
+function Panel({ title, subtitle, children, className = "" }) {
+  return (
+    <section className={`rounded-lg border border-slate-200 bg-white p-4 shadow-sm ${className}`}>
+      <div className="mb-4">
+        <h3 className="text-sm font-semibold text-slate-950">{title}</h3>
+        {subtitle ? <p className="mt-1 text-xs text-slate-500">{subtitle}</p> : null}
+      </div>
+      {children}
+    </section>
+  );
+}
 
 export default function AnalyticsDashboardPage() {
   const auth = getAuth();
@@ -153,6 +198,15 @@ export default function AnalyticsDashboardPage() {
     { name: "User", value: 0, fill: "#64748b" },
   ];
 
+  const totalUsers = analyticsData?.totalUsers || 0;
+  const activeSessions = analyticsData?.activeSessions || 0;
+  const technicians = analyticsData?.technicians || 0;
+  const admins = analyticsData?.admins || 0;
+  const regularUsers = analyticsData?.regularUsers || Math.max(totalUsers - admins - technicians, 0);
+  const utilizationAverage = Math.round(
+    resourceUsageData.reduce((sum, item) => sum + item.usage, 0) / resourceUsageData.length,
+  );
+
   return (
     <RoleDashboardLayout
       sectionLabel={isSuperAdmin ? "Super Admin Analytics" : "Admin Analytics"}
@@ -172,15 +226,50 @@ export default function AnalyticsDashboardPage() {
       chartCaption="Real-time user data from database"
       chartColor="#f97316"
       extraContent={
-        <div className="space-y-4">
+        <div className="space-y-5">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <MiniStatCard
+              icon={Users}
+              label="User Coverage"
+              value={totalUsers}
+              caption={`${regularUsers} standard accounts`}
+              color="orange"
+              trend="+12%"
+            />
+            <MiniStatCard
+              icon={TicketCheck}
+              label="Incident Load"
+              value={incidentData.reduce((sum, item) => sum + item.count, 0)}
+              caption="Open, active, and resolved tickets"
+              color="blue"
+              trend="-8%"
+            />
+            <MiniStatCard
+              icon={LayoutGrid}
+              label="Resource Use"
+              value={`${utilizationAverage}%`}
+              caption="Average booking utilization"
+              color="emerald"
+              trend="+6%"
+            />
+            <MiniStatCard
+              icon={Server}
+              label="Platform Health"
+              value={analyticsData?.systemUptime || "99.8%"}
+              caption="Service availability"
+              color="slate"
+              trend="Live"
+            />
+          </div>
+
           {/* Tabs */}
-          <div className="flex gap-2 border-b border-slate-200">
+          <div className="flex flex-wrap gap-2 rounded-lg border border-slate-200 bg-white p-2 shadow-sm">
             <button
               onClick={() => setActiveTab("overview")}
-              className={`px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-md px-4 py-2 text-sm font-medium transition ${
                 activeTab === "overview"
-                  ? "border-b-2 border-orange-600 text-orange-600"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-orange-600 text-white"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <BarChart3 className="mb-1 inline-block h-4 w-4 mr-1" />
@@ -188,10 +277,10 @@ export default function AnalyticsDashboardPage() {
             </button>
             <button
               onClick={() => setActiveTab("users")}
-              className={`px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-md px-4 py-2 text-sm font-medium transition ${
                 activeTab === "users"
-                  ? "border-b-2 border-orange-600 text-orange-600"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-orange-600 text-white"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <Users className="mb-1 inline-block h-4 w-4 mr-1" />
@@ -199,10 +288,10 @@ export default function AnalyticsDashboardPage() {
             </button>
             <button
               onClick={() => setActiveTab("performance")}
-              className={`px-4 py-2 text-sm font-medium transition ${
+              className={`rounded-md px-4 py-2 text-sm font-medium transition ${
                 activeTab === "performance"
-                  ? "border-b-2 border-orange-600 text-orange-600"
-                  : "text-slate-600 hover:text-slate-900"
+                  ? "bg-orange-600 text-white"
+                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <TrendingUp className="mb-1 inline-block h-4 w-4 mr-1" />
@@ -213,32 +302,61 @@ export default function AnalyticsDashboardPage() {
           {/* Overview Tab */}
           {activeTab === "overview" && (
             <div className="space-y-4">
-              {/* User Role Distribution */}
-              <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-slate-900">User Role Distribution</h3>
-                {userRoleData && userRoleData.length > 0 ? (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <RechartsePieChart>
-                      <Pie
-                        data={userRoleData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={({ name, value }) => `${name}: ${value}`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                      >
-                        {userRoleData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.fill} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                    </RechartsePieChart>
+              <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+                <Panel title="Operational Activity" subtitle="Logins, approvals, and administrative edits across the day.">
+                  <ResponsiveContainer width="100%" height={280}>
+                    <AreaChart data={activityData}>
+                      <defs>
+                        <linearGradient id="activityLogins" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#f97316" stopOpacity={0.35} />
+                          <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="activityApprovals" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.28} />
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                      <XAxis dataKey="time" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Area type="monotone" dataKey="logins" name="Logins" stroke="#f97316" strokeWidth={2.5} fill="url(#activityLogins)" />
+                      <Area type="monotone" dataKey="approvals" name="Approvals" stroke="#3b82f6" strokeWidth={2.5} fill="url(#activityApprovals)" />
+                      <Line type="monotone" dataKey="edits" name="Admin Edits" stroke="#10b981" strokeWidth={2.5} dot={false} />
+                    </AreaChart>
                   </ResponsiveContainer>
-                ) : (
-                  <p className="text-sm text-slate-500">No user data available</p>
-                )}
+                </Panel>
+
+                <Panel title="Incident Pipeline" subtitle="Ticket movement across active support states.">
+                  <ResponsiveContainer width="100%" height={280}>
+                    <BarChart data={incidentData} layout="vertical" margin={{ left: 14, right: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" horizontal={false} />
+                      <XAxis type="number" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                      <YAxis dataKey="status" type="category" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} width={82} />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Bar dataKey="count" name="Tickets" radius={[0, 8, 8, 0]}>
+                        {incidentData.map((entry) => (
+                          <Cell key={entry.status} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </Panel>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-3">
+                {resourceUsageData.map((item) => (
+                  <article key={item.resource} className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm font-semibold text-slate-900">{item.resource}</p>
+                      <span className="text-sm font-bold text-orange-600">{item.usage}%</span>
+                    </div>
+                    <div className="mt-4 h-2 rounded-full bg-slate-100">
+                      <div className="h-full rounded-full bg-orange-500" style={{ width: `${item.usage}%` }} />
+                    </div>
+                    <p className="mt-3 text-xs text-slate-500">Current utilization against monthly capacity.</p>
+                  </article>
+                ))}
               </div>
             </div>
           )}
@@ -246,35 +364,82 @@ export default function AnalyticsDashboardPage() {
           {/* Users Tab */}
           {activeTab === "users" && (
             <div className="space-y-4">
-              <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-slate-900">User Statistics Summary</h3>
+              <div className="grid gap-4 xl:grid-cols-[0.85fr_1.15fr]">
+                <Panel title="User Role Distribution" subtitle="Current account split by role.">
+                  {userRoleData && userRoleData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <RechartsePieChart>
+                        <Pie
+                          data={userRoleData}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={58}
+                          outerRadius={92}
+                          paddingAngle={4}
+                          dataKey="value"
+                        >
+                          {userRoleData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                        <Legend />
+                      </RechartsePieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <p className="text-sm text-slate-500">No user data available</p>
+                  )}
+                </Panel>
+
+                <Panel title="Account Growth" subtitle="Monthly growth across users, admins, and technicians.">
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={userGrowthData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fontSize: 11, fill: "#64748b" }} axisLine={false} tickLine={false} />
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend />
+                      <Line type="monotone" dataKey="users" name="Users" stroke="#f97316" strokeWidth={3} dot={{ r: 3 }} />
+                      <Line type="monotone" dataKey="technicians" name="Technicians" stroke="#3b82f6" strokeWidth={2.5} dot={{ r: 3 }} />
+                      <Line type="monotone" dataKey="admins" name="Admins" stroke="#a855f7" strokeWidth={2.5} dot={{ r: 3 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </Panel>
+              </div>
+
+              <Panel title="User Statistics Summary" subtitle="Role totals pulled from the analytics summary.">
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="rounded-lg border border-orange-200 bg-orange-50 p-4">
                     <p className="text-xs text-orange-700 font-semibold uppercase">ADMINS</p>
-                    <p className="text-3xl font-bold text-orange-900">{analyticsData?.admins || 0}</p>
+                    <p className="text-3xl font-bold text-orange-900">{admins}</p>
                     <p className="text-xs text-orange-600 mt-1">System administrators</p>
                   </div>
                   <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
                     <p className="text-xs text-blue-700 font-semibold uppercase">TECHNICIANS</p>
-                    <p className="text-3xl font-bold text-blue-900">{analyticsData?.technicians || 0}</p>
+                    <p className="text-3xl font-bold text-blue-900">{technicians}</p>
                     <p className="text-xs text-blue-600 mt-1">Support staff</p>
                   </div>
                   <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                     <p className="text-xs text-slate-700 font-semibold uppercase">REGULAR USERS</p>
-                    <p className="text-3xl font-bold text-slate-900">{analyticsData?.regularUsers || 0}</p>
+                    <p className="text-3xl font-bold text-slate-900">{regularUsers}</p>
                     <p className="text-xs text-slate-600 mt-1">Standard accounts</p>
                   </div>
                 </div>
-              </div>
+              </Panel>
             </div>
           )}
 
           {/* Performance Tab */}
           {activeTab === "performance" && (
             <div className="space-y-4">
+              <div className="grid gap-4 md:grid-cols-3">
+                <MiniStatCard icon={Activity} label="Active Sessions" value={activeSessions} caption="Current authenticated sessions" color="blue" trend="Live" />
+                <MiniStatCard icon={Clock} label="Avg Response" value="245ms" caption="API response average" color="emerald" trend="-15%" />
+                <MiniStatCard icon={Database} label="DB Query Time" value="156ms" caption="Average query latency" color="slate" trend="-9%" />
+              </div>
+
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                  <h3 className="mb-3 text-sm font-semibold text-slate-900">API Performance</h3>
+                <Panel title="API Performance" subtitle="Response time and service reliability.">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-slate-600">Avg Response Time</span>
@@ -293,10 +458,9 @@ export default function AnalyticsDashboardPage() {
                       <div className="h-full w-1/12 rounded-full bg-green-500" />
                     </div>
                   </div>
-                </div>
+                </Panel>
 
-                <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-                  <h3 className="mb-3 text-sm font-semibold text-slate-900">Database Performance</h3>
+                <Panel title="Database Performance" subtitle="Connection usage and query timing.">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-slate-600">Query Time</span>
@@ -315,9 +479,28 @@ export default function AnalyticsDashboardPage() {
                       <div className="h-full w-7/12 rounded-full bg-orange-500" />
                     </div>
                   </div>
-                </div>
+                </Panel>
               </div>
-            </div>
+
+              <Panel title="Capacity Profile" subtitle="Resource utilization shown as compact operational bars.">
+                <div className="grid gap-3 md:grid-cols-2">
+                  {resourceUsageData.map((item) => (
+                    <div key={item.resource} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="inline-flex items-center gap-2 text-sm font-semibold text-slate-800">
+                          <Gauge className="h-4 w-4 text-orange-500" />
+                          {item.resource}
+                        </span>
+                        <span className="text-xs font-bold text-slate-600">{item.usage}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-white">
+                        <div className="h-full rounded-full bg-gradient-to-r from-orange-500 to-amber-400" style={{ width: `${item.usage}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Panel>
+              </div>
           )}
         </div>
       }

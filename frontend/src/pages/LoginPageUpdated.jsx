@@ -139,9 +139,9 @@ export default function LoginPageUpdated() {
             <div className="absolute right-16 top-28 h-32 w-32 rounded-full bg-[#ffb36d]/30 blur-2xl" />
 
             <p className="inline-flex rounded-full border border-white/30 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#ffdcae]">
-              Campus Operations Hub
+              CleverCampus Operations Hub
             </p>
-            <h1 className="mt-3 text-3xl font-bold leading-tight md:text-4xl">One Login, Full Campus Control</h1>
+            <h1 className="mt-3 text-3xl font-bold leading-tight md:text-4xl">One Login, Full CleverCampus Control</h1>
             <p className="mt-3 max-w-xl text-sm text-slate-100/90">
               Access facility bookings, incidents, approvals, and live updates through a secure and role-aware
               workspace.
@@ -190,7 +190,7 @@ export default function LoginPageUpdated() {
             className="bg-white/85 p-6 md:p-8"
           >
             <h2 className="text-2xl font-bold text-slate-900 md:text-3xl">Welcome back</h2>
-            <p className="mt-2 text-sm text-slate-500">Sign in to continue your smart campus workflows.</p>
+            <p className="mt-2 text-sm text-slate-500">Sign in to continue your CleverCampus workflows.</p>
 
             <form onSubmit={handleSubmit} className="mt-5 space-y-4">
               <div>

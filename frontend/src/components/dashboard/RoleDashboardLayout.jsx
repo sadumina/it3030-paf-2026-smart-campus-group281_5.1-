@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import {
   ChartNoAxesCombined,
@@ -7,8 +7,6 @@ import {
   House,
   Moon,
   Sun,
-  Download,
-  FileJson,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -25,7 +23,6 @@ import { Breadcrumb } from "../Breadcrumb";
 import { UserProfileModal } from "./UserProfileModal";
 import DashboardNotificationBell from "./DashboardNotificationBell";
 import { useTheme } from "../../context/ThemeContext";
-import { reportExport } from "../../services/reportExport";
 import { notifyAlert } from "../../services/notificationHelper";
 import { userProfileService } from "../../services/userProfileService";
 import { clearAuth } from "../../services/authStorage";
@@ -243,6 +240,8 @@ export default function RoleDashboardLayout({
   const [livePoints, setLivePoints] = useState(() => getRoleChartSeed(userRole, chartPoints));
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [currentUserProfile, setCurrentUserProfile] = useState(auth || {});
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [dashboardSearch, setDashboardSearch] = useState("");
   const initials = userName
     .split(" ")
     .filter(Boolean)
@@ -259,16 +258,6 @@ export default function RoleDashboardLayout({
       notifyAlert.error(error.message || 'Failed to update profile');
       throw error;
     }
-  };
-
-  const handleExportPDF = () => {
-    reportExport.exportDashboardReport(kpis, `dashboard-report-${new Date().toISOString().split('T')[0]}.pdf`);
-    notifyAlert.success('Dashboard report exported as PDF');
-  };
-
-  const handleExportCSV = () => {
-    reportExport.exportToCSV(kpis, `dashboard-data-${new Date().toISOString().split('T')[0]}.csv`);
-    notifyAlert.success('Dashboard data exported as CSV');
   };
 
   useEffect(() => {
@@ -293,13 +282,73 @@ export default function RoleDashboardLayout({
     navigate("/login");
   };
 
+  const searchableItems = useMemo(() => {
+    const navigationItems = sidebarItems
+      .filter((item) => item.label)
+      .map((item) => ({
+        type: "Navigation",
+        title: item.label,
+        description: item.badge ? `Badge: ${item.badge}` : "Open section",
+        onSelect: () => {
+          if (item.path) {
+            navigate(item.path);
+          }
+        },
+      }));
+
+    const kpiItems = kpis.map((item) => ({
+      type: "Metric",
+      title: item.label,
+      description: `${item.value}${item.change ? ` - ${item.change}` : ""}`,
+    }));
+
+    const actionItems = quickActions
+      .filter((action) => action.label || action.title)
+      .map((action) => ({
+        type: "Action",
+        title: action.label || action.title,
+        description: action.description || "Run quick action",
+        onSelect: action.onClick,
+      }));
+
+    const activityItems = activityFeed.map((item) => ({
+      type: "Activity",
+      title: item.title,
+      description: item.meta,
+    }));
+
+    return [...navigationItems, ...kpiItems, ...actionItems, ...activityItems];
+  }, [activityFeed, kpis, navigate, quickActions, sidebarItems]);
+
+  const searchResults = useMemo(() => {
+    const query = dashboardSearch.trim().toLowerCase();
+
+    if (!query) {
+      return searchableItems.slice(0, 6);
+    }
+
+    return searchableItems
+      .filter((item) =>
+        [item.type, item.title, item.description]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(query)),
+      )
+      .slice(0, 8);
+  }, [dashboardSearch, searchableItems]);
+
+  const handleSearchSelect = (item) => {
+    item.onSelect?.();
+    setIsSearchOpen(false);
+    setDashboardSearch("");
+  };
+
   return (
     <div className="dashboard-page min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="relative flex min-h-screen w-full overflow-hidden bg-slate-50 dark:bg-slate-950">
         <aside className="hidden w-64 shrink-0 flex-col border-r border-orange-100 bg-white p-4 text-slate-900 md:flex dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100">
           <div className="mb-6">
             <p className="font-display text-xl font-semibold leading-none">
-              Campus<span className="text-orange-500">Flow</span>
+              Clever<span className="text-orange-500">Campus</span>
             </p>
             <p className="mt-1 text-xs uppercase tracking-widest text-orange-600">{roleLabel}</p>
           </div>
@@ -350,7 +399,7 @@ export default function RoleDashboardLayout({
           <div className="border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-900/95 md:px-6">
             <div className="flex items-center justify-between gap-3">
               <div className="text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                Smart Campus Platform
+                CleverCampus Platform
               </div>
 
               <div
@@ -378,7 +427,7 @@ export default function RoleDashboardLayout({
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="relative flex items-center gap-2">
                 {showUtilityActions ? (
                   <>
                     <button
@@ -391,37 +440,64 @@ export default function RoleDashboardLayout({
                     </button>
                     <button
                       type="button"
+                      onClick={() => setIsSearchOpen((current) => !current)}
                       className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                     >
                       <Search className="h-3.5 w-3.5" />
                       Search
                     </button>
+                    {isSearchOpen ? (
+                      <div className="absolute right-0 top-full z-30 mt-2 w-[min(360px,calc(100vw-2rem))] rounded-lg border border-slate-200 bg-white p-3 shadow-xl dark:border-slate-700 dark:bg-slate-900">
+                        <div className="relative">
+                          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                          <input
+                            autoFocus
+                            value={dashboardSearch}
+                            onChange={(event) => setDashboardSearch(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Escape") {
+                                setIsSearchOpen(false);
+                                setDashboardSearch("");
+                              }
+                            }}
+                            placeholder="Search dashboard"
+                            className="w-full rounded-md border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm text-slate-900 outline-none transition focus:border-orange-400 focus:ring-2 focus:ring-orange-100 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:focus:ring-orange-900/30"
+                          />
+                        </div>
+                        <div className="mt-3 max-h-72 overflow-y-auto">
+                          {searchResults.length ? (
+                            <div className="space-y-1">
+                              {searchResults.map((item, index) => (
+                                <button
+                                  key={`${item.type}-${item.title}-${index}`}
+                                  type="button"
+                                  onClick={() => handleSearchSelect(item)}
+                                  className="w-full rounded-md px-3 py-2 text-left transition hover:bg-orange-50 dark:hover:bg-slate-800"
+                                >
+                                  <div className="flex items-center justify-between gap-3">
+                                    <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{item.title}</p>
+                                    <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-slate-500 dark:bg-slate-800 dark:text-slate-300">
+                                      {item.type}
+                                    </span>
+                                  </div>
+                                  {item.description ? (
+                                    <p className="mt-0.5 truncate text-xs text-slate-500 dark:text-slate-400">{item.description}</p>
+                                  ) : null}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="rounded-md border border-dashed border-slate-200 px-3 py-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+                              No dashboard results found.
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    ) : null}
                   </>
                 ) : null}
                 {showNotifications ? (
                   <DashboardNotificationBell />
-                ) : null}
-                {showUtilityActions ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleExportPDF}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                      title="Export as PDF"
-                    >
-                      <Download className="h-3.5 w-3.5" />
-                      PDF
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleExportCSV}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                      title="Export as CSV"
-                    >
-                      <FileJson className="h-3.5 w-3.5" />
-                      CSV
-                    </button>
-                  </>
                 ) : null}
                 <button
                   type="button"
@@ -529,3 +605,4 @@ export default function RoleDashboardLayout({
     </div>
   );
 }
+

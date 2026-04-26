@@ -87,7 +87,7 @@ export default function Features() {
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">About</p>
             <h3 className="text-3xl font-semibold text-slate-900">Built for campus-wide alignment</h3>
             <p className="text-lg text-slate-600">
-              Clever Campus keeps your booking catalogues, technicians, and leadership teams operating with clarity. Every pixel is tuned for modern SaaS expectations.
+              CleverCampus keeps your booking catalogues, technicians, and leadership teams operating with clarity. Every pixel is tuned for modern SaaS expectations.
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="rounded-2xl bg-white/80 p-4 text-sm font-semibold text-slate-700 shadow-sm">
@@ -144,3 +144,4 @@ export default function Features() {
     </section>
   );
 }
+

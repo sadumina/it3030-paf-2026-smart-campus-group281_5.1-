@@ -7,6 +7,7 @@ import TicketCard from "../../components/ticketing/TicketCard";
 import TicketDetailModal from "../../components/ticketing/TicketDetailModal";
 import { fetchCurrentUser } from "../../services/authService";
 import { clearAuth, getAuth, getToken, saveAuth } from "../../services/authStorage";
+import { RefreshCw, Search, Trash2, X } from "lucide-react";
 
 const STATUSES = [
   { key: "ALL",         label: "All",         cls: "s-all" },
@@ -18,11 +19,11 @@ const STATUSES = [
 ];
 
 const PRIORITIES = [
-  { key: "ALL",      label: "All",      icon: "●",  cls: "p-all" },
-  { key: "CRITICAL", label: "Critical", icon: "🔴", cls: "p-critical" },
-  { key: "HIGH",     label: "High",     icon: "🟠", cls: "p-high" },
-  { key: "MEDIUM",   label: "Medium",   icon: "🟡", cls: "p-medium" },
-  { key: "LOW",      label: "Low",      icon: "🟢", cls: "p-low" },
+  { key: "ALL",      label: "All",      cls: "p-all" },
+  { key: "CRITICAL", label: "Critical", cls: "p-critical" },
+  { key: "HIGH",     label: "High",     cls: "p-high" },
+  { key: "MEDIUM",   label: "Medium",   cls: "p-medium" },
+  { key: "LOW",      label: "Low",      cls: "p-low" },
 ];
 
 const CATEGORIES = ["ALL","ELECTRICAL","PLUMBING","IT","HVAC","STRUCTURAL","CLEANING","OTHER"];
@@ -185,7 +186,7 @@ export default function AdminTicketView({ embedded = false }) {
 
   if (accessDenied) {
     return (
-      <div className={`tkt-root ${embedded ? "tkt-embedded" : "tkt-page"}`}>
+      <div className={`tkt-root tkt-admin-board ${embedded ? "tkt-embedded" : "tkt-page"}`}>
         <div className="tkt-container">
           <div className="tkt-empty">
             <div className="tkt-empty-icon">!</div>
@@ -198,7 +199,7 @@ export default function AdminTicketView({ embedded = false }) {
   }
 
   return (
-    <div className={`tkt-root ${embedded ? "tkt-embedded" : "tkt-page"}`}>
+    <div className={`tkt-root tkt-admin-board ${embedded ? "tkt-embedded" : "tkt-page"}`}>
       <div className="tkt-container">
 
         {/* Header */}
@@ -209,9 +210,7 @@ export default function AdminTicketView({ embedded = false }) {
             <p>Review submitted support requests and assign registered technicians.</p>
           </div>
           <button className="tkt-btn-secondary" onClick={loadAll}>
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
+            <RefreshCw size={15} strokeWidth={2.2} />
             Refresh
           </button>
         </div>
@@ -233,9 +232,7 @@ export default function AdminTicketView({ embedded = false }) {
           <div className="tkt-filter-row">
             <span className="tkt-filter-label">Search</span>
             <div className="tkt-search-wrap" style={{ flex: 1 }}>
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <circle cx="11" cy="11" r="8" /><path strokeLinecap="round" d="m21 21-4.35-4.35" />
-              </svg>
+              <Search size={16} strokeWidth={2.2} />
               <input
                 className="tkt-search"
                 placeholder="Search ID, title, description, location or requester..."
@@ -272,7 +269,7 @@ export default function AdminTicketView({ embedded = false }) {
                   className={`tkt-priority-pill ${p.cls} ${priorityFilter === p.key ? "active" : ""}`}
                   onClick={() => setPriority(p.key)}
                 >
-                  {p.icon} {p.label}
+                  <span className="tkt-priority-dot" aria-hidden="true" /> {p.label}
                   {p.key !== "ALL" && <span style={{ opacity: 0.6, fontSize: "0.68rem" }}>({priorityCounts[p.key] ?? 0})</span>}
                 </button>
               ))}
@@ -302,7 +299,10 @@ export default function AdminTicketView({ embedded = false }) {
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               {hasActiveFilters && (
-                <button className="tkt-clear-btn" onClick={clearFilters}>✕ Clear filters</button>
+                <button className="tkt-clear-btn" onClick={clearFilters}>
+                  <X size={13} strokeWidth={2.4} />
+                  Clear filters
+                </button>
               )}
               <span className="tkt-result-count">
                 Showing <strong>{filtered.length}</strong> of {allTickets.length} ticket{allTickets.length !== 1 ? "s" : ""}
@@ -317,7 +317,7 @@ export default function AdminTicketView({ embedded = false }) {
             <div className="tkt-spinner" />
           ) : filtered.length === 0 ? (
             <div className="tkt-empty">
-              <div className="tkt-empty-icon">📋</div>
+              <div className="tkt-empty-icon">!</div>
               <h3>No tickets found</h3>
               <p>{hasActiveFilters ? "Try adjusting or clearing your filters" : "No tickets have been submitted yet."}</p>
               {hasActiveFilters && (
@@ -339,10 +339,10 @@ export default function AdminTicketView({ embedded = false }) {
                   />
                   <button
                     className="tkt-btn-danger"
-                    style={{ position: "absolute", top: 10, right: 10, padding: "4px 10px", fontSize: "0.7rem", zIndex: 2 }}
+                    title="Delete ticket"
                     onClick={e => { e.stopPropagation(); handleDelete(t.id); }}
                   >
-                    🗑
+                    <Trash2 size={14} strokeWidth={2.2} />
                   </button>
                 </div>
               ))}
@@ -365,3 +365,4 @@ export default function AdminTicketView({ embedded = false }) {
     </div>
   );
 }
+

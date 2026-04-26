@@ -1,242 +1,493 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarClock, CalendarDays, CheckCircle2, RefreshCw, XCircle } from "lucide-react";
-import { Link } from "react-router-dom";
-
+import {
+  PlusCircle,
+  X,
+  LayoutDashboard,
+  CalendarDays,
+  TriangleAlert,
+  CalendarClock,
+  LifeBuoy,
+  Trash2,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import RoleDashboardLayout from "../components/dashboard/RoleDashboardLayout";
-import { userActions, userSidebar } from "../config/userDashboardConfig";
+import StudentBookingForm from "../components/booking/StudentBookingForm";
+import BookingDetailsModal from "../components/booking/BookingDetailsModal";
+import PendingBookingUpdateModal from "../components/booking/PendingBookingUpdateModal";
 import { getAuth } from "../services/authStorage";
-import { cancelBooking, fetchMyBookings } from "../services/bookingService";
+import {
+  getMyBookings,
+  deleteBooking,
+  updatePendingBooking,
+} from "../services/bookingService";
 
-const STATUS_STYLES = {
-  PENDING: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-  APPROVED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-  CONFIRMED: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300",
-  REJECTED: "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300",
-  CANCELLED: "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200",
+const statusClasses = {
+  PENDING:
+    "border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-500/40 dark:bg-orange-900/20 dark:text-orange-300",
+  APPROVED:
+    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/40 dark:bg-emerald-900/20 dark:text-emerald-300",
+  REJECTED:
+    "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-500/40 dark:bg-rose-900/20 dark:text-rose-300",
+  CANCELLED:
+    "border-slate-200 bg-slate-100 text-slate-700 dark:border-slate-600 dark:bg-slate-800/70 dark:text-slate-300",
 };
 
-function normalizeBookingStatus(status) {
-  return status === "CONFIRMED" ? "APPROVED" : status || "PENDING";
-}
+const userSidebar = [
+  { label: "Overview", icon: LayoutDashboard, path: "/dashboard" },
+  {
+    label: "My Bookings",
+    badge: "7",
+    icon: CalendarDays,
+    path: "/dashboard/bookings",
+  },
+  { label: "New Reservation", icon: PlusCircle },
+  { label: "Incident Reports", icon: TriangleAlert },
+  { label: "Availability", icon: CalendarClock, path: "/dashboard/availability" },
+  { label: "Support", icon: LifeBuoy },
+];
 
-function sortBookings(a, b) {
-  const statusRank = { PENDING: 0, APPROVED: 1, REJECTED: 2, CANCELLED: 3 };
-  const rankA = statusRank[normalizeBookingStatus(a.status)] ?? 4;
-  const rankB = statusRank[normalizeBookingStatus(b.status)] ?? 4;
-
-  if (rankA !== rankB) {
-    return rankA - rankB;
+function formatDateTime(value) {
+  if (!value) {
+    return "-";
   }
 
-  return String(b.date || "").localeCompare(String(a.date || ""));
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString("en-GB", {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export default function MyBookingsPage() {
+  const navigate = useNavigate();
+  const auth = getAuth();
+  const userIdentifier = auth?.id || auth?.email || "";
+
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [cancellingId, setCancellingId] = useState(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [editingBooking, setEditingBooking] = useState(null);
+  const [updateBusy, setUpdateBusy] = useState(false);
+  const [updateError, setUpdateError] = useState("");
 
-  async function loadBookings() {
-    try {
-      setLoading(true);
-      setError("");
-      const data = await fetchMyBookings();
-      setBookings(data);
-    } catch (loadError) {
-      setError(loadError.message || "Unable to load your bookings.");
-    } finally {
+  // Delete confirmation state
+  const [deleteConfirm, setDeleteConfirm] = useState(null); // booking to delete
+  const [deleteBusyId, setDeleteBusyId] = useState(null);
+  const [deleteError, setDeleteError] = useState("");
+
+  const loadBookings = async () => {
+    if (!userIdentifier) {
+      setError("Unable to determine user identity. Please sign in again.");
+      setBookings([]);
       setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    loadBookings();
-  }, []);
-
-  async function handleCancel(bookingId) {
-    if (!window.confirm("Cancel this booking?")) {
       return;
     }
 
-    setCancellingId(bookingId);
+    setLoading(true);
+    setError("");
     try {
-      const updated = await cancelBooking(bookingId);
-      setBookings((current) =>
-        current.map((booking) => (booking.id === bookingId ? { ...booking, ...updated } : booking)),
+      const response = await getMyBookings();
+      const normalized = Array.isArray(response)
+        ? response
+        : response?.data || [];
+      setBookings(normalized);
+    } catch (requestError) {
+      setError(
+        requestError?.response?.data?.message ||
+        requestError.message ||
+        "Failed to load your bookings.",
       );
-    } catch (cancelError) {
-      alert(cancelError.message || "Failed to cancel booking.");
+      setBookings([]);
     } finally {
-      setCancellingId(null);
+      setLoading(false);
     }
-  }
+  };
+
+  useEffect(() => {
+    loadBookings();
+  }, [userIdentifier]);
 
   const stats = useMemo(() => {
     const total = bookings.length;
-    const pending = bookings.filter((booking) => normalizeBookingStatus(booking.status) === "PENDING").length;
-    const approved = bookings.filter((booking) => normalizeBookingStatus(booking.status) === "APPROVED").length;
-    const rejected = bookings.filter((booking) => normalizeBookingStatus(booking.status) === "REJECTED").length;
+    const pending = bookings.filter(
+      (booking) => booking.status === "PENDING",
+    ).length;
+    const approved = bookings.filter(
+      (booking) => booking.status === "APPROVED",
+    ).length;
+    const rejected = bookings.filter(
+      (booking) => booking.status === "REJECTED",
+    ).length;
 
     return { total, pending, approved, rejected };
   }, [bookings]);
 
-  const sortedBookings = useMemo(() => [...bookings].sort(sortBookings), [bookings]);
+  const handleDeleteConfirm = async () => {
+    if (!deleteConfirm) return;
+    setDeleteBusyId(deleteConfirm.id);
+    setDeleteError("");
+    try {
+      await deleteBooking(deleteConfirm.id, userIdentifier);
+      setDeleteConfirm(null);
+      await loadBookings();
+    } catch (err) {
+      setDeleteError(
+        err?.response?.data?.message ||
+        err.message ||
+        "Failed to delete booking.",
+      );
+    } finally {
+      setDeleteBusyId(null);
+    }
+  };
+
+  const handleUpdateBookingSubmit = async (payload) => {
+    if (!editingBooking) return;
+
+    setUpdateBusy(true);
+    setUpdateError("");
+
+    try {
+      await updatePendingBooking(editingBooking.id, payload);
+      const updatedBookingId = editingBooking.id;
+      setEditingBooking(null);
+
+      if (selectedBooking?.id === updatedBookingId) {
+        setSelectedBooking(null);
+      }
+
+      await loadBookings();
+    } catch (requestError) {
+      setUpdateError(
+        requestError?.response?.data?.message ||
+        requestError.message ||
+        "Failed to update booking.",
+      );
+    } finally {
+      setUpdateBusy(false);
+    }
+  };
 
   return (
-    <RoleDashboardLayout
-      sectionLabel="User Workspace"
-      dashboardTitle="My Bookings"
-      dashboardSubtitle="Track your reservation requests and approvals."
-      roleLabel="USER"
-      auth={getAuth()}
-      sidebarItems={userSidebar}
-      kpis={[
-        { label: "Total Bookings", value: String(stats.total), change: "All requests" },
-        { label: "Pending", value: String(stats.pending), change: "Awaiting approval" },
-        { label: "Approved", value: String(stats.approved), change: "Ready to use" },
-        { label: "Rejected", value: String(stats.rejected), change: "Needs another slot" },
-      ]}
-      quickActions={userActions}
-      activityFeed={sortedBookings.slice(0, 4).map((booking) => ({
-        title: booking.resourceName || "Resource booking",
-        meta: `${booking.date || "No date"} - ${normalizeBookingStatus(booking.status)}`,
-      }))}
-      chartTitle="Booking activity"
-      chartCaption="Current status of your booking requests."
-      chartColor="#fb923c"
-      showNotifications={false}
-      extraContent={
-        <section className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-            <div>
-              <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">Booking Requests</h2>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                New reservations start from the resource catalogue.
+    <>
+      <RoleDashboardLayout
+        sectionLabel="User Workspace"
+        dashboardTitle="My Bookings"
+        dashboardSubtitle="View your booking details and create new booking requests."
+        roleLabel="USER"
+        auth={auth}
+        sidebarItems={userSidebar}
+        hideDashboardWidgets={true}
+        extraContent={
+          <section className="rounded-2xl border border-slate-200/80 dark:border-slate-700/80 bg-white dark:bg-slate-900 p-4 shadow-sm ring-1 ring-slate-100/70 dark:ring-slate-800/50 md:p-5">
+            <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/80 pb-4 dark:border-slate-700/80">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-600 dark:text-orange-400">
+                  User Workspace
+                </p>
+                <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                  My Bookings
+                </h1>
+                <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                  View your booking details and create new booking requests.
+                </p>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={loadBookings}
+                  className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-orange-200 hover:bg-slate-50 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-orange-500/40 dark:hover:bg-slate-700"
+                >
+                  Refresh
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(true)}
+                  className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-3.5 py-2 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all duration-200 hover:-translate-y-0.5 hover:bg-orange-500 hover:shadow-orange-500/30"
+                >
+                  <PlusCircle className="h-4 w-4" />
+                  Add Booking
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-xl border border-slate-200/80 bg-white/90 p-3 text-sm shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-slate-700/80 dark:bg-slate-800/80">
+                <p className="text-slate-500 dark:text-slate-400">Total</p>
+                <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
+                  {stats.total}
+                </p>
+              </div>
+              <div className="rounded-xl border border-orange-200/80 bg-orange-50/80 p-3 text-sm shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-orange-500/30 dark:bg-orange-900/20">
+                <p className="text-orange-700 dark:text-orange-300">Pending</p>
+                <p className="mt-1 text-2xl font-bold tracking-tight text-orange-800 dark:text-orange-200">
+                  {stats.pending}
+                </p>
+              </div>
+              <div className="rounded-xl border border-emerald-200/80 bg-emerald-50/80 p-3 text-sm shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-emerald-500/30 dark:bg-emerald-900/20">
+                <p className="text-emerald-700 dark:text-emerald-300">
+                  Approved
+                </p>
+                <p className="mt-1 text-2xl font-bold tracking-tight text-emerald-800 dark:text-emerald-200">
+                  {stats.approved}
+                </p>
+              </div>
+              <div className="rounded-xl border border-rose-200/80 bg-rose-50/80 p-3 text-sm shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-rose-500/30 dark:bg-rose-900/20">
+                <p className="text-rose-700 dark:text-rose-300">Rejected</p>
+                <p className="mt-1 text-2xl font-bold tracking-tight text-rose-800 dark:text-rose-200">
+                  {stats.rejected}
+                </p>
+              </div>
+            </div>
+            <div className="mb-3 flex items-center gap-2">
+              <p className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+                Bookings
               </p>
             </div>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={loadBookings}
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
-              >
-                <RefreshCw className="h-4 w-4" />
-                Refresh
-              </button>
-              <Link
-                to="/dashboard/resources"
-                className="inline-flex items-center gap-2 rounded-lg bg-orange-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-orange-500"
-              >
-                <CalendarDays className="h-4 w-4" />
-                New Reservation
-              </Link>
-            </div>
-          </div>
 
-          {loading ? (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-10 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
-              Loading your bookings...
-            </div>
-          ) : null}
+            {loading ? (
+              <div className="space-y-3 rounded-xl border border-slate-200/80 bg-white/80 p-4 shadow-sm dark:border-slate-700/80 dark:bg-slate-800/70">
+                <div className="h-4 w-40 animate-pulse rounded-full bg-slate-200 dark:bg-slate-700" />
+                <div className="space-y-2">
+                  <div className="h-20 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-700/70" />
+                  <div className="h-20 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-700/70" />
+                </div>
+              </div>
+            ) : null}
+            {error ? (
+              <p className="mb-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700 shadow-sm dark:border-rose-500/40 dark:bg-rose-900/20 dark:text-rose-300">
+                {error}
+              </p>
+            ) : null}
 
-          {!loading && error ? (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-4 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300">
-              {error}
-            </div>
-          ) : null}
+            {!loading && bookings.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/70 p-5 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/70 dark:text-slate-300">
+                No bookings found. Click Add Booking to create your first
+                request.
+              </div>
+            ) : null}
 
-          {!loading && !error && sortedBookings.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-slate-300 bg-white px-4 py-10 text-center text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
-              You do not have any bookings yet.
-            </div>
-          ) : null}
+            {!loading && bookings.length > 0 ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {bookings.map((booking) => {
+                  const status = booking.status || "PENDING";
+                  const startDate =
+                    booking.date && booking.startTime
+                      ? new Date(
+                        `${booking.date}T${String(booking.startTime).slice(0, 8)}`,
+                      )
+                      : booking.startTime
+                        ? new Date(booking.startTime)
+                        : null;
+                  const displayDate =
+                    startDate && !Number.isNaN(startDate.getTime())
+                      ? startDate.toLocaleDateString("en-GB", {
+                        month: "short",
+                        day: "numeric",
+                      })
+                      : "-";
+                  const displayTime =
+                    startDate && !Number.isNaN(startDate.getTime())
+                      ? startDate.toLocaleTimeString("en-GB", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                      : "-";
 
-          {!loading && !error && sortedBookings.length > 0 ? (
-            <div className="grid gap-4 lg:grid-cols-2">
-              {sortedBookings.map((booking) => {
-                const displayStatus = normalizeBookingStatus(booking.status);
+                  return (
+                    <article
+                      key={booking.id}
+                      className="group relative cursor-pointer rounded-xl border border-slate-200/80 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md hover:border-orange-200/70 dark:hover:border-orange-500/40 dark:border-slate-700/80 dark:bg-slate-800/90"
+                      onClick={() => setSelectedBooking(booking)}
+                    >
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex flex-col">
+                          <p className="text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
+                            {booking.resourceId}
+                          </p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5">
+                            <CalendarDays className="h-3 w-3" />
+                            {displayDate} <span className="mx-1">•</span>{" "}
+                            <CalendarClock className="h-3 w-3" /> {displayTime}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`rounded-full border px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider transition-transform duration-200 group-hover:scale-[1.02] ${statusClasses[status] || "border-slate-200 bg-slate-50 text-slate-700"}`}
+                          >
+                            {status}
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            ) : null}
+          </section>
+        }
+      />
 
-                return (
-                <article
-                  key={booking.id}
-                  className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-800"
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[80] flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm"
+            onClick={() => setDeleteConfirm(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 16 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 16 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xl dark:border-slate-700/60 dark:bg-slate-900"
+            >
+              {/* Icon */}
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-rose-100 dark:bg-rose-900/30 mx-auto mb-4">
+                <Trash2 className="h-6 w-6 text-rose-600 dark:text-rose-400" />
+              </div>
+
+              <h2 className="text-center text-lg font-semibold text-slate-900 dark:text-slate-100 mb-1">
+                Delete Booking?
+              </h2>
+              <p className="text-center text-sm text-slate-500 dark:text-slate-400 mb-1">
+                <span className="font-semibold text-slate-700 dark:text-slate-200">
+                  {deleteConfirm.resourceId}
+                </span>{" "}
+                —{" "}
+                {formatDateTime(
+                  deleteConfirm.date && deleteConfirm.startTime
+                    ? `${deleteConfirm.date}T${String(deleteConfirm.startTime).slice(0, 8)}`
+                    : deleteConfirm.startTime,
+                )}
+              </p>
+              <p className="text-center text-xs text-slate-400 dark:text-slate-500 mb-5">
+                This booking will be removed from your list and permanently
+                deleted after{" "}
+                <span className="font-semibold text-rose-500">7 days</span>.
+              </p>
+
+              {deleteError && (
+                <p className="mb-3 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs font-medium text-rose-700 dark:border-rose-700 dark:bg-rose-900/20 dark:text-rose-300">
+                  {deleteError}
+                </p>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setDeleteConfirm(null)}
+                  className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-all hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                        {booking.resourceName || "Resource"}
-                      </p>
-                      <h3 className="mt-1 text-lg font-semibold text-slate-900 dark:text-slate-100">
-                        {booking.date || "No date selected"}
-                      </h3>
-                    </div>
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${STATUS_STYLES[displayStatus] || STATUS_STYLES.PENDING}`}>
-                      {displayStatus}
-                    </span>
-                  </div>
+                  Keep It
+                </button>
+                <button
+                  type="button"
+                  id="confirm-delete-booking"
+                  onClick={handleDeleteConfirm}
+                  disabled={deleteBusyId === deleteConfirm?.id}
+                  className="flex-1 rounded-xl bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-rose-500 disabled:opacity-60 shadow-lg shadow-rose-500/20"
+                >
+                  {deleteBusyId === deleteConfirm?.id
+                    ? "Deleting…"
+                    : "Yes, Delete"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-900/50">
-                      <p className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-200">
-                        <CalendarClock className="h-4 w-4 text-orange-500" />
-                        Time
-                      </p>
-                      <p className="mt-1 text-slate-500 dark:text-slate-400">
-                        {booking.startTime || "--"} - {booking.endTime || "--"}
-                      </p>
-                      {booking.expectedAttendees ? (
-                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                          {booking.expectedAttendees} attendee{booking.expectedAttendees === 1 ? "" : "s"}
-                        </p>
-                      ) : null}
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-3 text-sm dark:bg-slate-900/50">
-                      <p className="font-medium text-slate-700 dark:text-slate-200">Booking ID</p>
-                      <p className="mt-1 break-all text-slate-500 dark:text-slate-400">{booking.id}</p>
-                    </div>
-                  </div>
+      <PendingBookingUpdateModal
+        booking={editingBooking}
+        isOpen={Boolean(editingBooking)}
+        onClose={() => {
+          if (updateBusy) return;
+          setEditingBooking(null);
+          setUpdateError("");
+        }}
+        onSubmit={handleUpdateBookingSubmit}
+        loading={updateBusy}
+        errorMessage={updateError}
+      />
 
-                  {booking.purpose ? (
-                    <p className="mt-4 rounded-lg border border-slate-100 bg-slate-50 p-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-300">
-                      {booking.purpose}
-                    </p>
-                  ) : null}
-                  {booking.rejectionReason ? (
-                    <p className="mt-3 rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm font-medium text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-300">
-                      Reason: {booking.rejectionReason}
-                    </p>
-                  ) : null}
+      {/* Add Booking Modal */}
+      <AnimatePresence>
+        {showAddModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[70] flex justify-center bg-slate-950/40 p-4 backdrop-blur-sm sm:items-center items-end"
+            onClick={() => setShowAddModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+              className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-4 shadow-2xl dark:border-slate-700/60 dark:bg-slate-900"
+            >
+              <div className="mb-2 flex justify-end shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="inline-flex items-center gap-1 rounded-lg border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-slate-600 transition hover:-translate-y-0.5 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                >
+                  <X className="h-4 w-4" /> Close
+                </button>
+              </div>
+              <div className="overflow-y-auto pr-1 -mr-1">
+                <StudentBookingForm
+                  embedded
+                  initialUserId={userIdentifier}
+                  onClose={() => setShowAddModal(false)}
+                  onSuccess={() => {
+                    setShowAddModal(false);
+                    loadBookings();
+                  }}
+                />
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-                  <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-                    {displayStatus === "APPROVED" ? (
-                      <span className="inline-flex items-center gap-2 text-sm font-medium text-emerald-600 dark:text-emerald-300">
-                        <CheckCircle2 className="h-4 w-4" />
-                        Approved
-                      </span>
-                    ) : (
-                      <span className="text-sm text-slate-500 dark:text-slate-400">Status updates appear here automatically.</span>
-                    )}
-
-                    {["PENDING", "APPROVED"].includes(displayStatus) ? (
-                      <button
-                        type="button"
-                        onClick={() => handleCancel(booking.id)}
-                        disabled={cancellingId === booking.id}
-                        className="inline-flex items-center gap-2 rounded-lg border border-rose-200 px-3 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 disabled:opacity-60 dark:border-rose-800 dark:text-rose-300 dark:hover:bg-rose-950/30"
-                      >
-                        <XCircle className="h-4 w-4" />
-                        {cancellingId === booking.id ? "Cancelling..." : "Cancel"}
-                      </button>
-                    ) : null}
-                  </div>
-                </article>
-                );
-              })}
-            </div>
-          ) : null}
-        </section>
-      }
-    />
+      <BookingDetailsModal
+        booking={selectedBooking}
+        onClose={() => setSelectedBooking(null)}
+        statusClasses={statusClasses}
+        formatDateTime={formatDateTime}
+        onUpdatePending={(booking) => {
+          setSelectedBooking(null);
+          setEditingBooking(booking);
+          setUpdateError("");
+        }}
+        onDeletePending={(booking) => {
+          setSelectedBooking(null);
+          setDeleteConfirm(booking);
+          setDeleteError("");
+        }}
+        updateBusy={updateBusy}
+        deleteBusy={deleteBusyId === selectedBooking?.id}
+      />
+    </>
   );
 }

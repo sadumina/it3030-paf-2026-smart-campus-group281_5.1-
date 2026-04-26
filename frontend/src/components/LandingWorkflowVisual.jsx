@@ -55,13 +55,13 @@ export default function LandingWorkflowVisual() {
   }, []);
 
   return (
-    <div className="relative rounded-3xl border border-orange-100 bg-white p-5 shadow-sm">
+    <div className="relative rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
       <div
         ref={pulseRef}
-        className="absolute right-6 top-5 h-14 w-14 rounded-full bg-gradient-to-r from-orange-200 to-violet-200 blur-lg"
+        className="absolute right-6 top-5 h-14 w-14 rounded-full bg-orange-200/60 blur-lg"
       />
 
-      <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
+      <p className="mb-4 inline-flex items-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">
         <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
         Workflow Preview
       </p>
@@ -75,7 +75,7 @@ export default function LandingWorkflowVisual() {
               ref={(el) => {
                 cardRefs.current[index] = el;
               }}
-              className="relative rounded-2xl border border-slate-200 bg-[#fffdfb] px-4 py-3"
+              className="relative rounded-md border border-slate-200 bg-slate-50 px-4 py-3"
             >
               <div className="flex items-start gap-3">
                 <span className={`rounded-lg p-2 ${item.accent}`}>

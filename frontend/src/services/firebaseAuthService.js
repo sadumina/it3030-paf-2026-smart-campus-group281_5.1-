@@ -13,7 +13,7 @@ import { doc, setDoc, getDoc, updateDoc } from 'firebase/firestore';
 
 /**
  * Firebase Authentication Service
- * Handles all Firebase auth operations and smart campus backend sync
+ * Handles all Firebase auth operations and CleverCampus backend sync
  */
 
 // ============================================================================
@@ -31,7 +31,7 @@ export const firebaseRegister = async (email, password, fullName) => {
       displayName: fullName,
     });
 
-    // Store user in Firestore with Smart Campus details
+    // Store user in Firestore with CleverCampus details
     const userDoc = {
       uid: firebaseUser.uid,
       email: firebaseUser.email,
@@ -44,7 +44,7 @@ export const firebaseRegister = async (email, password, fullName) => {
 
     await setDoc(doc(db, 'users', firebaseUser.uid), userDoc);
 
-    // Register in Smart Campus backend
+    // Register in CleverCampus backend
     const idToken = await firebaseUser.getIdToken();
     const backendResponse = await fetch('/api/auth/firebase-register', {
       method: 'POST',
@@ -60,7 +60,7 @@ export const firebaseRegister = async (email, password, fullName) => {
     });
 
     if (!backendResponse.ok) {
-      throw new Error('Failed to register in Smart Campus backend');
+      throw new Error('Failed to register in CleverCampus backend');
     }
 
     const backendData = await backendResponse.json();
@@ -93,7 +93,7 @@ export const firebaseLogin = async (email, password) => {
     // Get Firebase ID token
     const idToken = await firebaseUser.getIdToken();
 
-    // Authenticate with Smart Campus backend
+    // Authenticate with CleverCampus backend
     const backendResponse = await fetch('/api/auth/firebase-login', {
       method: 'POST',
       headers: {
@@ -107,7 +107,7 @@ export const firebaseLogin = async (email, password) => {
     });
 
     if (!backendResponse.ok) {
-      throw new Error('Failed to authenticate with Smart Campus backend');
+      throw new Error('Failed to authenticate with CleverCampus backend');
     }
 
     const backendData = await backendResponse.json();
@@ -169,7 +169,7 @@ export const firebaseLogout = async () => {
 
 export const firebaseGoogleLogin = async (googleIdToken) => {
   try {
-    // Verify Google token with Smart Campus backend
+    // Verify Google token with CleverCampus backend
     const backendResponse = await fetch('/api/auth/firebase-google', {
       method: 'POST',
       headers: {
@@ -351,3 +351,4 @@ export default {
   getUserData,
   setupAuthStateListener,
 };
+

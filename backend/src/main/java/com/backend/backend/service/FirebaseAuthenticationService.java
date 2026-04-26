@@ -101,11 +101,11 @@ public class FirebaseAuthenticationService {
 
     /**
      * Create custom JWT token for verified Firebase user
-     * This allows your Smart Campus system to use its own tokens
+     * This allows your CleverCampus system to use its own tokens
      * 
      * @param firebaseUid Firebase UID
      * @param email User email
-     * @param role User role in Smart Campus
+     * @param role User role in CleverCampus
      * @return Custom JWT token
      */
     public String createCustomToken(String firebaseUid, String email, String role) {
@@ -137,3 +137,4 @@ public class FirebaseAuthenticationService {
         return !FirebaseApp.getApps().isEmpty() && firebaseAuth != null;
     }
 }
+

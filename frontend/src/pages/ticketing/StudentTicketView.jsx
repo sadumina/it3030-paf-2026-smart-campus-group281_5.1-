@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import { Plus, Search, TicketCheck, X } from "lucide-react";
 import { deleteTicket, fetchTickets } from "../../services/ticketService";
 import { getAuth } from "../../services/authStorage";
 import TicketCard from "../../components/ticketing/TicketCard";
@@ -15,11 +16,11 @@ const STATUSES = [
 ];
 
 const PRIORITIES = [
-  { key: "ALL",      label: "All",      icon: "●",  cls: "p-all" },
-  { key: "CRITICAL", label: "Critical", icon: "🔴", cls: "p-critical" },
-  { key: "HIGH",     label: "High",     icon: "🟠", cls: "p-high" },
-  { key: "MEDIUM",   label: "Medium",   icon: "🟡", cls: "p-medium" },
-  { key: "LOW",      label: "Low",      icon: "🟢", cls: "p-low" },
+  { key: "ALL",      label: "All",      cls: "p-all" },
+  { key: "CRITICAL", label: "Critical", cls: "p-critical" },
+  { key: "HIGH",     label: "High",     cls: "p-high" },
+  { key: "MEDIUM",   label: "Medium",   cls: "p-medium" },
+  { key: "LOW",      label: "Low",      cls: "p-low" },
 ];
 
 const CATEGORIES = ["ALL","ELECTRICAL","PLUMBING","IT","HVAC","STRUCTURAL","CLEANING","OTHER"];
@@ -118,20 +119,18 @@ export default function StudentTicketView({ embedded = false }) {
   };
 
   return (
-    <div className={`tkt-root ${embedded ? "tkt-embedded" : "tkt-page"}`}>
+    <div className={`tkt-root tkt-admin-board tkt-student-board ${embedded ? "tkt-embedded" : "tkt-page"}`}>
       <div className="tkt-container">
 
         {/* Header */}
         <div className="tkt-header">
           <div className="tkt-header-left">
-            <span className="tkt-header-badge">Module C — Ticketing</span>
-            <h1>🎫 My Tickets</h1>
+            <span className="tkt-header-badge">Incident Reports</span>
+            <h1>My Tickets</h1>
             <p>Track and manage your incident reports, {auth?.name}</p>
           </div>
           <button className="tkt-btn-primary" onClick={() => setShowCreate(true)}>
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
+            <Plus size={16} strokeWidth={2.4} />
             New Ticket
           </button>
         </div>
@@ -158,9 +157,7 @@ export default function StudentTicketView({ embedded = false }) {
           <div className="tkt-filter-row">
             <span className="tkt-filter-label">Search</span>
             <div className="tkt-search-wrap" style={{ flex: 1 }}>
-              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <circle cx="11" cy="11" r="8" /><path strokeLinecap="round" d="m21 21-4.35-4.35" />
-              </svg>
+              <Search size={16} strokeWidth={2.2} />
               <input
                 className="tkt-search"
                 placeholder="Search by ID, title, description or location..."
@@ -197,7 +194,7 @@ export default function StudentTicketView({ embedded = false }) {
                   className={`tkt-priority-pill ${p.cls} ${priorityFilter === p.key ? "active" : ""}`}
                   onClick={() => setPriority(p.key)}
                 >
-                  {p.icon} {p.label}
+                  <span className="tkt-priority-dot" aria-hidden="true" /> {p.label}
                   {p.key !== "ALL" && <span style={{ opacity: 0.6, fontSize: "0.68rem" }}>({priorityCounts[p.key] ?? 0})</span>}
                 </button>
               ))}
@@ -217,7 +214,8 @@ export default function StudentTicketView({ embedded = false }) {
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               {hasActiveFilters && (
                 <button className="tkt-clear-btn" onClick={clearFilters}>
-                  ✕ Clear filters
+                  <X size={13} strokeWidth={2.4} />
+                  Clear filters
                 </button>
               )}
               <span className="tkt-result-count">
@@ -233,7 +231,7 @@ export default function StudentTicketView({ embedded = false }) {
             <div className="tkt-spinner" />
           ) : filtered.length === 0 ? (
             <div className="tkt-empty">
-              <div className="tkt-empty-icon">🎫</div>
+              <div className="tkt-empty-icon"><TicketCheck size={44} strokeWidth={1.8} /></div>
               <h3>{hasActiveFilters ? "No matching tickets" : "No tickets yet"}</h3>
               <p>{hasActiveFilters ? "Try adjusting or clearing your filters" : "Create your first incident ticket to get started"}</p>
               {hasActiveFilters && (
@@ -279,3 +277,5 @@ export default function StudentTicketView({ embedded = false }) {
     </div>
   );
 }
+
+

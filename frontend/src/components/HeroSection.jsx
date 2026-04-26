@@ -44,7 +44,7 @@ export default function HeroSection() {
               transition={{ duration: 0.9, delay: 0.1 }}
               className="mt-8 text-4xl font-semibold leading-tight text-white sm:text-5xl"
             >
-              Clever Campus Operations Hub with <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-fuchsia-500 bg-clip-text text-transparent">neon precision</span>.
+              CleverCampus Operations Hub with <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-fuchsia-500 bg-clip-text text-transparent">neon precision</span>.
             </motion.h1>
 
             <motion.p
@@ -136,3 +136,4 @@ export default function HeroSection() {
     </section>
   );
 }
+
