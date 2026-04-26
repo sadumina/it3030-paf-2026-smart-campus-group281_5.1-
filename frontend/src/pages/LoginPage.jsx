@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft, BadgeCheck, EyeOff, Lock, Mail } from "lucide-react";
+import { ArrowLeft, BadgeCheck, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import AuthShowcase from "../components/AuthShowcase";
 import { googleLogin, loginUser } from "../services/authService";
 import { saveAuth } from "../services/authStorage";
@@ -27,6 +27,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const googleButtonRef = useRef(null);
   const loginRole = new URLSearchParams(location.search).get("role");
   const isStudentLogin = loginRole?.toLowerCase() === "student";
@@ -179,13 +180,20 @@ export default function LoginPage() {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={form.password}
                     onChange={handleChange}
                     placeholder="Password"
                     className="h-12 w-full border border-slate-300 bg-white pl-12 pr-12 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-orange-400 focus:ring-4 focus:ring-orange-100"
                   />
-                  <EyeOff className="pointer-events-none absolute right-5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((visible) => !visible)}
+                    className="absolute right-4 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center text-slate-400 transition hover:text-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-200"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  </button>
                 </motion.div>
 
                 <motion.div className="flex justify-end" {...fieldMotion} transition={{ duration: 0.32, delay: 0.26 }}>
