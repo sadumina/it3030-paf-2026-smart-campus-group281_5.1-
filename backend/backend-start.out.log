@@ -1,3 +1,30 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------< com.backend:backend >-------------------------
+[INFO] Building backend 0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:4.0.5:run (default-cli) > test-compile @ backend >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ backend ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ backend ---
+[INFO] skip non existing resourceDirectory C:\Users\Sadumina Rathnayaka\Desktop\PAF Smart Campus\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] <<< spring-boot:4.0.5:run (default-cli) < test-compile @ backend <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.0.5:run (default-cli) @ backend ---
+[INFO] Attaching agents: []
 
   .   ____          _            __ _ _
  /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
@@ -8,110 +35,59 @@
 
  :: Spring Boot ::                (v4.0.5)
 
-2026-04-23T17:30:39.653+05:30  INFO 7340 --- [backend] [           main] com.backend.backend.BackendApplication   : Starting BackendApplication v0.0.1-SNAPSHOT using Java 17.0.12 with PID 7340 (C:\Users\Sadumina Rathnayaka\Desktop\PAF Smart Campus\backend\target\backend-0.0.1-SNAPSHOT.jar started by Sadumina Rathnayaka in C:\Users\Sadumina Rathnayaka\Desktop\PAF Smart Campus\backend)
-2026-04-23T17:30:39.656+05:30  INFO 7340 --- [backend] [           main] com.backend.backend.BackendApplication   : No active profile set, falling back to 1 default profile: "default"
-2026-04-23T17:30:39.661+05:30 DEBUG 7340 --- [backend] [           main] o.s.boot.SpringApplication               : Loading source class com.backend.backend.BackendApplication
-2026-04-23T17:30:39.737+05:30 DEBUG 7340 --- [backend] [           main] ConfigServletWebServerApplicationContext : Refreshing org.springframework.boot.web.server.servlet.context.AnnotationConfigServletWebServerApplicationContext@f80945f
-2026-04-23T17:30:40.655+05:30  INFO 7340 --- [backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
-2026-04-23T17:30:40.680+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.a.AutoConfigurationPackages        : @EnableAutoConfiguration was declared on a class in the package 'com.backend.backend'. Automatic @Repository and @Entity scanning is enabled.
-2026-04-23T17:30:40.725+05:30  INFO 7340 --- [backend] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 59 ms. Found 6 MongoDB repository interfaces.
-2026-04-23T17:30:41.437+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.t.s.TomcatServletWebServerFactory  : Code archive: C:\Users\Sadumina Rathnayaka\Desktop\PAF Smart Campus\backend\target\backend-0.0.1-SNAPSHOT.jar
-2026-04-23T17:30:41.439+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.t.s.TomcatServletWebServerFactory  : Code archive: C:\Users\Sadumina Rathnayaka\Desktop\PAF Smart Campus\backend\target\backend-0.0.1-SNAPSHOT.jar
-2026-04-23T17:30:41.439+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.t.s.TomcatServletWebServerFactory  : None of the document roots [src/main/webapp, public, static] point to a directory and will be ignored.
-2026-04-23T17:30:41.479+05:30  INFO 7340 --- [backend] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
-2026-04-23T17:30:41.503+05:30  INFO 7340 --- [backend] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-04-23T17:30:41.503+05:30  INFO 7340 --- [backend] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
-2026-04-23T17:30:41.549+05:30 DEBUG 7340 --- [backend] [           main] b.w.c.s.WebApplicationContextInitializer : Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
-2026-04-23T17:30:41.552+05:30  INFO 7340 --- [backend] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1812 ms
-2026-04-23T17:30:41.609+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.w.s.ServletContextInitializerBeans : Mapping filters: springSecurityFilterChain urls=[/*] order=-100, characterEncodingFilter urls=[/*] order=-2147483648, formContentFilter urls=[/*] order=-9900, requestContextFilter urls=[/*] order=-105, jwtAuthenticationFilter urls=[/*] order=2147483647
-2026-04-23T17:30:41.609+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.w.s.ServletContextInitializerBeans : Mapping servlets: dispatcherServlet urls=[/]
-2026-04-23T17:30:41.638+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.s.f.OrderedRequestContextFilter    : Filter 'requestContextFilter' configured for use
-2026-04-23T17:30:41.643+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.s.f.OrderedCharacterEncodingFilter : Filter 'characterEncodingFilter' configured for use
-2026-04-23T17:30:41.645+05:30 DEBUG 7340 --- [backend] [           main] .DelegatingFilterProxyRegistrationBean$1 : Filter 'springSecurityFilterChain' configured for use
-2026-04-23T17:30:41.645+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.s.filter.OrderedFormContentFilter  : Filter 'formContentFilter' configured for use
-2026-04-23T17:30:42.115+05:30  INFO 7340 --- [backend] [           main] org.mongodb.driver.client                : MongoClient with metadata {"driver": {"name": "mongo-java-driver|spring-boot|sync", "version": "5.6.4"}, "os": {"type": "Windows", "name": "Windows 11", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/17.0.12+8-LTS-286"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='edusense42_db_user', source='admin', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@3e1f1046, com.mongodb.Jep395RecordCodecProvider@23e3f5cd, com.mongodb.KotlinCodecProvider@5c931134, EnumCodecProvider{}]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[127.0.0.1:27017], srvHost=cluster0.wnctjbm.mongodb.net, srvServiceName=mongodb, mode=MULTIPLE, requiredClusterType=REPLICA_SET, requiredReplicaSetName='atlas-dqfih2-shard-0', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=true, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=null, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
-2026-04-23T17:30:42.531+05:30 DEBUG 7340 --- [backend] [           main] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.Booking for index information
-2026-04-23T17:30:42.539+05:30 DEBUG 7340 --- [backend] [           main] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.User for index information
-2026-04-23T17:30:42.539+05:30 DEBUG 7340 --- [backend] [           main] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.Ticket for index information
-2026-04-23T17:30:42.612+05:30  INFO 7340 --- [backend] [           main] org.mongodb.driver.cluster               : Waiting for server to become available for operation createIndexes with ID 2. Remaining time: 29989 ms. Selector: WritableServerSelector, topology description: {type=UNKNOWN, servers=[].
-2026-04-23T17:30:42.762+05:30  INFO 7340 --- [backend] [jbm.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017 to client view of cluster
-2026-04-23T17:30:42.798+05:30  INFO 7340 --- [backend] [jbm.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017 to client view of cluster
-2026-04-23T17:30:42.798+05:30  INFO 7340 --- [backend] [jbm.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017 to client view of cluster
-2026-04-23T17:30:44.415+05:30  INFO 7340 --- [backend] [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017, type=REPLICA_SET_PRIMARY, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=1064350800, minRoundTripTimeNanos=0, setName='atlas-dqfih2-shard-0', canonicalAddress=ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017, hosts=[ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017], passives=[], arbiters=[], primary='ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='aps1-az2'}, Tag{name='cacheState', value='READY'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='AP_SOUTH_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=7fffffff00000000000000e6, setVersion=77, topologyVersion=TopologyVersion{processId=69e91b3c825a90a6a163a037, counter=6}, lastWriteDate=Thu Apr 23 17:29:30 IST 2026, lastUpdateTimeNanos=26410890310800}
-2026-04-23T17:30:44.417+05:30  INFO 7340 --- [backend] [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, type=REPLICA_SET_SECONDARY, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=1064981100, minRoundTripTimeNanos=0, setName='atlas-dqfih2-shard-0', canonicalAddress=ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, hosts=[ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017], passives=[], arbiters=[], primary='ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='aps1-az1'}, Tag{name='cacheState', value='READY'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='AP_SOUTH_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=77, topologyVersion=TopologyVersion{processId=69e91af22f68de9e35cf2f26, counter=4}, lastWriteDate=Thu Apr 23 17:29:30 IST 2026, lastUpdateTimeNanos=26410890863800}
-2026-04-23T17:30:44.415+05:30  INFO 7340 --- [backend] [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, type=REPLICA_SET_SECONDARY, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=1064354400, minRoundTripTimeNanos=0, setName='atlas-dqfih2-shard-0', canonicalAddress=ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, hosts=[ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017], passives=[], arbiters=[], primary='ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='aps1-az3'}, Tag{name='cacheState', value='READY'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='AP_SOUTH_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=77, topologyVersion=TopologyVersion{processId=69e91b87b781ad319e888bd1, counter=3}, lastWriteDate=Thu Apr 23 17:29:30 IST 2026, lastUpdateTimeNanos=26410890315800}
-2026-04-23T17:30:44.427+05:30  INFO 7340 --- [backend] [ngodb.net:27017] org.mongodb.driver.cluster               : Discovered replica set primary ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017 with max election id 7fffffff00000000000000e6 and max set version 77
-2026-04-23T17:30:46.112+05:30 DEBUG 7340 --- [backend] [           main] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.Ticket$TicketEvent for index information
-2026-04-23T17:30:46.112+05:30 DEBUG 7340 --- [backend] [           main] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.TicketComment for index information
-2026-04-23T17:30:46.347+05:30 DEBUG 7340 --- [backend] [           main] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.Notification for index information
-2026-04-23T17:30:46.352+05:30 DEBUG 7340 --- [backend] [           main] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.Resource for index information
-2026-04-23T17:30:46.647+05:30 ERROR 7340 --- [backend] [           main] c.b.b.s.FirebaseAuthenticationService    : Failed to initialize Firebase
-
-java.io.FileNotFoundException: 
-	at java.base/java.io.FileInputStream.open0(Native Method) ~[na:na]
-	at java.base/java.io.FileInputStream.open(FileInputStream.java:216) ~[na:na]
-	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157) ~[na:na]
-	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:111) ~[na:na]
-	at com.backend.backend.service.FirebaseAuthenticationService.initializeFirebase(FirebaseAuthenticationService.java:40) ~[!/:0.0.1-SNAPSHOT]
-	at com.backend.backend.service.FirebaseAuthenticationService.<init>(FirebaseAuthenticationService.java:29) ~[!/:0.0.1-SNAPSHOT]
-	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method) ~[na:na]
-	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77) ~[na:na]
-	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45) ~[na:na]
-	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:499) ~[na:na]
-	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:480) ~[na:na]
-	at org.springframework.beans.BeanUtils.instantiateClass(BeanUtils.java:207) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:129) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:318) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:309) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1382) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1221) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:229) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1762) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1651) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:912) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1382) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1221) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:565) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:196) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1218) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1184) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1121) ~[spring-beans-7.0.6.jar!/:7.0.6]
-	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:994) ~[spring-context-7.0.6.jar!/:7.0.6]
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:621) ~[spring-context-7.0.6.jar!/:7.0.6]
-	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143) ~[spring-boot-web-server-4.0.5.jar!/:4.0.5]
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756) ~[spring-boot-4.0.5.jar!/:4.0.5]
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445) ~[spring-boot-4.0.5.jar!/:4.0.5]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321) ~[spring-boot-4.0.5.jar!/:4.0.5]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365) ~[spring-boot-4.0.5.jar!/:4.0.5]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354) ~[spring-boot-4.0.5.jar!/:4.0.5]
-	at com.backend.backend.BackendApplication.main(BackendApplication.java:12) ~[!/:0.0.1-SNAPSHOT]
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
-	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
-	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
-	at java.base/java.lang.reflect.Method.invoke(Method.java:568) ~[na:na]
-	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:106) ~[backend-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
-	at org.springframework.boot.loader.launch.Launcher.launch(Launcher.java:64) ~[backend-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
-	at org.springframework.boot.loader.launch.JarLauncher.main(JarLauncher.java:40) ~[backend-0.0.1-SNAPSHOT.jar:0.0.1-SNAPSHOT]
-
-2026-04-23T17:30:46.910+05:30  INFO 7340 --- [backend] [           main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
-2026-04-23T17:30:47.322+05:30 DEBUG 7340 --- [backend] [           main] s.w.s.m.m.a.RequestMappingHandlerMapping : 57 mappings in 'requestMappingHandlerMapping'
-2026-04-23T17:30:47.368+05:30 DEBUG 7340 --- [backend] [           main] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
-2026-04-23T17:30:47.428+05:30 DEBUG 7340 --- [backend] [           main] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 2 RequestBodyAdvice, 1 ResponseBodyAdvice
-2026-04-23T17:30:47.529+05:30 DEBUG 7340 --- [backend] [           main] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
-2026-04-23T17:30:47.765+05:30  INFO 7340 --- [backend] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8080 (http) with context path '/'
-2026-04-23T17:30:47.777+05:30 DEBUG 7340 --- [backend] [           main] .s.b.a.l.ConditionEvaluationReportLogger : 
+2026-04-26T05:52:26.466+05:30  INFO 8344 --- [backend] [  restartedMain] com.backend.backend.BackendApplication   : Starting BackendApplication using Java 17.0.12 with PID 8344 (C:\Users\Sadumina Rathnayaka\Desktop\PAF Smart Campus\backend\target\classes started by Sadumina Rathnayaka in C:\Users\Sadumina Rathnayaka\Desktop\PAF Smart Campus\backend)
+2026-04-26T05:52:26.466+05:30  INFO 8344 --- [backend] [  restartedMain] com.backend.backend.BackendApplication   : No active profile set, falling back to 1 default profile: "default"
+2026-04-26T05:52:26.466+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.boot.SpringApplication               : Loading source class com.backend.backend.BackendApplication
+2026-04-26T05:52:26.522+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.devtools.restart.ChangeableUrls    : Matching URLs for reloading : [file:/C:/Users/Sadumina%20Rathnayaka/Desktop/PAF%20Smart%20Campus/backend/target/classes/]
+2026-04-26T05:52:26.522+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.d.settings.DevToolsSettings        : Included patterns for restart : []
+2026-04-26T05:52:26.522+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.d.settings.DevToolsSettings        : Excluded patterns for restart : [/spring-boot-starter-[\w-]+/, /spring-boot/(bin|build|out)/, /spring-boot-starter/(bin|build|out)/, /spring-boot-devtools/(bin|build|out)/, /spring-boot-actuator/(bin|build|out)/, /spring-boot-autoconfigure/(bin|build|out)/]
+2026-04-26T05:52:26.524+05:30  INFO 8344 --- [backend] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+2026-04-26T05:52:26.524+05:30  INFO 8344 --- [backend] [  restartedMain] .e.DevToolsPropertyDefaultsPostProcessor : For additional web related logging consider setting the 'logging.level.web' property to 'DEBUG'
+2026-04-26T05:52:26.524+05:30 DEBUG 8344 --- [backend] [  restartedMain] ConfigServletWebServerApplicationContext : Refreshing org.springframework.boot.web.server.servlet.context.AnnotationConfigServletWebServerApplicationContext@3dee726b
+2026-04-26T05:52:27.155+05:30  INFO 8344 --- [backend] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2026-04-26T05:52:27.163+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.a.AutoConfigurationPackages        : @EnableAutoConfiguration was declared on a class in the package 'com.backend.backend'. Automatic @Repository and @Entity scanning is enabled.
+2026-04-26T05:52:27.216+05:30  INFO 8344 --- [backend] [  restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 51 ms. Found 6 MongoDB repository interfaces.
+2026-04-26T05:52:27.712+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.t.s.TomcatServletWebServerFactory  : Code archive: C:\Users\Sadumina Rathnayaka\.m2\repository\org\springframework\boot\spring-boot-web-server\4.0.5\spring-boot-web-server-4.0.5.jar
+2026-04-26T05:52:27.712+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.t.s.TomcatServletWebServerFactory  : Code archive: C:\Users\Sadumina Rathnayaka\.m2\repository\org\springframework\boot\spring-boot-web-server\4.0.5\spring-boot-web-server-4.0.5.jar
+2026-04-26T05:52:27.712+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.t.s.TomcatServletWebServerFactory  : None of the document roots [src/main/webapp, public, static] point to a directory and will be ignored.
+2026-04-26T05:52:27.788+05:30  INFO 8344 --- [backend] [  restartedMain] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8080 (http)
+2026-04-26T05:52:27.795+05:30  INFO 8344 --- [backend] [  restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-26T05:52:27.795+05:30  INFO 8344 --- [backend] [  restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.20]
+2026-04-26T05:52:27.846+05:30 DEBUG 8344 --- [backend] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+2026-04-26T05:52:27.849+05:30  INFO 8344 --- [backend] [  restartedMain] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1322 ms
+2026-04-26T05:52:27.878+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.w.s.ServletContextInitializerBeans : Mapping filters: springSecurityFilterChain urls=[/*] order=-100, characterEncodingFilter urls=[/*] order=-2147483648, formContentFilter urls=[/*] order=-9900, requestContextFilter urls=[/*] order=-105, jwtAuthenticationFilter urls=[/*] order=2147483647
+2026-04-26T05:52:27.878+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.w.s.ServletContextInitializerBeans : Mapping servlets: dispatcherServlet urls=[/]
+2026-04-26T05:52:27.900+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.s.f.OrderedRequestContextFilter    : Filter 'requestContextFilter' configured for use
+2026-04-26T05:52:27.901+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.s.f.OrderedCharacterEncodingFilter : Filter 'characterEncodingFilter' configured for use
+2026-04-26T05:52:27.903+05:30 DEBUG 8344 --- [backend] [  restartedMain] .DelegatingFilterProxyRegistrationBean$1 : Filter 'springSecurityFilterChain' configured for use
+2026-04-26T05:52:27.903+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.s.filter.OrderedFormContentFilter  : Filter 'formContentFilter' configured for use
+2026-04-26T05:52:29.148+05:30  INFO 8344 --- [backend] [  restartedMain] org.mongodb.driver.client                : MongoClient with metadata {"driver": {"name": "mongo-java-driver|spring-boot|sync", "version": "5.6.4"}, "os": {"type": "Windows", "name": "Windows 11", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/17.0.12+8-LTS-286"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='edusense42_db_user', source='admin', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@2ceabe40, com.mongodb.Jep395RecordCodecProvider@5f732f45, com.mongodb.KotlinCodecProvider@19bfa74f, EnumCodecProvider{}]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[127.0.0.1:27017], srvHost=cluster0.wnctjbm.mongodb.net, srvServiceName=mongodb, mode=MULTIPLE, requiredClusterType=REPLICA_SET, requiredReplicaSetName='atlas-dqfih2-shard-0', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=true, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=null, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+2026-04-26T05:52:30.223+05:30  INFO 8344 --- [backend] [jbm.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017 to client view of cluster
+2026-04-26T05:52:30.284+05:30  INFO 8344 --- [backend] [jbm.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017 to client view of cluster
+2026-04-26T05:52:30.284+05:30  INFO 8344 --- [backend] [jbm.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017 to client view of cluster
+2026-04-26T05:52:30.463+05:30 DEBUG 8344 --- [backend] [  restartedMain] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.TicketComment for index information
+2026-04-26T05:52:30.511+05:30  INFO 8344 --- [backend] [  restartedMain] org.mongodb.driver.cluster               : Waiting for server to become available for operation createIndexes with ID 5. Remaining time: 29992 ms. Selector: WritableServerSelector, topology description: {type=REPLICA_SET, servers=[{address=ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, type=UNKNOWN, state=CONNECTING}, {address=ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017, type=UNKNOWN, state=CONNECTING}, {address=ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, type=UNKNOWN, state=CONNECTING}].
+2026-04-26T05:52:30.882+05:30  INFO 8344 --- [backend] [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, type=REPLICA_SET_SECONDARY, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=274477800, minRoundTripTimeNanos=0, setName='atlas-dqfih2-shard-0', canonicalAddress=ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, hosts=[ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017], passives=[], arbiters=[], primary='ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='aps1-az1'}, Tag{name='cacheState', value='READY'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='AP_SOUTH_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=77, topologyVersion=TopologyVersion{processId=69e91af22f68de9e35cf2f26, counter=4}, lastWriteDate=Sun Apr 26 05:51:14 IST 2026, lastUpdateTimeNanos=262062307100}
+2026-04-26T05:52:30.882+05:30  INFO 8344 --- [backend] [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, type=REPLICA_SET_SECONDARY, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=274544399, minRoundTripTimeNanos=0, setName='atlas-dqfih2-shard-0', canonicalAddress=ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, hosts=[ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017], passives=[], arbiters=[], primary='ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='aps1-az3'}, Tag{name='cacheState', value='READY'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='AP_SOUTH_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=77, topologyVersion=TopologyVersion{processId=69e91b87b781ad319e888bd1, counter=3}, lastWriteDate=Sun Apr 26 05:51:14 IST 2026, lastUpdateTimeNanos=262062306999}
+2026-04-26T05:52:30.882+05:30  INFO 8344 --- [backend] [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017, type=REPLICA_SET_PRIMARY, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=274551800, minRoundTripTimeNanos=0, setName='atlas-dqfih2-shard-0', canonicalAddress=ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017, hosts=[ac-ldnsgdn-shard-00-00.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-01.wnctjbm.mongodb.net:27017, ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017], passives=[], arbiters=[], primary='ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017', tagSet=TagSet{[Tag{name='availabilityZone', value='aps1-az2'}, Tag{name='cacheState', value='READY'}, Tag{name='diskState', value='READY'}, Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='AP_SOUTH_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=7fffffff00000000000000e6, setVersion=77, topologyVersion=TopologyVersion{processId=69e91b3c825a90a6a163a037, counter=6}, lastWriteDate=Sun Apr 26 05:51:14 IST 2026, lastUpdateTimeNanos=262062307100}
+2026-04-26T05:52:30.882+05:30  INFO 8344 --- [backend] [ngodb.net:27017] org.mongodb.driver.cluster               : Discovered replica set primary ac-ldnsgdn-shard-00-02.wnctjbm.mongodb.net:27017 with max election id 7fffffff00000000000000e6 and max set version 77
+2026-04-26T05:52:31.454+05:30 DEBUG 8344 --- [backend] [  restartedMain] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.Ticket for index information
+2026-04-26T05:52:31.541+05:30 DEBUG 8344 --- [backend] [  restartedMain] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.Booking for index information
+2026-04-26T05:52:31.542+05:30 DEBUG 8344 --- [backend] [  restartedMain] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.Ticket$TicketEvent for index information
+2026-04-26T05:52:31.543+05:30 DEBUG 8344 --- [backend] [  restartedMain] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.User for index information
+2026-04-26T05:52:31.544+05:30 DEBUG 8344 --- [backend] [  restartedMain] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.Resource for index information
+2026-04-26T05:52:31.544+05:30 DEBUG 8344 --- [backend] [  restartedMain] .m.c.i.MongoPersistentEntityIndexCreator : Analyzing class class com.backend.backend.model.Notification for index information
+2026-04-26T05:52:31.731+05:30  WARN 8344 --- [backend] [  restartedMain] c.b.b.s.FirebaseAuthenticationService    : Firebase credentials path is not configured. Firebase authentication will remain disabled.
+2026-04-26T05:52:31.921+05:30  INFO 8344 --- [backend] [  restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-04-26T05:52:32.196+05:30 DEBUG 8344 --- [backend] [  restartedMain] s.w.s.m.m.a.RequestMappingHandlerMapping : 59 mappings in 'requestMappingHandlerMapping'
+2026-04-26T05:52:32.228+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+2026-04-26T05:52:32.259+05:30 DEBUG 8344 --- [backend] [  restartedMain] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 2 RequestBodyAdvice, 1 ResponseBodyAdvice
+2026-04-26T05:52:32.301+05:30 DEBUG 8344 --- [backend] [  restartedMain] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2026-04-26T05:52:32.412+05:30  WARN 8344 --- [backend] [  restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-04-26T05:52:32.499+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.boot.devtools.restart.Restarter      : Creating new Restarter for thread Thread[main,5,main]
+2026-04-26T05:52:32.499+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.boot.devtools.restart.Restarter      : Immediately restarting application
+2026-04-26T05:52:32.499+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.boot.devtools.restart.Restarter      : Starting application com.backend.backend.BackendApplication with URLs [file:/C:/Users/Sadumina%20Rathnayaka/Desktop/PAF%20Smart%20Campus/backend/target/classes/]
+2026-04-26T05:52:32.509+05:30 DEBUG 8344 --- [backend] [  restartedMain] .s.b.a.l.ConditionEvaluationReportLogger : 
 
 
 ============================
@@ -244,6 +220,21 @@ Positive matches:
 
    LifecycleAutoConfiguration#defaultLifecycleProcessor matched:
       - @ConditionalOnMissingBean (names: lifecycleProcessor; SearchStrategy: current) did not find any beans (OnBeanCondition)
+
+   LocalDevToolsAutoConfiguration matched:
+      - Initialized Restarter Condition available and initialized (OnInitializedRestarterCondition)
+
+   LocalDevToolsAutoConfiguration.RestartConfiguration matched:
+      - @ConditionalOnBooleanProperty (spring.devtools.restart.enabled=true) matched (OnPropertyCondition)
+
+   LocalDevToolsAutoConfiguration.RestartConfiguration#classPathFileSystemWatcher matched:
+      - @ConditionalOnMissingBean (types: org.springframework.boot.devtools.classpath.ClassPathFileSystemWatcher; SearchStrategy: all) did not find any beans (OnBeanCondition)
+
+   LocalDevToolsAutoConfiguration.RestartConfiguration#classPathRestartStrategy matched:
+      - @ConditionalOnMissingBean (types: org.springframework.boot.devtools.classpath.ClassPathRestartStrategy; SearchStrategy: all) did not find any beans (OnBeanCondition)
+
+   LocalDevToolsAutoConfiguration.RestartConfiguration#conditionEvaluationDeltaLoggingListener matched:
+      - @ConditionalOnBooleanProperty (spring.devtools.restart.log-condition-evaluation-delta=true) matched (OnPropertyCondition)
 
    MongoAutoConfiguration matched:
       - @ConditionalOnClass found required class 'com.mongodb.client.MongoClient' (OnClassCondition)
@@ -378,6 +369,16 @@ Positive matches:
    TransactionManagerCustomizationAutoConfiguration#platformTransactionManagerCustomizers matched:
       - @ConditionalOnMissingBean (types: org.springframework.boot.transaction.autoconfigure.TransactionManagerCustomizers; SearchStrategy: all) did not find any beans (OnBeanCondition)
 
+   ValidationAutoConfiguration matched:
+      - @ConditionalOnClass found required class 'jakarta.validation.executable.ExecutableValidator' (OnClassCondition)
+      - @ConditionalOnResource found location classpath:META-INF/services/jakarta.validation.spi.ValidationProvider (OnResourceCondition)
+
+   ValidationAutoConfiguration#defaultValidator matched:
+      - @ConditionalOnMissingBean (types: jakarta.validation.Validator; SearchStrategy: all) did not find any beans (OnBeanCondition)
+
+   ValidationAutoConfiguration#methodValidationPostProcessor matched:
+      - @ConditionalOnMissingBean (types: org.springframework.validation.beanvalidation.MethodValidationPostProcessor; SearchStrategy: current) did not find any beans (OnBeanCondition)
+
    WebMvcAutoConfiguration matched:
       - @ConditionalOnClass found required classes 'jakarta.servlet.Servlet', 'org.springframework.web.servlet.DispatcherServlet', 'org.springframework.web.servlet.config.annotation.WebMvcConfigurer' (OnClassCondition)
       - found 'session' scope (OnWebApplicationCondition)
@@ -429,6 +430,22 @@ Negative matches:
       Did not match:
          - @ConditionalOnBean did not find required type 'io.micrometer.core.instrument.MeterRegistry' (OnBeanCondition)
 
+   DevToolsDataSourceAutoConfiguration:
+      Did not match:
+         - DevTools DataSource Condition did not find a single DataSource bean (DevToolsDataSourceAutoConfiguration.DevToolsDataSourceCondition)
+      Matched:
+         - @ConditionalOnClass found required class 'javax.sql.DataSource' (OnClassCondition)
+         - Devtools devtools enabled. (OnEnabledDevToolsCondition)
+
+   DevToolsDataSourceAutoConfiguration.DatabaseShutdownExecutorEntityManagerFactoryDependsOnConfiguration:
+      Did not match:
+         - @ConditionalOnClass did not find required classes 'org.springframework.boot.jpa.autoconfigure.EntityManagerFactoryDependsOnPostProcessor', 'org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean' (OnClassCondition)
+         - Ancestor org.springframework.boot.devtools.autoconfigure.DevToolsDataSourceAutoConfiguration did not match (ConditionEvaluationReport.AncestorsMatchedCondition)
+
+   DevToolsR2dbcAutoConfiguration:
+      Did not match:
+         - @ConditionalOnClass did not find required class 'io.r2dbc.spi.ConnectionFactory' (OnClassCondition)
+
    DispatcherServletAutoConfiguration.DispatcherServletConfiguration#multipartResolver:
       Did not match:
          - @ConditionalOnBean (types: org.springframework.web.multipart.MultipartResolver; SearchStrategy: all) did not find any beans of type org.springframework.web.multipart.MultipartResolver (OnBeanCondition)
@@ -476,6 +493,10 @@ Negative matches:
    KotlinSerializationHttpMessageConvertersConfiguration:
       Did not match:
          - @ConditionalOnClass did not find required classes 'kotlinx.serialization.Serializable', 'kotlinx.serialization.json.Json' (OnClassCondition)
+
+   LocalDevToolsAutoConfiguration.LiveReloadConfiguration:
+      Did not match:
+         - @ConditionalOnBooleanProperty (spring.devtools.livereload.enabled=true) did not find property 'spring.devtools.livereload.enabled' (OnPropertyCondition)
 
    ManagementWebSecurityAutoConfiguration:
       Did not match:
@@ -527,6 +548,12 @@ Negative matches:
    ReactiveWebSecurityAutoConfiguration:
       Did not match:
          - @ConditionalOnClass did not find required class 'reactor.core.publisher.Flux' (OnClassCondition)
+
+   RemoteDevToolsAutoConfiguration:
+      Did not match:
+         - @ConditionalOnProperty (spring.devtools.remote.secret) did not find property 'spring.devtools.remote.secret' (OnPropertyCondition)
+      Matched:
+         - @ConditionalOnClass found required classes 'jakarta.servlet.Filter', 'org.springframework.http.server.ServerHttpRequest', 'org.springframework.boot.web.server.autoconfigure.ServerProperties' (OnClassCondition)
 
    SecurityAutoConfiguration.SecurityDataConfiguration:
       Did not match:
@@ -694,48 +721,76 @@ Unconditional classes:
 
 
 
-2026-04-23T17:30:47.808+05:30  INFO 7340 --- [backend] [           main] com.backend.backend.BackendApplication   : Started BackendApplication in 8.804 seconds (process running for 9.587)
-2026-04-23T17:30:47.811+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.a.ApplicationAvailabilityBean      : Application availability state LivenessState changed to CORRECT
-2026-04-23T17:30:47.818+05:30 DEBUG 7340 --- [backend] [           main] o.s.b.a.ApplicationAvailabilityBean      : Application availability state ReadinessState changed to ACCEPTING_TRAFFIC
-2026-04-23T17:30:47.830+05:30 DEBUG 7340 --- [backend] [   scheduling-1] o.s.data.mongodb.core.MongoTemplate      : find using query: {} fields: Document{{}} sort: null for class: class com.backend.backend.model.User in collection: users
-2026-04-23T17:30:48.721+05:30 DEBUG 7340 --- [backend] [   scheduling-1] o.s.d.m.r.query.MongoQueryCreator        : Created query Query: { "status" : { "$in" : ["OPEN", "IN_PROGRESS"]}, "priorityEscalated" : false}, Fields: {}, Sort: {}
-2026-04-23T17:30:48.734+05:30 DEBUG 7340 --- [backend] [   scheduling-1] o.s.data.mongodb.core.MongoTemplate      : find using query: { "status" : { "$in" : ["OPEN", "IN_PROGRESS"]}, "priorityEscalated" : false} fields: Document{{}} sort: null for class: class com.backend.backend.model.Ticket in collection: tickets
-2026-04-23T17:30:48.968+05:30 DEBUG 7340 --- [backend] [   scheduling-1] o.s.d.m.r.query.MongoQueryCreator        : Created query Query: { "status" : { "$in" : ["OPEN", "IN_PROGRESS"]}, "slaBreachedNotified" : false}, Fields: {}, Sort: {}
-2026-04-23T17:30:48.970+05:30 DEBUG 7340 --- [backend] [   scheduling-1] o.s.data.mongodb.core.MongoTemplate      : find using query: { "status" : { "$in" : ["OPEN", "IN_PROGRESS"]}, "slaBreachedNotified" : false} fields: Document{{}} sort: null for class: class com.backend.backend.model.Ticket in collection: tickets
-2026-04-23T17:31:07.520+05:30  INFO 7340 --- [backend] [nio-8080-exec-4] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-04-23T17:31:07.521+05:30  INFO 7340 --- [backend] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-04-23T17:31:07.523+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Detected StandardServletMultipartResolver
-2026-04-23T17:31:07.523+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Detected AcceptHeaderLocaleResolver
-2026-04-23T17:31:07.523+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@70c205bf
-2026-04-23T17:31:07.523+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.support.SessionFlashMapManager@d8e4250
-2026-04-23T17:31:07.523+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
-2026-04-23T17:31:07.523+05:30  INFO 7340 --- [backend] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
-2026-04-23T17:31:07.588+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : GET "/api/resources", parameters={}
-2026-04-23T17:31:07.593+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.backend.backend.controller.ResourceController#getAllResources(String, Integer, String, String)
-2026-04-23T17:31:07.683+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.data.mongodb.core.MongoTemplate      : Executing count: {} in collection: resources
-2026-04-23T17:31:07.851+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.data.mongodb.core.MongoTemplate      : find using query: {} fields: Document{{}} sort: null for class: class com.backend.backend.model.Resource in collection: resources
-2026-04-23T17:31:08.001+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.data.mongodb.core.MongoTemplate      : find using query: {} fields: Document{{}} sort: null for class: class com.backend.backend.model.Resource in collection: resources
-2026-04-23T17:31:08.163+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-2026-04-23T17:31:08.163+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [[com.backend.backend.model.Resource@66f1756a, com.backend.backend.model.Resource@340eb860, com.backe (truncated)...]
-2026-04-23T17:31:08.238+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
-2026-04-23T17:31:33.559+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : GET "/api/resources", parameters={}
-2026-04-23T17:31:33.567+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-8] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.backend.backend.controller.ResourceController#getAllResources(String, Integer, String, String)
-2026-04-23T17:31:33.570+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-8] o.s.data.mongodb.core.MongoTemplate      : Executing count: {} in collection: resources
-2026-04-23T17:31:33.625+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : GET "/api/resources", parameters={}
-2026-04-23T17:31:33.627+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-9] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.backend.backend.controller.ResourceController#getAllResources(String, Integer, String, String)
-2026-04-23T17:31:33.629+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-9] o.s.data.mongodb.core.MongoTemplate      : Executing count: {} in collection: resources
-2026-04-23T17:31:34.527+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-8] o.s.data.mongodb.core.MongoTemplate      : find using query: {} fields: Document{{}} sort: null for class: class com.backend.backend.model.Resource in collection: resources
-2026-04-23T17:31:34.764+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-8] o.s.data.mongodb.core.MongoTemplate      : find using query: {} fields: Document{{}} sort: null for class: class com.backend.backend.model.Resource in collection: resources
-2026-04-23T17:31:35.145+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-8] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-2026-04-23T17:31:35.147+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-8] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [[com.backend.backend.model.Resource@5c80b6d, com.backend.backend.model.Resource@b0ff5a4, com.backend (truncated)...]
-2026-04-23T17:31:35.149+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
-2026-04-23T17:31:36.264+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-9] o.s.data.mongodb.core.MongoTemplate      : find using query: {} fields: Document{{}} sort: null for class: class com.backend.backend.model.Resource in collection: resources
-2026-04-23T17:31:36.572+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-9] o.s.data.mongodb.core.MongoTemplate      : find using query: {} fields: Document{{}} sort: null for class: class com.backend.backend.model.Resource in collection: resources
-2026-04-23T17:31:36.723+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
-2026-04-23T17:31:36.725+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [[com.backend.backend.model.Resource@6c9943d1, com.backend.backend.model.Resource@426ae75, com.backen (truncated)...]
-2026-04-23T17:31:36.728+05:30 DEBUG 7340 --- [backend] [nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
-2026-04-23T17:31:49.190+05:30 DEBUG 7340 --- [backend] [   scheduling-1] o.s.data.mongodb.core.MongoTemplate      : find using query: {} fields: Document{{}} sort: null for class: class com.backend.backend.model.User in collection: users
-2026-04-23T17:31:49.417+05:30 DEBUG 7340 --- [backend] [   scheduling-1] o.s.d.m.r.query.MongoQueryCreator        : Created query Query: { "status" : { "$in" : ["OPEN", "IN_PROGRESS"]}, "priorityEscalated" : false}, Fields: {}, Sort: {}
-2026-04-23T17:31:49.421+05:30 DEBUG 7340 --- [backend] [   scheduling-1] o.s.data.mongodb.core.MongoTemplate      : find using query: { "status" : { "$in" : ["OPEN", "IN_PROGRESS"]}, "priorityEscalated" : false} fields: Document{{}} sort: null for class: class com.backend.backend.model.Ticket in collection: tickets
-2026-04-23T17:31:49.590+05:30 DEBUG 7340 --- [backend] [   scheduling-1] o.s.d.m.r.query.MongoQueryCreator        : Created query Query: { "status" : { "$in" : ["OPEN", "IN_PROGRESS"]}, "slaBreachedNotified" : false}, Fields: {}, Sort: {}
-2026-04-23T17:31:49.591+05:30 DEBUG 7340 --- [backend] [   scheduling-1] o.s.data.mongodb.core.MongoTemplate      : find using query: { "status" : { "$in" : ["OPEN", "IN_PROGRESS"]}, "slaBreachedNotified" : false} fields: Document{{}} sort: null for class: class com.backend.backend.model.Ticket in collection: tickets
+2026-04-26T05:52:32.511+05:30 DEBUG 8344 --- [backend] [  restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : Application failed to start due to an exception
+
+org.springframework.boot.web.server.PortInUseException: Port 8080 is already in use
+	at org.springframework.boot.web.server.PortInUseException.lambda$throwIfPortBindingException$0(PortInUseException.java:73) ~[spring-boot-web-server-4.0.5.jar:4.0.5]
+	at org.springframework.boot.web.server.PortInUseException.lambda$ifPortBindingException$0(PortInUseException.java:89) ~[spring-boot-web-server-4.0.5.jar:4.0.5]
+	at org.springframework.boot.web.server.PortInUseException.ifCausedBy(PortInUseException.java:107) ~[spring-boot-web-server-4.0.5.jar:4.0.5]
+	at org.springframework.boot.web.server.PortInUseException.ifPortBindingException(PortInUseException.java:85) ~[spring-boot-web-server-4.0.5.jar:4.0.5]
+	at org.springframework.boot.web.server.PortInUseException.throwIfPortBindingException(PortInUseException.java:72) ~[spring-boot-web-server-4.0.5.jar:4.0.5]
+	at org.springframework.boot.tomcat.TomcatWebServer.start(TomcatWebServer.java:247) ~[spring-boot-tomcat-4.0.5.jar:4.0.5]
+	at org.springframework.boot.web.server.servlet.context.WebServerStartStopLifecycle.start(WebServerStartStopLifecycle.java:44) ~[spring-boot-web-server-4.0.5.jar:4.0.5]
+	at org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:420) ~[spring-context-7.0.6.jar:7.0.6]
+	at org.springframework.context.support.DefaultLifecycleProcessor.doStart(DefaultLifecycleProcessor.java:409) ~[spring-context-7.0.6.jar:7.0.6]
+	at org.springframework.context.support.DefaultLifecycleProcessor$LifecycleGroup.start(DefaultLifecycleProcessor.java:613) ~[spring-context-7.0.6.jar:7.0.6]
+	at java.base/java.lang.Iterable.forEach(Iterable.java:75) ~[na:na]
+	at org.springframework.context.support.DefaultLifecycleProcessor.startBeans(DefaultLifecycleProcessor.java:379) ~[spring-context-7.0.6.jar:7.0.6]
+	at org.springframework.context.support.DefaultLifecycleProcessor.onRefresh(DefaultLifecycleProcessor.java:306) ~[spring-context-7.0.6.jar:7.0.6]
+	at org.springframework.context.support.AbstractApplicationContext.finishRefresh(AbstractApplicationContext.java:1013) ~[spring-context-7.0.6.jar:7.0.6]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:624) ~[spring-context-7.0.6.jar:7.0.6]
+	at org.springframework.boot.web.server.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:143) ~[spring-boot-web-server-4.0.5.jar:4.0.5]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756) ~[spring-boot-4.0.5.jar:4.0.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445) ~[spring-boot-4.0.5.jar:4.0.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321) ~[spring-boot-4.0.5.jar:4.0.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1365) ~[spring-boot-4.0.5.jar:4.0.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1354) ~[spring-boot-4.0.5.jar:4.0.5]
+	at com.backend.backend.BackendApplication.main(BackendApplication.java:12) ~[classes/:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[na:na]
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77) ~[na:na]
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568) ~[na:na]
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:52) ~[spring-boot-devtools-4.0.5.jar:4.0.5]
+Caused by: java.lang.IllegalArgumentException: standardService.connector.startFailed
+	at org.apache.catalina.core.StandardService.addConnector(StandardService.java:220) ~[tomcat-embed-core-11.0.20.jar:11.0.20]
+	at org.springframework.boot.tomcat.TomcatWebServer.addPreviouslyRemovedConnectors(TomcatWebServer.java:307) ~[spring-boot-tomcat-4.0.5.jar:4.0.5]
+	at org.springframework.boot.tomcat.TomcatWebServer.start(TomcatWebServer.java:233) ~[spring-boot-tomcat-4.0.5.jar:4.0.5]
+	... 21 common frames omitted
+Caused by: org.apache.catalina.LifecycleException: Protocol handler start failed
+	at org.apache.catalina.connector.Connector.startInternal(Connector.java:1119) ~[tomcat-embed-core-11.0.20.jar:11.0.20]
+	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164) ~[tomcat-embed-core-11.0.20.jar:11.0.20]
+	at org.apache.catalina.core.StandardService.addConnector(StandardService.java:217) ~[tomcat-embed-core-11.0.20.jar:11.0.20]
+	... 23 common frames omitted
+Caused by: java.net.BindException: Address already in use: bind
+	at java.base/sun.nio.ch.Net.bind0(Native Method) ~[na:na]
+	at java.base/sun.nio.ch.Net.bind(Net.java:555) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.netBind(ServerSocketChannelImpl.java:337) ~[na:na]
+	at java.base/sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:294) ~[na:na]
+	at org.apache.tomcat.util.net.NioEndpoint.initServerSocket(NioEndpoint.java:265) ~[tomcat-embed-core-11.0.20.jar:11.0.20]
+	at org.apache.tomcat.util.net.NioEndpoint.bind(NioEndpoint.java:220) ~[tomcat-embed-core-11.0.20.jar:11.0.20]
+	at org.apache.tomcat.util.net.AbstractEndpoint.bindWithCleanup(AbstractEndpoint.java:1640) ~[tomcat-embed-core-11.0.20.jar:11.0.20]
+	at org.apache.tomcat.util.net.AbstractEndpoint.start(AbstractEndpoint.java:1723) ~[tomcat-embed-core-11.0.20.jar:11.0.20]
+	at org.apache.coyote.AbstractProtocol.start(AbstractProtocol.java:644) ~[tomcat-embed-core-11.0.20.jar:11.0.20]
+	at org.apache.catalina.connector.Connector.startInternal(Connector.java:1116) ~[tomcat-embed-core-11.0.20.jar:11.0.20]
+	... 25 common frames omitted
+
+2026-04-26T05:52:32.526+05:30 ERROR 8344 --- [backend] [  restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Web server failed to start. Port 8080 was already in use.
+
+Action:
+
+Identify and stop the process that's listening on port 8080 or configure this application to listen on another port.
+
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  10.379 s
+[INFO] Finished at: 2026-04-26T05:52:33+05:30
+[INFO] ------------------------------------------------------------------------
