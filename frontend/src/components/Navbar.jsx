@@ -46,11 +46,10 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-orange-100/80 bg-[#fffaf5]/95 backdrop-blur-xl">
-      <div className="mx-auto px-4 py-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between rounded-2xl border border-orange-100 bg-white/90 px-4 py-3 shadow-[0_10px_26px_rgba(249,115,22,0.10)]">
-          <button onClick={() => navigate("/")} className="inline-flex items-center gap-2 text-xl font-semibold text-slate-900">
-            <span className="rounded-lg bg-orange-100 p-1.5 text-orange-600">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="flex w-full items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+          <button onClick={() => navigate("/")} className="inline-flex items-center gap-2 font-display text-xl font-semibold text-slate-950">
+            <span className="rounded-md bg-orange-50 p-1.5 text-orange-600">
               <Building2 className="h-4 w-4" />
             </span>
             Clever<span className="text-orange-500">Campus</span>
@@ -64,7 +63,7 @@ export default function Navbar() {
                 onClick={() => goToSection(link.href)}
                 className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
                   activeSection === link.href
-                    ? "bg-orange-100 text-orange-700 shadow-sm"
+                    ? "bg-orange-50 text-orange-700 shadow-sm"
                     : "text-slate-600 hover:bg-orange-50 hover:text-slate-900"
                 }`}
               >
@@ -78,10 +77,10 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => navigate(getDashboardPathForRole(auth?.role || "USER"))}
-                className="inline-flex items-center gap-2 rounded-full border border-orange-200 bg-white px-2.5 py-1.5 text-sm font-semibold text-slate-900 shadow-sm"
+                className="inline-flex items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
                 title="Open dashboard"
               >
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-500 text-xs font-bold text-white shadow-[0_6px_16px_rgba(249,115,22,0.35)]">
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-md bg-orange-600 text-xs font-bold text-white">
                   {initials}
                 </span>
                 Dashboard
@@ -90,14 +89,14 @@ export default function Navbar() {
               <>
                 <button
                   type="button"
-                  className="rounded-full border border-orange-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-orange-300 hover:text-slate-900"
+                  className="rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-orange-200 hover:bg-orange-50 hover:text-orange-700"
                   onClick={() => navigate("/login")}
                 >
                   Login
                 </button>
                 <button
                   type="button"
-                  className="rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(249,115,22,0.35)]"
+                  className="rounded-md bg-orange-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-orange-700"
                   onClick={() => navigate("/register")}
                 >
                   Get Started
@@ -109,15 +108,14 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-700 md:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-700 md:hidden"
             aria-label="Toggle mobile menu"
           >
             {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
-        </div>
 
         {isMobileMenuOpen ? (
-          <div className="mt-2 rounded-2xl border border-orange-100 bg-white p-3 shadow-[0_12px_30px_rgba(249,115,22,0.13)] md:hidden">
+          <div className="absolute left-4 right-4 top-full mt-2 rounded-lg border border-slate-200 bg-white p-3 shadow-sm md:hidden">
               <nav className="grid gap-1.5">
                 {navLinks.map((link) => (
                   <button
@@ -126,7 +124,7 @@ export default function Navbar() {
                     onClick={() => goToSection(link.href)}
                     className={`rounded-xl px-3 py-2 text-left text-sm font-semibold transition ${
                       activeSection === link.href
-                        ? "bg-orange-100 text-orange-700"
+                        ? "bg-orange-50 text-orange-700"
                         : "text-slate-700 hover:bg-orange-50 hover:text-slate-900"
                     }`}
                   >
@@ -143,9 +141,9 @@ export default function Navbar() {
                       navigate(getDashboardPathForRole(auth?.role || "USER"));
                       setIsMobileMenuOpen(false);
                     }}
-                    className="inline-flex items-center gap-2 rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
+                    className="inline-flex items-center gap-2 rounded-md border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
                   >
-                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-500 text-xs font-bold text-white">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-orange-600 text-xs font-bold text-white">
                       {initials}
                     </span>
                     Dashboard
@@ -158,7 +156,7 @@ export default function Navbar() {
                         navigate("/login");
                         setIsMobileMenuOpen(false);
                       }}
-                      className="rounded-xl border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
+                      className="rounded-md border border-orange-200 bg-white px-3 py-2 text-sm font-semibold text-slate-900"
                     >
                       Login
                     </button>
@@ -168,7 +166,7 @@ export default function Navbar() {
                         navigate("/register");
                         setIsMobileMenuOpen(false);
                       }}
-                      className="rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 px-3 py-2 text-sm font-semibold text-white"
+                      className="rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white"
                     >
                       Get Started
                     </button>
