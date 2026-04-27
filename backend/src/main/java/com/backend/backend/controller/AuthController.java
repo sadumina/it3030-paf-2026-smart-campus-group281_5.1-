@@ -28,7 +28,7 @@ import com.backend.backend.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(originPatterns = { "http://localhost:*", "http://127.0.0.1:*" })
+@CrossOrigin(originPatterns = { "http://localhost:*", "http://127.0.0.1:*", "https://*.vercel.app" })
 public class AuthController {
 
         private final UserService userService;
