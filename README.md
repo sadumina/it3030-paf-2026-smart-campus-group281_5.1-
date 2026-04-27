@@ -1,4 +1,4 @@
-# Smart Study Operation Hub
+# Smart Campus Managment System
 
 ## Overview
 
