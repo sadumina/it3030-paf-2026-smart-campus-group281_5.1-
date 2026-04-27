@@ -1,4 +1,5 @@
 import { saveAuth } from './authStorage';
+import { API_BASE_URL } from '../config/api';
 
 /**
  * Google OAuth Service
@@ -18,7 +19,7 @@ export const googleAuthService = {
     }
 
     try {
-      const response = await fetch('http://localhost:8080/api/auth/oauth/google', {
+      const response = await fetch(`${API_BASE_URL}/auth/oauth/google`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

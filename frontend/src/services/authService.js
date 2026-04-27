@@ -1,4 +1,6 @@
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/auth`;
+import { API_BASE_URL } from "../config/api";
+
+const AUTH_API_BASE_URL = `${API_BASE_URL}/auth`;
 
 async function parseResponse(response) {
   const data = await response.json().catch(() => ({}));
@@ -16,7 +18,7 @@ function authHeaders(token) {
 }
 
 export async function loginUser(payload) {
-  const response = await fetch(`${API_BASE_URL}/login`, {
+  const response = await fetch(`${AUTH_API_BASE_URL}/login`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(payload),
@@ -26,7 +28,7 @@ export async function loginUser(payload) {
 }
 
 export async function registerUser(payload) {
-  const response = await fetch(`${API_BASE_URL}/register`, {
+  const response = await fetch(`${AUTH_API_BASE_URL}/register`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify(payload),
@@ -36,7 +38,7 @@ export async function registerUser(payload) {
 }
 
 export async function googleLogin(idToken, role = "USER") {
-  const response = await fetch(`${API_BASE_URL}/oauth/google`, {
+  const response = await fetch(`${AUTH_API_BASE_URL}/oauth/google`, {
     method: "POST",
     headers: authHeaders(),
     body: JSON.stringify({ idToken, role }),
@@ -46,7 +48,7 @@ export async function googleLogin(idToken, role = "USER") {
 }
 
 export async function fetchCurrentUser(token) {
-  const response = await fetch(`${API_BASE_URL}/me`, {
+  const response = await fetch(`${AUTH_API_BASE_URL}/me`, {
     method: "GET",
     headers: authHeaders(token),
   });

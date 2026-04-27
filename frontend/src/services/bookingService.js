@@ -1,7 +1,8 @@
 import { getToken } from "./authStorage";
+import { API_BASE_URL } from "../config/api";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/bookings`;
-const RESOURCES_API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/resources`;
+const BOOKINGS_API_BASE_URL = `${API_BASE_URL}/bookings`;
+const RESOURCES_API_BASE_URL = `${API_BASE_URL}/resources`;
 const ENABLE_DELETED_BOOKINGS_ENDPOINT =
   import.meta.env.VITE_ENABLE_DELETED_BOOKINGS_ENDPOINT === "true";
 
@@ -35,7 +36,7 @@ function getAuthHeaders() {
 
 /** USER: submit a new booking */
 export async function createBooking(payload) {
-  const response = await fetch(API_BASE_URL, {
+  const response = await fetch(BOOKINGS_API_BASE_URL, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),
@@ -45,7 +46,7 @@ export async function createBooking(payload) {
 
 /** USER: list own bookings */
 export async function fetchMyBookings() {
-  const response = await fetch(`${API_BASE_URL}/my`, {
+  const response = await fetch(`${BOOKINGS_API_BASE_URL}/my`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -57,7 +58,7 @@ export const getMyBookings = fetchMyBookings;
 
 /** USER: update own pending booking details */
 export async function updatePendingBooking(bookingId, payload) {
-  const response = await fetch(`${API_BASE_URL}/${bookingId}`, {
+  const response = await fetch(`${BOOKINGS_API_BASE_URL}/${bookingId}`, {
     method: "PATCH",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),
@@ -67,7 +68,7 @@ export async function updatePendingBooking(bookingId, payload) {
 
 /** USER: cancel a booking */
 export async function cancelBooking(bookingId) {
-  const response = await fetch(`${API_BASE_URL}/${bookingId}/cancel`, {
+  const response = await fetch(`${BOOKINGS_API_BASE_URL}/${bookingId}/cancel`, {
     method: "PATCH",
     headers: getAuthHeaders(),
   });
@@ -76,7 +77,7 @@ export async function cancelBooking(bookingId) {
 
 /** USER: delete booking permanently via REST API */
 export async function deleteBooking(bookingId) {
-  const response = await fetch(`${API_BASE_URL}/${bookingId}`, {
+  const response = await fetch(`${BOOKINGS_API_BASE_URL}/${bookingId}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
   });
@@ -85,7 +86,7 @@ export async function deleteBooking(bookingId) {
 
 /** ADMIN: list all bookings */
 export async function fetchAllBookings() {
-  const response = await fetch(API_BASE_URL, {
+  const response = await fetch(BOOKINGS_API_BASE_URL, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -137,7 +138,7 @@ export async function getDeletedBookings() {
     return [];
   }
 
-  const response = await fetch(`${API_BASE_URL}/deleted`, {
+  const response = await fetch(`${BOOKINGS_API_BASE_URL}/deleted`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -153,7 +154,7 @@ export async function getDeletedBookings() {
 
 /** ADMIN: update a booking's status */
 export async function updateBookingStatus(bookingId, status, reason = "") {
-  const response = await fetch(`${API_BASE_URL}/${bookingId}/status`, {
+  const response = await fetch(`${BOOKINGS_API_BASE_URL}/${bookingId}/status`, {
     method: "PATCH",
     headers: getAuthHeaders(),
     body: JSON.stringify({ status, reason }),

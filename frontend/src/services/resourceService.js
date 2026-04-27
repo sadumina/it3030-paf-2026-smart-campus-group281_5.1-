@@ -1,6 +1,7 @@
 import { getToken } from "./authStorage";
+import { API_BASE_URL } from "../config/api";
 
-const API_BASE_URL = `${import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api"}/resources`;
+const RESOURCES_API_BASE_URL = `${API_BASE_URL}/resources`;
 
 async function parseResponse(response) {
   const data = await response.json().catch(() => null);
@@ -43,7 +44,7 @@ export async function fetchResources(filters = {}) {
     params.set("status", filters.status);
   }
 
-  const requestUrl = params.toString() ? `${API_BASE_URL}?${params.toString()}` : API_BASE_URL;
+  const requestUrl = params.toString() ? `${RESOURCES_API_BASE_URL}?${params.toString()}` : RESOURCES_API_BASE_URL;
 
   const response = await fetch(requestUrl, {
     method: "GET",
@@ -59,7 +60,7 @@ export async function fetchResourceById(resourceId) {
     throw new Error("Resource id is required");
   }
 
-  const response = await fetch(`${API_BASE_URL}/${resourceId}`, {
+  const response = await fetch(`${RESOURCES_API_BASE_URL}/${resourceId}`, {
     method: "GET",
     headers: getReadHeaders(),
   });
@@ -73,7 +74,7 @@ export async function updateResourceStatus(resourceId, status) {
     throw new Error("Resource id is required");
   }
 
-  const response = await fetch(`${API_BASE_URL}/${resourceId}/status`, {
+  const response = await fetch(`${RESOURCES_API_BASE_URL}/${resourceId}/status`, {
     method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify({ status }),
@@ -93,7 +94,7 @@ export async function changeResourceStatus(resourceId, status, reason = "") {
     body.reason = reason.trim();
   }
 
-  const response = await fetch(`${API_BASE_URL}/${resourceId}/status`, {
+  const response = await fetch(`${RESOURCES_API_BASE_URL}/${resourceId}/status`, {
     method: "PATCH",
     headers: getAuthHeaders(),
     body: JSON.stringify(body),
@@ -108,7 +109,7 @@ export async function updateResource(resourceId, payload) {
     throw new Error("Resource id is required");
   }
 
-  const response = await fetch(`${API_BASE_URL}/${resourceId}`, {
+  const response = await fetch(`${RESOURCES_API_BASE_URL}/${resourceId}`, {
     method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload || {}),
@@ -123,7 +124,7 @@ export async function deleteResource(resourceId) {
     throw new Error("Resource id is required");
   }
 
-  const response = await fetch(`${API_BASE_URL}/${resourceId}`, {
+  const response = await fetch(`${RESOURCES_API_BASE_URL}/${resourceId}`, {
     method: "DELETE",
     headers: getAuthHeaders(),
   });
@@ -141,7 +142,7 @@ export async function fetchResourceBookingContext(resourceId) {
     throw new Error("Resource id is required");
   }
 
-  const response = await fetch(`${API_BASE_URL}/${resourceId}/booking-context`, {
+  const response = await fetch(`${RESOURCES_API_BASE_URL}/${resourceId}/booking-context`, {
     method: "GET",
     headers: getReadHeaders(),
   });
@@ -151,7 +152,7 @@ export async function fetchResourceBookingContext(resourceId) {
 }
 
 export async function createResource(payload) {
-  const response = await fetch(API_BASE_URL, {
+  const response = await fetch(RESOURCES_API_BASE_URL, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload || {}),

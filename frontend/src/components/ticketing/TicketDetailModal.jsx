@@ -8,6 +8,7 @@ import { getAuth } from "../../services/authStorage";
 import TicketTimeline from "./TicketTimeline";
 import ImagePreviewModal from "./ImagePreviewModal";
 import SlaTimer from "./SlaTimer";
+import { buildAssetUrl } from "../../config/api";
 
 function formatDateTime(iso) {
   return new Date(iso).toLocaleString("en-US", {
@@ -285,7 +286,7 @@ export default function TicketDetailModal({ ticket: initialTicket, onClose, onUp
                       {ticket.imageUrls.map((url, i) => (
                         <div key={i} className="tkt-gallery-item" style={{ position: "relative" }}>
                           <img
-                            src={`http://localhost:8080${url}`}
+                            src={buildAssetUrl(url)}
                             alt={`Attachment ${i + 1}`}
                             onClick={() => setLightboxSrc(url)}
                           />
